@@ -9,7 +9,7 @@ my_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 # CONSTANTS
-src = '.'
+src = 'src'
 name = 'green_magic'
 # source_code_repo = 'https://github.com/boromir674/music-album-creator'
 # changelog = '{}/blob/master/CHANGELOG.rst'.format(source_code_repo)
@@ -21,8 +21,8 @@ def readme():
     # return str(resource_string(__name__, 'README.rst'))
 
 def requirements():
-    with open(os.path.join(my_dir, 'requirements', 'base.txt')) as f:
-        return f.read().split('\n')
+    with open(os.path.join(my_dir, 'requirements', 'base.txt')) as fh:
+        return fh.read().split('\n')
 
 
 try:
@@ -55,7 +55,7 @@ setup(
     zip_safe=False,
 
     # what packages/distributions (python) need to be installed when this one is. (Roughly what is imported in source code)
-    install_requires=requirements,
+    install_requires=requirements(),
     #
     # A string or list of strings specifying what other distributions need to be present in order for the setup script to run.
     # (Note: projects listed in setup_requires will NOT be automatically installed on the system where the setup script is being run.
@@ -65,7 +65,7 @@ setup(
 
     # Folder where unittest.TestCase-like written modules reside. Specifying this argument enables use of the test command
     # to run the specified test suite, e.g. via setup.py test.
-    test_suite='tests',
+    test_suite='src/tests',
 
     # Declare packages that the project's tests need besides those needed to install it. A string or list of strings specifying
     # what other distributions need to be present for the package's tests to run. Note that these required projects will not be installed on the system where the

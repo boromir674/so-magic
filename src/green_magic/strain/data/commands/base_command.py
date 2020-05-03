@@ -64,7 +64,7 @@ class TransformDatasetCommand(BaseTransformDatasetCommand):
 # class RawExtractionCommand(TransformDatasetCommand):
 #     transformer = attr.ib(init=False, default=attr.Factory(lambda self: self.feature.function, takes_self=True))
 #
-@attrs.s
+@attr.s
 class AttributeAddDeleteCommand(Command, ABC):
     data_handler = attr.ib(init=True)
     dataset = attr.ib(init=True)

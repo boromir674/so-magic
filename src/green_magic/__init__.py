@@ -1,3 +1,5 @@
+__version__ = '0.8.0'
+
 import os
 from .strain_dataset import StrainDataset
 from .strainmaster import StrainMaster

@@ -34,16 +34,6 @@ class Datapoints:
     @classmethod
     def from_df(cls, df):
         return Datapoints(df)
-#
-# @attr.s
-# class TabularData(Datapoints):
-#     data = attr.ib(init=True)
-#
-#
-#     def add_state(self, data, feature, state, columns=None):
-#
-#         return
-
 
 
 @attr.s

@@ -140,7 +140,7 @@ class Grouping(object):
         """
         counts = compute_counts(tuple(_ for _ in self.gen_ids()), id2strain, self.vars)
         for var, value_counts in counts.items():
-            norm = float(sum(value_counts.values(,))
+            norm = float(sum(value_counts.values()))
             self.freqs[var] = {k: v / norm for k, v in value_counts.items()}
 
     def compute_tfs(self, id2strain, field='_id'):

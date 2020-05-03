@@ -18,10 +18,9 @@ class Manager2:
     def do_something_else(self, b: str) -> None:
         print(f"\nReceiver: Also working on ({b}.)", end="")
 
-import attr
 
 @attr.s
-class BaseReceiver(AbstractReceiver):
+class BaseReceiver(Manager2):
     data_handler = attr.ib(init=True, default=None)
 
     def normalize(self, *args, **kwargs):

@@ -1,0 +1,37 @@
+checks:
+    python:
+        code_rating: true
+        duplicate_code: true
+
+build:
+#    environment:
+#        variables:
+#            BIGARTM_PARENT_DIR:   $(echo $PWD)
+#            COLLECTIONS_DIR: "$(echo $PWD)/collections"
+#        apt_packages:
+#          - make
+#          - cmake
+
+    nodes:
+        analysis:
+            project_setup:
+                override:
+                    - 'true'
+            tests:
+                override:
+                    - py-scrutinizer-run
+                    -
+                        command: pylint-run
+                        use_website_config: true
+        tests:
+            tests:
+                override:
+                    - 'true'
+
+
+filter:
+    excluded_paths:
+        - '*/test/*'
+        - '*/build/*'
+    dependency_paths:
+        - 'lib/*'
