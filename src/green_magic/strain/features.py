@@ -10,52 +10,21 @@ class FeatureInterface(ABC):
 
 
 
+@attr.s
+class Features:
+    feats = attr.ib(init=True)
+    @feats.validator
+    def list_validator(self, attribute, value):
+        if not type(value) == list:
+            raise ValueError(f'Expected a list, instead a {type(value).__name__} was give.')
 
-# class RawValueExtractor(metaclass=ABCMeta):
-#     @classmethod
-#     def __subclasshook__(cls, subclass):
-#         return hasattr(subclass, 'raw_value') and callable(subclass.raw_value)
-#
-#     @abstractmethod
-#     def raw_value(self, observation):
-#         raise NotImplementedError
-#
-#
-#
-# #### DICT-LIKE Features ####
-#
-# class DictLikeExtractor(RawValueExtractor, ABC):
-#     subclasses = {}
-#     @classmethod
-#     def register_subclass(cls, feature):
-#         def decorator(subclass):
-#             cls.subclasses[feature] = subclass
-#             return subclass
-#         return decorator
-#
-#     @classmethod
-#     def create(cls, feature, *args, **kwargs):
-#         if feature not in cls.subclasses:
-#             raise ValueError('Bad feature {} requested for instantiation'.format(feature))
-#         return cls.subclasses[feature](*args, **kwargs)
-#
-#     @classmethod
-#     def from_callable(cls, a_callable):
-#         return DictLikeExtractor
-#
-# @DictLikeExtractor.register_subclass
-# class NameExtractor(DictLikeExtractor):
-#
-#     def raw_value(self, observation):
-#         return observation['name']
-#
-# @DictLikeExtractor.register_subclass
-# class TypeExtractor(DictLikeExtractor):
-#
-#     def raw_value(self, observation):
-#         return observation['type']
-#
-#
+    def __getitem__(self, item):
+        return self.feats[item]
+
+    def __iter__(self):
+        return iter((feat.id, feat) for feat in self.feats)
+
+
 # def effects_f(item):
 #     return item['effects']
 #

@@ -4,9 +4,7 @@ import attr
 from ..features import FeatureInterface
 
 
-
 #### HELPERS
-
 def _list_validator(self, attribute, value):
     if not type(value) == list:
         raise ValueError(f'Expected a list; instead a {type(value).__name__} was given.')
@@ -16,15 +14,9 @@ def _string_validator(self, attribute, value):
         raise ValueError(f'Expected a string; instead a {type(value).__name__} was given.')
 
 
-
-class AbstractFeature(FeatureInterface):
-
+class AbstractFeature(FeatureInterface, ABC):
     def nb_unique(self):
         pass
-
-    def values(self, dataset):
-        raise NotImplementedError
-
 
 @attr.s
 class BaseFeature(AbstractFeature):
@@ -39,7 +31,6 @@ class BaseFeature(AbstractFeature):
 @attr.s
 class Feature(BaseFeature):
     function = attr.ib(init=True, default=None)
-    # variable_type = attr.ib(init=True, default=None)
 
     def values(self, dataset):
         return self.function(dataset)
@@ -67,13 +58,6 @@ class FeatureState:
 class FeatureIndex:
     keys = attr.ib(init=True, validator=_list_validator)
 
-class FeatureStateFactory:
-    @classmethod
-    def get_state(cls, *args, **kwargs):
-        return FeatureState(args[0], args[1])
-    @classmethod
-    def current(cls, feature):
-        return FeatureState(feature.current, feature.function)
 
 @attr.s
 class TrackingFeat(Feature):
@@ -87,8 +71,6 @@ class TrackingFeat(Feature):
     @property
     def index(self):
         return self.id
-    # def values(self, dataset):
-    #     return self.states[self._current](dataset)
 
     def update(self, *args, **kwargs):
         if 1 < len(args):
@@ -120,22 +102,3 @@ class FeatureFactory(AbstractFeatureFactory):
 
     def get_feature(self, an_id, *args, **kwargs) -> FeatureInterface:
         pass
-
-
-
-@attr.s
-class Features:
-    feats = attr.ib(init=True)
-    @feats.validator
-    def list_validator(self, attribute, value):
-        if not type(value) == list:
-            raise ValueError(f'Expected a list, instead a {type(value).__name__} was give.')
-
-    def __getitem__(self, item):
-        return self.feats[item]
-
-    def __iter__(self):
-        return iter((feat.id, feat) for feat in self.feats)
-
-
-feat_state_fact = FeatureStateFactory()
