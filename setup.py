@@ -11,7 +11,7 @@ my_dir = os.path.dirname(os.path.realpath(__file__))
 # CONSTANTS
 src = 'src'
 name = 'green_magic'
-# source_code_repo = 'https://github.com/boromir674/music-album-creator'
+source_code_repo = 'https://github.com/boromir674/green-magic'
 # changelog = '{}/blob/master/CHANGELOG.rst'.format(source_code_repo)
 
 
@@ -42,7 +42,7 @@ setup(
     keywords='unsuperised learning',
 
     # rendered as 'HomePage' in Pypi
-    # url=source_code_repo,
+    url=source_code_repo,
 
     # project_urls=OrderedDict([
     #     # ("1-Tracker", "https://github.com/blahblah/gavgav/issues"),
@@ -91,8 +91,8 @@ setup(
     #     'Topic :: Multimedia :: Sound/Audio',
     # ],
     #
-    # author='Konstantinos Lampridis',
-    # author_email='k.lampridis@hotmail.com',
+    author='Konstantinos Lampridis',
+    author_email='boromir674@hotmail.com',
     # license='GNU GPLv3',
     packages=find_packages(where=src),
     # package_dir={'': src},  # this is required by distutils
