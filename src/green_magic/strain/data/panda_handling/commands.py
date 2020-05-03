@@ -1,0 +1,4 @@
+
+class CommandsManager:
+
+    def
