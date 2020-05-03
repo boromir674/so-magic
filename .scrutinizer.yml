@@ -11,7 +11,7 @@ build:
 #        apt_packages:
 #          - make
 #          - cmake
-    
+
     nodes:
         analysis:
             project_setup:
