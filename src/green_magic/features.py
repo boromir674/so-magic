@@ -78,7 +78,7 @@ class FeatureComputer:
 
 
 # define encoding for variables
-# encoding type -> variable features
+# encoding type -> variable variables
 enctype2features = {
     'binary-1': [],
     'binary-on-off': [

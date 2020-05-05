@@ -8,8 +8,6 @@ class FeatureInterface(ABC):
         raise NotImplementedError
 
 
-
-
 @attr.s
 class Features:
     feats = attr.ib(init=True)

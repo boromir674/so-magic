@@ -147,18 +147,20 @@ class StrainMaster:
         from .strain.dataset import Dataset
         from .strain.data.panda_handling.df_feature_factory import df_features_factory
         from .strain.data.panda_handling.data_handler import df_receiver_factory
-        from .strain.data.commands.invoker import Invoker
+        from .strain.data.commands import invoker_object
         from .strain.data.base_handling import DataHandler
         from .strain.data import data_master
 
         # design
         DESIGN = {'name': 'dev-dataset',
-                  'features': ['type', 'name']}
+                  'variables': ['type', 'name']}
+        json_file = 'p'
 
-        # infra
-        invoker = Invoker()
-
+        from .strain.data.backend import Backend
+        bd = Backend.create('df')
         # data
+        bd.create_data_from_file(json_file)
+
         dataset = Dataset([[1, 2], [3, 4]], )
         dataset.handler = DataHandler.create('df-handler')
         features = [df_features_factory.get_feature(feat, dataset=dataset) for feat in feats]
@@ -169,6 +171,6 @@ class StrainMaster:
         commands = get_commands(dataset, features)
 
         for c in commands:
-            invoker.execute_command(c)
+            invoker_object.execute_command(c)
 
 class InvalidDatasetSelectionError(Exception): pass

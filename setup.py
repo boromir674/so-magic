@@ -108,7 +108,7 @@ setup(
     #         'create-album = music_album_creation.create_album:main',
     #     ]
     # },
-    # A dictionary mapping names of "extras" (optional features of your project: eg imports that a console_script uses) to strings or lists of strings
-    # specifying what other distributions must be installed to support those features.
+    # A dictionary mapping names of "extras" (optional variables of your project: eg imports that a console_script uses) to strings or lists of strings
+    # specifying what other distributions must be installed to support those variables.
     # extras_require={},
 )

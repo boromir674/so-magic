@@ -1,15 +1,1 @@
 graft requirements
-graft scripts
-graft src
-graft tests
-
-include .bettercodehub.yml
-include .coveragerc
-include .gitignore
-include .scrutinizer
-
-include CHANGELOG.rst
-include README.rst
-include tox.ini
-
-global-exclude *.py[cod] __pycache__ *.so *.dylib

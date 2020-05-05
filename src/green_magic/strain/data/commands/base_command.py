@@ -96,7 +96,6 @@ class EncodeCommand(AugmentDataCommnad):
         res = self.computer(self.dataset, self.feature)
 
 
-
 @attr.s
 class RemoveColumnCommand(Command):
     _receiver = attr.ib(init=True)
@@ -105,4 +104,3 @@ class RemoveColumnCommand(Command):
 
     def execute(self) -> None:
         self._receiver.remove_column(dataset, feature)
-

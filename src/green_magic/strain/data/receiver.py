@@ -52,7 +52,6 @@ class Backend(abc.ABC):
         def wrapper(subclass):
             cls.subclasses[backend_type] = subclass
             return subclass
-
         return wrapper
 
     @classmethod

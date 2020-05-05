@@ -153,7 +153,7 @@ def _op_gen(dataframe, columns, band_str='Band', post_str='_Code'):
 
 
 #### CONSTANTS #####
-POST_STR = '_Code'  # postfix string for encoded features
+POST_STR = '_Code'  # postfix string for encoded variables
 BAND_STR = 'Band'
 
 #### SETTINGS ###
@@ -187,27 +187,27 @@ def label_encode(dataframe, columns, encode_callback, code_str='_Code'):
 Target = ['Survived']
 
 # FEATURE SLECTION
-# define features (original and encoded)
+# define variables (original and encoded)
 feature_titles = ['Sex','Pclass', 'Embarked', 'Title','SibSp', 'Parch', 'Age', 'Fare', 'FamilySize', 'IsAlone'] #pretty name/values for charts
 feature_names = ['Sex_Code','Pclass', 'Embarked_Code', 'Title_Code','SibSp', 'Parch', 'Age', 'Fare'] #coded for algorithm calculation
 # data1_xy =  Target + data1_x
 # print('Original X Y: ', data1_xy, '\n')
 
 
-#define x variables for original w/bin features to remove continuous variables
+#define x variables for original w/bin variables to remove continuous variables
 data1_x_bin = ['Sex_Code','Pclass', 'Embarked_Code', 'Title_Code', 'FamilySize', 'Age_Code', 'Fare_Code']
 # data1_xy_bin = Target + data1_x_bin
 # print('Bin X Y: ', data1_xy_bin, '\n')
 
 
-#define x and y variables for dummy features original
+#define x and y variables for dummy variables original
 data1_dummy = pd.get_dummies(train_data[feature_titles])
 data1_x_dummy = data1_dummy.columns.tolist()
 # data1_xy_dummy = Target + data1_x_dummy
 # print('Dummy X Y: ', data1_xy_dummy, '\n')
 
 
-# SELECT features
+# SELECT variables
 numerical_feats = ['Pclass', 'Fare_Code', 'Age_Code', 'FamilySize']  # ordering makes sence: eg: class_1 < class_2,
 binary_feats = ['Sex_Code', 'IsAlone']
 categorical_feats = ['Embarked']

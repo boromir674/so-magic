@@ -35,18 +35,3 @@ class DataFHandler(BaseDataHandler):
 
 data_handler = DataFHandler()
 
-# class DFReceiver(BaseReceiver):
-#     def normalize(self, *args, **kwargs):
-#         dataset, feature = args[:2]
-#         dataset[f'norm-{feature.id}'] = feature.function(dataset)
-#         return dataset
-#
-#     def discretize(self, *args, **kwargs):
-#         dataset, feature, discretizer = args[:3]
-#         dataset[f'discr-{feature.id}'] = discretizer(dataset, feature)
-#
-#     def encode(self, *args, **kwargs):
-#         dataset, feature, encoder = args[:3]
-#         dataset[f'encoded-{feature.id}'] = encoder(dataset, feature)
-#
-

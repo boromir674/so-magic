@@ -9,7 +9,9 @@ from green_magic.features import enctype2features
 from green_magic.utils import extract_value, gen_values, generate_id_tokens
 
 
-class Clustering(object):
+@attr.s
+class Clustering:
+    clusters = attr.ib(init=True, [Cluster(clid2members[cl_id], self._av, cl_id) for cl_id in range(len(clid2members))]
     """
     An instance of this class encapsulates the behaviour of a clustering; a set of clusters estimated on some data
     """
@@ -27,7 +29,7 @@ class Clustering(object):
         :type fact_ref: ClusteringFactory
         """
         self._av = active_variables
-        self.clusters = [Cluster(cl_id, clid2members[cl_id], self._av) for cl_id in range(len(clid2members))]
+        self.clusters = [Cluster(clid2members[cl_id], self._av, cl_id) for cl_id in range(len(clid2members))]
         self.id = an_id + ':{}'.format(len(self))
         self.map_buffer = map_buffer
         self._fct = fact_ref
@@ -109,13 +111,13 @@ class Clustering(object):
         return b, max_token_lens
 
 
-class Grouping(object):
-    def __init__(self, members, active_variables):
-        self.members = tuple(members)
-        self.vars = active_variables
-        self.freqs = OrderedDict()
-        self.id_grams = None
-        self._bytes = ''
+@attr.s
+class Grouping:
+    members = attr.ib(init=True, converter=tuple)
+    vars = attr.ib(init=True)
+    freqs = attr.ib(init=False, default=OrderedDict)
+    id_grams = attr.ib(init=False, default=None)
+    _bytes = attr.ib(init=True, default='')
 
     def __str__(self):
         return 'len {}\n[{}]'.format(len(self), ', '.join((_ for _ in self.gen_ids())))
@@ -148,15 +150,13 @@ class Grouping(object):
         for i, text in enumerate((extract_value(id2strain[iid], field) for iid in self.gen_ids())):
             self.id_grams += Counter(generate_id_tokens(text))
 
-
+@attr.s
 class Cluster(Grouping):
     """
     An instance of this class encapsuates the behaviour of a single cluster estimated on some data. The object contains
     essential a "list" of the string ids ponting to unique datapoints.
     """
-    def __init__(self, _id, members, active_variables):
-        super().__init__(members, active_variables)
-        self.id = _id
+    id = attr.ib(init=True)
 
     def __str__(self):
         return 'cluster id {}, {}'.format(self.id, super().__str__())
@@ -164,6 +164,10 @@ class Cluster(Grouping):
     def __next__(self):
         for strain_id in self.gen_ids():
             yield strain_id
+
+@attr.s
+class BaseClustering:
+    clusters = attr.ib(init=True)
 
 
 def _make_counter_munchable(data, var):
@@ -190,24 +194,6 @@ def compute_counts(iterable_of_ids, id2strain, variables):
         for var in variables:
             counts[var].update(_make_counter_munchable([_ for _ in gen_values(extract_value(id2strain[iid], var))], var))
     return counts
-
-
-# def gen_ngrams(text, n=1, normalizer='', word_filter='stopwords'):
-#     """
-#     This method creates and returns a generator of ngrams based on the input text, a normalizer and potentially a stopwords list.\n
-#     :param text: the raw unprocessed text
-#     :type text: str
-#     :param n: the degree of the id_grams desired to generate
-#     :type n: int
-#     :param normalizer:
-#     :type normalizer: str
-#     :param word_filter:
-#     :return:
-#     """
-#     if n == 1:
-#         return ('_'.join((_ for _ in gr)) for gr in nltk_ngrams(generate_id_tokens(text), n))
-#     else:
-#         return ('_'.join((_ for _ in gr)) for gr in nltk_ngrams(generate_tokens_with_padding(text, normalizer=normalizer, word_filter=word_filter), n))
 
 
 def distance(vec1, vec2, metric='euclidean'):
@@ -271,4 +257,3 @@ class ClusteringFactory(object):
 
 def _extract_dataset_id(map_id):
     return map_id.split('_')[1]  # reverse engineers the MapMakerManager.get_map_id
-

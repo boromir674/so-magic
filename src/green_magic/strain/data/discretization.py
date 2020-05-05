@@ -40,7 +40,6 @@ class FeatureDiscretizer(BaseDiscretizer):
         return self.bin(self.feature.function(dataset), nb_bins)
 
 
-
 class FeatureDiscretizerFactory:
     def categorical(self, feature) -> FeatureDiscretizer:
         raise NotImplementedError

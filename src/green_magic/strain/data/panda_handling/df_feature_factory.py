@@ -1,11 +1,10 @@
 import attr
-from ..feature_factory import TrackingFeat, FeatureFactory
+from ..variables import TrackingFeature, FeatureFactory
 
 
 @attr.s
-class AbstractDfFeature(TrackingFeat):
-    _df = attr.ib(init=True, default=None)
-    _column = attr.ib(init=True, default='')
+class AbstractDfFeature:
+    feat = attr.ib(init=True)
 
     @property
     def nb_unique(self):
@@ -19,6 +18,9 @@ class AbstractDfFeature(TrackingFeat):
 
 @attr.s
 class DFFeature(AbstractDfFeature):
+    # _df = attr.ib(init=True, default=None)
+    _column = attr.ib(init=True, default='')
+
     def unique(self):
         return list(self._df[self.id].unique())
 
@@ -26,12 +28,11 @@ class DFFeature(AbstractDfFeature):
 class DFFeatureFactory(FeatureFactory):
     @classmethod
     def get_feature(cls, an_id, *args, **kwargs):
-        dataset = args[0]
         handler = args[1]
         # df = dataset.handler.data
         def function(x_dataset):
-            return handler.data[an_id]
-        _ = DFFeature(an_id, kwargs.get('name', an_id), function)
+            return handler.extract(an_id)
+        _ = DFFeature(TrackingFeature.from_extractor(an_id, function), kwargs.get('name', an_id), function))
         _.df = df
         _._column = an_id
         return _

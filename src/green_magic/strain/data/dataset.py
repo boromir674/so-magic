@@ -17,6 +17,10 @@ class Dataset:
     def features(self, features):
         self._features = features
 
+    @classmethod
+    def from_file(cls, file_path):
+        return Dataset(Datapoints.from_file(file_path), file_path)
+
 
 @attr.s
 class Datapoints:
@@ -31,17 +35,3 @@ class Datapoints:
     def __len__(self):
         return len(self.observations)
 
-    @classmethod
-    def from_df(cls, df):
-        return Datapoints(df)
-
-
-@attr.s
-class FeatureList:
-    features = attr.ib(init=True)
-
-    def __getitem__(self, item):
-        return self.features[item]
-
-    def __len__(self):
-        return len(self.features)
