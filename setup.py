@@ -30,7 +30,7 @@ try:
         _version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
 except FileNotFoundError as e:
     print(e)
-    _version = '0.5.0'
+    _version='0.3.0'
 
 
 setup(

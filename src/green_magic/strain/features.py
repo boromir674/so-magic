@@ -14,7 +14,7 @@ class Features:
     @feats.validator
     def list_validator(self, attribute, value):
         if not type(value) == list:
-            raise ValueError(f'Expected a list, instead a {type(value).__name__} was give.')
+            raise ValueError(f'Expected a list, instead a {type(value).__name__} was given.')
 
     def __getitem__(self, item):
         return self.feats[item]
