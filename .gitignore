@@ -9,3 +9,6 @@ snippets\.txt
 legacy
 \.cache*
 \.coverage
+
+# ignore modules installed by node
+node_modules*
