@@ -32,7 +32,7 @@ class DFFeatureFactory(FeatureFactory):
         # df = dataset.handler.data
         def function(x_dataset):
             return handler.extract(an_id)
-        _ = DFFeature(TrackingFeature.from_extractor(an_id, function), kwargs.get('name', an_id), function))
+        _ = DFFeature(TrackingFeature.from_extractor(an_id, function), kwargs.get('name', an_id), function)
         _.df = df
         _._column = an_id
         return _
