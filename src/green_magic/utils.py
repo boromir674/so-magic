@@ -3,11 +3,6 @@ from nltk.tokenize import word_tokenize as nltk_tokenize
 from .definitions import grow_info, stop_words
 
 
-def generate_id_tokens(text):
-    for id_token in text.split('-'):
-        yield id_token
-
-
 def gen_values(extr_output):
     """
     Expects the content of a strain item's field. In other words the data contained in the specific dataframe column.
