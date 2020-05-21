@@ -1,15 +1,14 @@
+import pandas as pd
+from ..encoding import EncoderFactory, AbstractEncoder
 
 
-
-
-class NominalEncoder(BaseFeatureEncoder):
+class NominalEncoder(AbstractEncoder):
     def encode(self, *args, **kwargs):
         dataset, feature = args[0], args[1]
-        return pd.get_dummies(dataset.datapoints.observations.df, f'{feature.id}-{feature.current}')
+        return pd.get_dummies(dataset.datapoints.observations.df, f'{feature.label}-{feature.state.current}')
 
 
-class DFEncoderFactory:
-    def get_encoder(self, feature):
-        if feature.variable_type == '':
-            return NominalEncoder()
-        return ''
+@EncoderFactory.register_as_subclass('pandas')
+class DFEncoderFactory(EncoderFactory):
+    def nominal_encoder(self, feature, **kwargs):
+        return NominalEncoder()

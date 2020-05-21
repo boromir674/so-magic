@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List, Sequence, AnyStr
+import attr
 from .dataset import Datapoints
 from .feature_factory import Feature
+from .feature_manager import FeatureManager
 
 
 class AbstractObsevationsFactory(ABC):
@@ -20,30 +22,24 @@ class DataBackend(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def check_features(self, dataset: Dataset, features: Sequence[Feature]):
-        raise NotImplementedError
-
-    @abstractmethod
-    def encodable_features(self, dataset: Dataset) -> List[Feature]:
-        raise NotImplementedError
-
     @property
-    @abstractmethod
-    def features_factory(self):
+    def features_manager(self):
         raise NotImplementedError
 
-    @property
     @abstractmethod
+    @property
     def commands_manager(self):
         raise NotImplementedError
 
     @property
     @abstractmethod
-    def computing(self):
+    def computer(self):
         raise NotImplementedError
 
+@attr.s
+class Backend(DataBackend, ABC):
+    features_manager = attr.ib(init=True, default=FeatureManager)
 
-class Backend(DataBackend):
     subclasses = {}
 
     @classmethod
@@ -56,32 +52,9 @@ class Backend(DataBackend):
     @classmethod
     def create(cls, backend_type, *args, **kwargs) -> DataBackend:
         if backend_type not in cls.subclasses:
-            raise ValueError('Bad "Data Backend type" type \'{}\''.format(backend_type))
+            raise ValueError("Bad 'Data Backend' of type '{}'".format(backend_type))
         return cls.subclasses[backend_type](*args, **kwargs)
 
-    @abc.abstractmethod
-    def datapoints_from_file(self, file_path: AnyStr) -> Datapoints:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def check_features(self, dataset: Dataset, features: Sequence[Feature]):
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def encodable_features(self, dataset: Dataset) -> List[Feature]:
-        raise NotImplementedError
-
     @property
-    @abc.abstractmethod
-    def features_factory(self):
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def commands_manager(self):
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def computing(self):
-        raise NotImplementedError
+    def features_manager(self):
+        return self.features_manager
