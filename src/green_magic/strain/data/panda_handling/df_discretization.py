@@ -1,50 +1,47 @@
+from abc import ABC
 import pandas as pd
 
-from ..discretization import FeatureDiscretizer, BinnerInterface, FeatureDiscretizerFactory
+from ..discretization import BaseBinner, BinnerFactory
 
 
-class DFSameLengthBinning(BinnerInterface):
+class BasePDBinner(BaseBinner, ABC):
+
+    @classmethod
+    def register_as_subclass(cls, binner_type):
+        def wrapper(subclass):
+            cls.subclasses[binner_type] = subclass
+            return subclass
+        return wrapper
+
+    @classmethod
+    def create(cls, binner_type, *args, **kwargs):
+        if binner_type not in cls.subclasses:
+            raise ValueError('Bad "BinnerFactory Backend type" type \'{}\''.format(binner_type))
+        return cls.subclasses[binner_type](*args, **kwargs)
+
+
+@BaseDFBinner.register_as_subclass('same-length')
+class DFSameLengthBinning(BasePDBinner):
+
     def bin(self, values, nb_bins):
         return pd.cut(values, nb_bins)
 
-class DFQBinning(BinnerInterface):
+@BaseDFBinner.register_as_subclass('quantisized')
+class DFQBinning(BasePDBinner):
+
     def bin(self, values, nb_bins):
         return pd.qcut(values, nb_bins)
 
-class BinContinuous(BinnerInterface):
-    def bin(self, values, nb_bins):
-        return pd.cut(values, nb_bins)
 
+@BinnerFactory.register_as_subclass('pandas')
+class PDBinnerFactory(BinnerFactory):
 
-class DFDiscretizer(FeatureDiscretizer):
-    pass
+    def equal_length_binner(self, *args, **kwargs) -> DFSameLengthBinning:
+        return DFSameLengthBinning()
 
+    def quantisized_binner(self, *args, **kwargs) -> DFQBinning:
+        return DFQBinning()
 
-@attr.s
-class DFDiscretizerFactory(FeatureDiscretizerFactory):
+    def create_binner(self, *args, **kwargs) -> BasePDBinner:
+        BasePDBinner.create(*args, **kwargs)
 
-    @classmethod
-    def categorical(cls, feature, quantisized=False):
-        if quantisized:
-            return DFDiscretizer(DFQBinning(), feature)
-        return DFDiscretizer(DFSameLengthBinning(), feature)
-
-    @classmethod
-    def numerical(cls, feature):
-        return DFDiscretizer(BinContinuous(), feature)
-
-
-from green_magic.strain.data.computer import BaseFeatureEncoder
-
-
-class NominalEncoder(BaseFeatureEncoder):
-    def encode(self, *args, **kwargs):
-        dataset, feature = args[0], args[1]
-        return pd.get_dummies(dataset.datapoints.observations.df, f'{feature.id}-{feature.current}')
-
-
-class DFEncoderFactory:
-    def get_encoder(self, feature):
-        if feature.variable_type == '':
-            return NominalEncoder()
-        return ''

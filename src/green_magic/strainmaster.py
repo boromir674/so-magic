@@ -150,18 +150,18 @@ class StrainMaster:
         from .strain.data.commands import invoker_object
         from .strain.data.base_handling import DataHandler
         from .strain.data import data_master
+        from .strain.data.backend import Backend
 
         # design
         DESIGN = {'name': 'dev-dataset',
                   'variables': ['type', 'name']}
         json_file = 'p'
 
-        from .strain.data.backend import Backend
         bd = Backend.create('df')
         # data
-        bd.create_data_from_file(json_file)
-
+        # dataset = Dataset.from_file(json_file, DESIGN['name'])
         dataset = Dataset([[1, 2], [3, 4]], )
+
         dataset.handler = DataHandler.create('df-handler')
         features = [df_features_factory.get_feature(feat, dataset=dataset) for feat in feats]
         dataset.features = features

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-
+import attr
 
 class FeatureInterface(ABC):
     @abstractmethod
@@ -23,27 +23,46 @@ class AbstractFeature(FeatureInterface, ABC):
 
 @attr.s
 class BaseFeature(AbstractFeature):
-    id = attr.ib(init=True)
+    label = attr.ib(init=True)
 
     def values(self, dataset):
         """A default implementation of the values method"""
-        return dataset[self.id]
+        return dataset[self.label]
+
+@attr.s
+class FeatureState:
+    key = attr.ib(init=True)
+    reporter = attr.ib(init=True)
+
+    def __str__(self):
+        return self.key
+
 
 @attr.s
 class FeatureFunction(BaseFeature):
-    function = attr.ib(init=True, default=None)
-    name = attr.ib(init=True, default=attr.Factory(lambda self: self.id, takes_self=True))
+    """Example: Assume we hav a datapoint v = [v_1, v_2, .., v_n, and 2 feature functions f_1, f_2\n
+    Then we can produce an encoded vector (eg to feed for training a ML model) like: encoded_vector = [f_1(v), f_2(v)]
+    """
+    function = attr.ib(init=True)
+    @function.validator
+    def is_callable(self, attribute, value):
+        if not callable(value):
+            raise ValueError(f"Expected a callable object; instead {type(value)} was given.")
+        if value.func_code.co_argcount < 1:
+            raise ValueError(f"Expected a callable that takes at least 1 argument; instead a callable that takes no arguments was given.")
+
+    label = attr.ib(init=True, default=None)
+    @label.validator
+    def is_label(self, attribute, value):
+        if value is None:
+            self.label = self.function.func_name
 
     def values(self, dataset):
         return self.function(dataset)
 
     @property
-    def index(self):
-        return self.id
-
-    @property
     def state(self):
-        return FeatureState(self.id, self.function)
+        return FeatureState(self.label, self.function)
 
 
 @attr.s
@@ -69,7 +88,7 @@ class StateMachine:
     @property
     def state(self):
         """Construct an object representing the current state"""
-        return FeatureState(self._current, self.state[self._current])
+        return FeatureState(self._current, self.states[self._current])
 
 
 @attr.s
@@ -78,15 +97,14 @@ class TrackingFeature:
     sm = attr.ib(init=True)
 
     @classmethod
-    def from_extractor(cls, an_id, function):
-        return TrackingFeature(FeatureFunction(an_id, function), StateMachine({'raw': function}, 'raw'))
+    def from_callable(cls, a_callable, label=None):
+        """Construct a feature that has one extract/report capability. Input id is correlated to the features position on the vector (see FeatureFunction above)"""
+        return TrackingFeature(FeatureFunction(a_callable, label), StateMachine({'raw': a_callable}, 'raw'))
 
     def values(self, dataset):
-        return self.feature.function(dataset)
-
-    @property
-    def index(self):
-        return self.feature.id
+        return self.sm.state.reporter(dataset)
+    def label(self):
+        return self.feature.label
 
     @property
     def state(self):
@@ -94,14 +112,6 @@ class TrackingFeature:
 
     def update(self, *args, **kwargs):
         self.sm.update(*args, **kwargs)
-
-
-@attr.s
-class FeatureState:
-    key = attr.ib(init=True)
-    reporter = attr.ib(init=True)
-    def __str__(self):
-        return self.key
 
 
 @attr.s

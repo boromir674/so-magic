@@ -2,6 +2,7 @@ import attr
 from .base_info import GrowInfo
 from .helpers import PositiveRange
 
+
 @GrowInfo.register_subclass('yield')
 @attr.s
 class YieldField(GrowInfo):

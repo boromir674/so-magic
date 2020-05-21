@@ -37,5 +37,3 @@ class IntervalVariableType(NumericalVariableType):
 class RatioVariableType(NumericalVariableType):
     """Ratio variable; numerical variable where all operations are supported (+, -, *, /) and true zero is defined; eg weight"""
     pass
-
-

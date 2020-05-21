@@ -6,7 +6,7 @@ from .helpers import PositiveRange
 @GrowInfo.register_subclass('difficulty')
 @attr.s
 class DifficultyField(GrowInfo):
-    valid = ['easy', 'medium', 'difficult']
+    valid = ('easy', 'medium', 'difficult')
     data = attr.ib(init=True)
     @data.validator
     def _difficulty_value(self, attribute, value):

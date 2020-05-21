@@ -4,9 +4,19 @@ from .dataset import Datapoints
 from .feature_factory import Feature
 
 
+class AbstractObsevationsFactory(ABC):
+    @abstractmethod
+    def from_file(self, file_path: AnyStr):
+        raise NotImplementedError
+
+    @abstractmethod
+    def from_pickle(self, file_path: AnyStr):
+        raise NotImplementedError
+
+
 class DataBackend(ABC):
     @abstractmethod
-    def datapoints_from_file(self, file_path: AnyStr) -> Datapoints:
+    def observations_from_file(self, file_path: AnyStr) -> Datapoints:
         raise NotImplementedError
 
     @abstractmethod
