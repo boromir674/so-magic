@@ -93,26 +93,26 @@ class StrainMaster:
             strain_dataset.use_variables(list_of_variables)
             return strain_dataset.load_feature_vectors()
 
-    def create_strain_dataset(self, jl_file, dataset_id, ffilter=''):
-        data_set = StrainDataset(dataset_id)
-        with open(jl_file, 'r') as json_lines_file:
-            for line in json_lines_file:
-                strain_dict = json.loads(line)
-                if ffilter.split(':')[0] in strain_dict:
-                    if strain_dict[ffilter.split(':')[0]] == ffilter.split(':')[1]:  # if datapoint meets criteria, add it
-                        data_set.add(strain_dict)
-                        if 'description' in strain_dict:
-                            self.lexicon.munch(strain_dict['description'])
-                else:
-                    data_set.add(strain_dict)
-                    if 'description' in strain_dict:
-                        self.lexicon.munch(strain_dict['description'])
-        data_set.load_feature_indexes()
-        self._id2dataset[dataset_id] = data_set
-        self.selected_dt_id = dataset_id
-        _log.info("Created StrainDataset object with id '{}'".format(data_set.name))
-        assert data_set.name == dataset_id
-        return data_set
+    # def create_strain_dataset(self, jl_file, dataset_id, ffilter=''):
+    #     data_set = StrainDataset(dataset_id)
+    #     with open(jl_file, 'r') as json_lines_file:
+    #         for line in json_lines_file:
+    #             strain_dict = json.loads(line)
+    #             if ffilter.split(':')[0] in strain_dict:
+    #                 if strain_dict[ffilter.split(':')[0]] == ffilter.split(':')[1]:  # if datapoint meets criteria, add it
+    #                     data_set.add(strain_dict)
+    #                     if 'description' in strain_dict:
+    #                         self.lexicon.munch(strain_dict['description'])
+    #             else:
+    #                 data_set.add(strain_dict)
+    #                 if 'description' in strain_dict:
+    #                     self.lexicon.munch(strain_dict['description'])
+    #     data_set.load_feature_indexes()
+    #     self._id2dataset[dataset_id] = data_set
+    #     self.selected_dt_id = dataset_id
+    #     _log.info("Created StrainDataset object with id '{}'".format(data_set.name))
+    #     assert data_set.name == dataset_id
+    #     return data_set
 
     def load_dataset(self, a_file):
         strain_dataset = create_dataset_from_pickle(self._datasets_dir + '/' + a_file)
