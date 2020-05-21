@@ -1,7 +1,10 @@
 import attr
 
+from .computing import ClusterDistroComputer
+
 @attr.s
 class BaseClustering:
+    """Items grouped in clusters/subgroups (eg based on proximity, similarity)"""
     clusters = attr.ib(init=True)
     id = attr.ib(init=True)
 
@@ -14,70 +17,48 @@ class BaseClustering:
     def __getitem__(self, item):
         return self.clusters[item]
 
+    def members_n_assigned_clusters(self):
+        """Generate tuples of cluster members and their assigned cluster index"""
+        for i, cl in enumerate(self.clusters):
+            for strain_id in iter(cl):
+                yield strain_id, i
+
 
 @attr.s
-class Clustering(BaseClustering):
-    variables = attr.ib(init=True)
+class DatapointsCluster(BaseClustering):
+    """
+    Provide a method to return datapoints from a cluster and a method to get the values of all datapoints for a given attribute.
+    """
+    datapoints_extractor = attr.ib(init=True)  # call(cluster) -> datapoints
+    attributes_extractor = attr.ib(init=True)  # call(datapoints, attribute) -> attribute_value per datapoint iterable
 
-    @property
-    def active_variables(self):
-        return self.variables
+    distro_computer = attr.ib(init=False, default=attr.Factory(lambda self: ClusterDistroComputer.from_extractors(
+        self.datapoints_extractor, self.attributes_extractor), takes_self=True))
+    members = attr.ib(init=False, default={})  # structure to use to cache found items in the clustering, so that we do not seek them next time
 
-    def __iter__(self):
-        for cl in self.clusters:
-            yield cl
-
-    def __len__(self):
-        return len(self.clusters)
-
-    def __getitem__(self, item):
-        return self.clusters[item]
-
-    def get_cluster_id(self, member_id):
-        for cl in self:
-            if member_id in cl.members:
-                return cl.id
-
-    def get_closest(self, an_id, n, metric='euclidean'):
-        return sorted((map(lambda x: distance(self.id2vec[an_id], x, metric=metric),
-                           [_ for _ in self[self.get_cluster_id(an_id)]])), reverse=True)[:n]
-
-    def gen_ids_and_assigned_clusters(self):
-        for cl in self:
-            for strain_id in cl.gen_ids():
-                yield strain_id, cl.id
 
 @attr.s
-class ReportingClustering(Clustering):
+class ReportingClustering(DatapointsCluster):
     """
     An instance of this class encapsulates the behaviour of a clustering; a set of clusters estimated on some data
     """
+
+    pre = 2
     def __str__(self):
-        pre = 2
         body, max_lens = self._get_rows(threshold=10, prob_precision=pre)
         header = self._get_header(max_lens, pre, [_ for _ in range(len(self))])
         return header + body
 
-    # clusters = attr.ib(init=True, default=[Cluster(clid2members[cl_id], self._av, cl_id) for cl_id in range(len(clid2members))])
-    #
-    # def __init__(self, clid2members, active_variables, an_id, map_buffer, dataset_id, fact_ref):
-    #     """
-    #     :param clid2members: mapping of cluster numerical ids to sets of strain ids
-    #     :type clid2members: dict
-    #     :param active_variables: the variables taken into account for cl the data
-    #     :type active_variables: tuple
-    #     :param an_id: a unique identifier for the Clustering object
-    #     :type an_id: str
-    #     :param map_buffer: a string that can be directly printed showing the topology of the clusters
-    #     :type map_buffer: str
-    #     :param fact_ref:
-    #     :type fact_ref: ClusteringFactory
-    # #     """
-    #     self._av = active_variables
-    #     self.clusters = [Cluster(clid2members[cl_id], self._av, cl_id) for cl_id in range(len(clid2members))]
-    #     self.id = an_id + ':{}'.format(len(self))
-    #     self.map_buffer = map_buffer
-    #     self._fct = fact_ref
+    def cluster_of(self, item):
+        h = hash(item)
+        return self.members.get(h, self._find_cluster(h))
+
+    def _find_cluster(self, item):
+        """Call this method to seek through the clusters for the given item."""
+        for cluster in self:
+            if item in cluster.members:
+                self.members[item] = cluster.id
+                return self.members[item]
 
     def gen_clusters(self, selected):
         """
@@ -90,10 +71,13 @@ class ReportingClustering(Clustering):
         for i in selected:
             yield self[i]
 
-    def compute_stats(self, id2strain, ngrams=1):
-        for cl in self.clusters:
-            cl.compute_counts(id2strain,,
-            cl.compute_tfs(id2strain)
+    def get_closest(self, an_id, n, metric='euclidean'):
+        """Call this method to find n closest vectors (within the same cluster) to the vector corresponding to the input id."""
+        return sorted((map(lambda x: distance(self.id2vec[an_id], x, metric=metric),
+                           [_ for _ in self[self.find_cluster(an_id)]])), reverse=True)[:n]
+
+    def compute_stats1(self, cluster, attributes):
+        self._stats = self.distro_computer(cluster, attributes)
 
     def print_clusters(self, selected_clusters='all', threshold=10, prec=2):
         if selected_clusters == 'all':
@@ -123,81 +107,5 @@ class ReportingClustering(Clustering):
         return b, max_token_lens
 
 
-
-@attr.s
-class ClusterFactory:
-    pass
-
-
-@attr.s
-class BaseClustering:
-    clusters = attr.ib(init=True)
-
-
-
 def distance(vec1, vec2, metric='euclidean'):
     return DistanceMetric.get_metric(metric).pairwise([vec1, vec2])[0][1]
-
-@attr.s
-class ClusteringFactory(object):
-    _sm = attr.ib(init=True)
-    algorithms = attr.ib(init=True)
-
-
-class ClusteringFactory1(object):
-
-    def __init__(self, strain_master):
-        self._sm = strain_master
-        self.algorithms = {
-            'kmeans': lambda x, y: KMeans(n_clusters=x, random_state=y),
-            'affinity-propagation': lambda x, y: AffinityPropagation()
-        }
-
-    def get_grouping(self, members, active_vars):
-        """Uses the currently selected strain dataset id in the strainmaster"""
-        gr = Grouping(members, active_vars)
-        gr.compute_counts(self._sm.dt.full_df.loc,,
-        gr.compute_tfs(self._sm.dt.full_df.loc)
-        return gr
-
-    def create_clusters(self, som, algorithm, nb_clusters=8, ngrams=1, random_state=None, vars=None):
-        """
-        :param som:
-        :type som: somoclu.train.Somoclu
-        :param algorithm:
-        :type algorithm: str
-        :param nb_clusters:
-        :type nb_clusters: int
-        :param ngrams: the degree of ngrams to extract out of ids
-        :type ngrams: int
-        :param random_state:
-        :type random_state: int
-        :return:
-        :rtype: Clustering
-        """
-        id2members = {}  # cluster id => members set mapping
-        map_id = self._sm.map_manager.map_obj2id[som]
-        dt_id = _extract_dataset_id(map_id)
-        if vars is None:
-            vars = tuple((var for var in self._sm._id2dataset[dt_id].generate_variables()))
-        if isinstance(som, Somoclu):
-            som.cluster(algorithm=self.algorithms[algorithm](nb_clusters, random_state))
-            for i, arr in enumerate(som.bmus):  # iterate through the array of shape [nb_datapoints, 2]. Each row is the coordinates of the neuron the datapoint gets attributed to (closest distance)
-                attributed_cluster = som.clusters[arr[0], arr[1]]  # >= 0
-                if attributed_cluster not in id2members:
-                    id2members[attributed_cluster] = set()
-                id2members[attributed_cluster].add(self._sm._id2dataset[dt_id].datapoint_index2_id[i])
-        else:
-            raise Exception("Clustering is not supported for Self Organizing Map of type '{}'".format(type(som)))
-        b = ''
-        max_len = len(str(np.max(som.clusters)))  # i.e. an clustering of 11 clusters with ids 0, 1, .., 10 has a max_len = 2
-        for j in range(som.umatrix.shape[0]):
-            b += ' '.join(' '*(max_len-len(str(i))) + str(i) for i in som.clusters[j, :]) + '\n'
-        clustering = Clustering(id2members, vars, map_id, b, dt_id, self)
-        clustering.compute_stats(self._sm._id2dataset[dt_id].full_df.loc, ngrams=ngrams)
-        print('Created {} clusters with {}'.format(len(clustering), algorithm))
-        return clustering
-
-
-def _extract_dataset_id(map_id):
-    return map_id.split('_')[1]  # reverse engineers the MapMakerManager.get_map_id

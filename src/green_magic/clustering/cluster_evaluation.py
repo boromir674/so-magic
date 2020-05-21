@@ -49,7 +49,7 @@ class ModelQualityReporter(object):
         :return: the calculated score
         :rtype: float
         """
-        array = np.array([res for res in clustering.gen_ids_and_assigned_clusters()])
+        array = np.array([res for res in clustering.members_n_assigned_clusters()])
         arr1 = np.array([self.strain_id2datapoint[iid] for iid in array[:, 0]])
         self.clustering = clustering
         self.metric = metric

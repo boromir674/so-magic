@@ -5,9 +5,9 @@ import attr
 class Dataset:
     datapoints = attr.ib(init=True)
     name = attr.ib(init=True, default=None)
-    size = attr.ib(init=False, default=attr.Factory(lambda self: len(self.datapoints), takes_self=True))
     _features = attr.ib(init=True, default=[])
     handler = attr.ib(init=True, default=None)
+    size = attr.ib(init=False, default=attr.Factory(lambda self: len(self.datapoints), takes_self=True))
 
     @property
     def features(self):
@@ -18,8 +18,8 @@ class Dataset:
         self._features = features
 
     @classmethod
-    def from_file(cls, file_path):
-        return Dataset(Datapoints.from_file(file_path), file_path)
+    def from_file(cls, file_path, name):
+        return Dataset(Datapoints.from_file(file_path), name)
 
 
 @attr.s
@@ -34,4 +34,9 @@ class Datapoints:
 
     def __len__(self):
         return len(self.observations)
+
+    @classmethod
+    def from_file(cls, file_path):
+        import pandas as pd
+        return Datapoints(pd.read_json(file_path))
 

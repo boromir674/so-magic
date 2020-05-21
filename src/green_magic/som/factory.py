@@ -1,116 +1,98 @@
-# import attr
-#
-# @attr.s
-# class ObjectsPool:
-#     constructor = attr.ib(init=True)
-#     _objects = {}
-#
-#     def get_object(self, *args, **kwargs):
-#         key = self._build_hash(*args, **kwargs)
-#         if key not in ObjectsPool._objects:
-#             ObjectsPool._objects[key] = self.constructor(*args, **kwargs)
-#         return ObjectsPool._objects[key]
-#
-#     def _build_hash(self, *args, **kwargs):
-#         return hash('-'.join([str(_) for _ in args]))
-#
-#
-# class MapObjectsPool(ObjectsPool):
-#     def _build_hash(self, *args, **kwargs):
-#         if type(args[0]) == str:
-#             return super()._build_hash(args[0])
-#         return super()._build_hash(*args)
-#
-#
-# class AbstractSomFactory:
-#
-#     def create_som(self, *args, **kwargs):
-#         raise NotImplementedError
-#
-#
-# @attr.s
-# class BaseSomFactory:
-#     """Implementing from the BaseSomFactory allows other class to register/subscribe on (emulated) 'events'."""
-#     observers = attr.ib(init=False, default=[])
-#
-#     def register(self, observer):
-#         if observer not in self.observers:
-#             self.observers.append(observer)
-#
-#     def unregister(self, observer):
-#         if observer in self.observers:
-#             self.observers.remove(observer)
-#
-#     def unregister_all(self):
-#         if self.observers:
-#             del self.observers[:]
-#
-#     def update_observers(self, *args, **kwargs):
-#         for observer in self.observers:
-#             observer.update(*args, **kwargs)
-#
-#
-# import logging
-# logger = logging.getLogger(__name__
-#
-#                            )
-# @attr.s
-# class SomFactory(BaseSomFactory):
-#     trainer = attr.ib(init=True)
-#
-#     def create_som(self, *args, **kwargs):
-#         try:
-#             map_obj = self.trainer.train_map(*args[:3], **kwargs)
-#             self.update_observers(*args, self.nb_rows, self.nb_cols, map_object=map_obj)
-#             return map_obj
-#         except NoDatapointsException:
-#             logger.info(f"No datapoints vectors found in dataset {self.dataset}. Fire up an 'encode' command.")
-#
-#
-# import numpy as np
-#
-# @attr.s
-# class SomTrainer(BaseSomeTrainer):
-#
-#     def train_map(self, nb_cols, nb_rows, dataset, **kwargs):
-#         """Infer a self-organizing map from dataset.\n
-#         initialcodebook = None, kerneltype = 0, maptype = 'planar', gridtype = 'rectangular',
-#         compactsupport = False, neighborhood = 'gaussian', std_coeff = 0.5, initialization = None
-#         """
-#         if not dataset.datapoints:
-#             raise NoFeatureVectors
-#         som = somoclu.Somoclu(nb_cols, nb_rows, **kwargs)
-#         som.train(data=np.array(dataset.datapoints, dtype=np.float32))
-#         return som
-#
-# class NoFeatureVectors(Exception): pass
-#
-#
-# @attr.s
-# class MapFactory:
-#     factory = attr.ib(init=True)
-#     pool = attr.ib(init=False, default=attr.Factory(lambda self: MapObjectsPool(self.factory.create_som), takes_self=True))
-#
-#     def get_som(self, *args, **kwargs):
-#         return self.pool.get_object(*args, **kwargs)
-#
-#
-# @attr.s
-# class SomManager:
-#     graphs_dir = attr.ib(init=True)
-#     backend = attr.ib(init=True, default='somoclu')
-#
-#     factories = {'somoclu': MapFactory(SomFactory(SomTrainer()))}
-#
-#     def get_som(self, *args, **kwargs):
-#         return self.factories[self.backend].create_som(*args, **kwargs)
-#
-#     @property
-#     def factory(self):
-#         return self.factories[self.backend]
-#
-#     mpeta = os.path.dirname(os.path.realpath(__file__)) + '/../../graphs/'
-#
+import attr
+
+import logging
+logger = logging.getLogger(__name__)
+
+
+@attr.s
+class ObjectsPool:
+    constructor = attr.ib(init=True)
+    _objects = {}
+
+    def get_object(self, *args, **kwargs):
+        key = self._build_hash(*args, **kwargs)
+        if key not in ObjectsPool._objects:
+            ObjectsPool._objects[key] = self.constructor(*args, **kwargs)
+        return ObjectsPool._objects[key]
+
+    def _build_hash(self, *args, **kwargs):
+        return hash('-'.join([str(_) for _ in args]))
+
+
+class MapObjectsPool(ObjectsPool):
+    def _build_hash(self, *args, **kwargs):
+        if type(args[0]) == str:
+            return super()._build_hash(args[0])
+        return super()._build_hash(*args)
+
+
+class AbstractSomFactory:
+
+    def create_som(self, *args, **kwargs):
+        raise NotImplementedError
+
+
+@attr.s
+class BaseSomFactory:
+    """Implementing from the BaseSomFactory allows other class to register/subscribe on (emulated) 'events'."""
+    observers = attr.ib(init=False, default=[])
+
+    def register(self, observer):
+        if observer not in self.observers:
+            self.observers.append(observer)
+
+    def unregister(self, observer):
+        if observer in self.observers:
+            self.observers.remove(observer)
+
+    def unregister_all(self):
+        if self.observers:
+            del self.observers[:]
+
+    def update_observers(self, *args, **kwargs):
+        for observer in self.observers:
+            observer.update(*args, **kwargs)
+
+
+@attr.s
+class SomFactory(BaseSomFactory):
+    trainer = attr.ib(init=True)
+
+    def create_som(self, *args, **kwargs):
+        try:
+            map_obj = self.trainer.train_map(*args[:3], **kwargs)
+            self.update_observers(*args, self.nb_rows, self.nb_cols, map_object=map_obj)
+            return map_obj
+        except NoDatapointsException:
+            logger.info(f"No datapoints vectors found in dataset {self.dataset}. Fire up an 'encode' command.")
+
+
+
+@attr.s
+class MapFactory:
+    factory = attr.ib(init=True)
+    pool = attr.ib(init=False, default=attr.Factory(lambda self: MapObjectsPool(self.factory.create_som), takes_self=True))
+
+    def get_som(self, *args, **kwargs):
+        return self.pool.get_object(*args, **kwargs)
+
+
+@attr.s
+class SomManager:
+    graphs_dir = attr.ib(init=True)
+    backend = attr.ib(init=True, default='somoclu')
+
+    factories = {'somoclu': MapFactory(SomFactory(SomTrainer()))}
+
+    def get_som(self, *args, **kwargs):
+        return self.factories[self.backend].create_som(*args, **kwargs)
+
+    @property
+    def factory(self):
+        return self.factories[self.backend]
+
+    mpeta = os.path.dirname(os.path.realpath(__file__)) + '/../../graphs/'
+
 #
 # class MapMakerManager:
 #
