@@ -6,35 +6,13 @@ from .feature_factory import Feature
 from .feature_manager import FeatureManager
 
 
-class AbstractObsevationsFactory(ABC):
-    @abstractmethod
-    def from_file(self, file_path: AnyStr):
-        raise NotImplementedError
-
-    @abstractmethod
-    def from_pickle(self, file_path: AnyStr):
-        raise NotImplementedError
-
-
 class DataBackend(ABC):
-    @abstractmethod
-    def observations_from_file(self, file_path: AnyStr) -> Datapoints:
-        raise NotImplementedError
 
     @abstractmethod
     @property
-    def features_manager(self):
+    def commands(self):
         raise NotImplementedError
 
-    @abstractmethod
-    @property
-    def commands_manager(self):
-        raise NotImplementedError
-
-    @property
-    @abstractmethod
-    def computer(self):
-        raise NotImplementedError
 
 @attr.s
 class Backend(DataBackend, ABC):
@@ -54,7 +32,3 @@ class Backend(DataBackend, ABC):
         if backend_type not in cls.subclasses:
             raise ValueError("Bad 'Data Backend' of type '{}'".format(backend_type))
         return cls.subclasses[backend_type](*args, **kwargs)
-
-    @property
-    def features_manager(self):
-        return self.features_manager

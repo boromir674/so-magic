@@ -4,7 +4,6 @@ import json
 import pickle
 import numpy as np
 from .features import StrainLexicon
-from .map_maker import MapMakerManager
 from .strain_dataset import StrainDataset, create_dataset_from_pickle
 from .clustering import get_model_quality_reporter
 

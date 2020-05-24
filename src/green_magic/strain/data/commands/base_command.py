@@ -66,7 +66,6 @@ class TransformDatasetCommand(BaseTransformDatasetCommand):
 #
 @attr.s
 class AttributeAddDeleteCommand(Command, ABC):
-    data_handler = attr.ib(init=True)
     dataset = attr.ib(init=True)
     feature = attr.ib(init=True)
     state = attr.ib(init=True)
@@ -76,15 +75,21 @@ class AugmentDataCommnad(AttributeAddDeleteCommand):
     computer = attr.ib(init=True)
 
     def execute(self) -> None:
-        self.data_handler.add_state(self.dataset, self.feature, self.computer, self.state, cache_prev=True)
+        values = self.computer(self.dataset, self.feature)
+        self.feature.update(self.state.key, self.state.reporter)
+        self.dataset.datapoints.observations[self.state.index] = values
 
     def get_undo(self):
         return UndoAddColumnCommnad(self.data_handler, self.dataset, self.feature, self.state)
 
-@attr.s
+
 class UndoAddColumnCommnad(AttributeAddDeleteCommand):
     def execute(self) -> None:
-        self.data_handler.del_state(self.dataset, self.feature, self.state)
+        if self.state.key == feature.current:
+            raise RuntimeError(
+                f"Requested to delete attribute/column '{self.state.key}', but it is the current state of feature {str(self.feature)}")
+        del self.dataset.datapoints.observations[f'{feature.id}-{state.key}']
+        del self.feature.states[state.key]
 
 #############
 
@@ -104,3 +109,8 @@ class RemoveColumnCommand(Command):
 
     def execute(self) -> None:
         self._receiver.remove_column(dataset, feature)
+
+
+@attr.s
+class LoadDatapointsCommand(Command):
+    datapoints_factory = attr.ib(init=True)

@@ -6,6 +6,7 @@ class Dataset:
     datapoints = attr.ib(init=True)
     name = attr.ib(init=True, default=None)
     _features = attr.ib(init=True, default=[])
+
     handler = attr.ib(init=True, default=None)
     size = attr.ib(init=False, default=attr.Factory(lambda self: len(self.datapoints), takes_self=True))
 
@@ -40,3 +41,11 @@ class Datapoints:
         import pandas as pd
         return Datapoints(pd.read_json(file_path))
 
+
+class DatapointsFactory:
+
+    def from_json(self, file_path):
+        raise NotImplementedError
+
+    def from_json_lines(self, file_path):
+        raise NotImplementedError

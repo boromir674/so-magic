@@ -21,10 +21,10 @@ class FeatureFactory(AbstractFeatureFactory):
         return wrapper
 
     @classmethod
-    def create(cls, binner_backend_typeype, *args, **kwargs):
-        if binner_backend_typeype not in cls.subclasses:
-            raise ValueError('Bad "BinnerFactory Backend type" type \'{}\''.format(binner_backend_typeype))
-        return cls.subclasses[binner_backend_typeype](*args, **kwargs)
+    def create(cls, backend_type, *args, **kwargs):
+        if backend_type not in cls.subclasses:
+            raise ValueError('Bad "BinnerFactory Backend type" type \'{}\''.format(backend_type))
+        return cls.subclasses[backend_type](*args, **kwargs)
 
     def get_feature(self, *args, **kwargs) -> TrackingFeature:
         raise NotImplementedError

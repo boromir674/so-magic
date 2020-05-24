@@ -29,6 +29,7 @@ class BaseFeature(AbstractFeature):
         """A default implementation of the values method"""
         return dataset[self.label]
 
+
 @attr.s
 class FeatureState:
     key = attr.ib(init=True)
@@ -95,19 +96,22 @@ class StateMachine:
 class TrackingFeature:
     feature = attr.ib(init=True)
     sm = attr.ib(init=True)
+    variable_type = attr.ib(init=True, default=None)
 
     @classmethod
-    def from_callable(cls, a_callable, label=None):
+    def from_callable(cls, a_callable, label=None, variable_type=None):
         """Construct a feature that has one extract/report capability. Input id is correlated to the features position on the vector (see FeatureFunction above)"""
-        return TrackingFeature(FeatureFunction(a_callable, label), StateMachine({'raw': a_callable}, 'raw'))
+        return TrackingFeature(FeatureFunction(a_callable, label), StateMachine({'raw': a_callable}, 'raw'), variable_type)
 
     def values(self, dataset):
         return self.sm.state.reporter(dataset)
+
     def label(self):
         return self.feature.label
 
     @property
     def state(self):
+        """Returns the current state"""
         return self.sm.state
 
     def update(self, *args, **kwargs):

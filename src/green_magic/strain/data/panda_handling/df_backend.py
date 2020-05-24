@@ -1,32 +1,41 @@
-from typing import AnyStr
-
+import copy
 import attr
 import pandas as pd
 from ..backend import Backend
-from green_magic.strain.data.dataset import Datapoints, Dataset
+from green_magic.strain.data.dataset import Datapoints, DatapointsFactory
 from ..types import *
+
+from strain.data.data_commands import Command
+
+
+class PDDatapointsFactory(DatapointsFactory):
+
+    def from_json(self, file_path):
+        raise NotImplementedError
+
+    def from_json_lines(self, file_path):
+        return Datapoints(pd.read_json(file_path, lines=True))
 
 
 @attr.s
-@Backend.register_as_subclass('df')
-class Backend(Backend):
+class PDCommandsManager:
+    prototypes = attr.ib(init=True, default={
+        'read_json': Command(PDDatapointsFactory, 'from_json_lines')
+    })
 
-    @property
-    def computer(self):
-        return ''
+    def __getattr__(self, item):
+        return copy.copy(self.prototypes[item])
 
-    def observations_from_file(self, file_path: AnyStr) -> Datapoints:
-        pass
 
+@attr.s
+@Backend.register_as_subclass('pandas')
+class PDBackend(Backend):
     handler = attr.ib(init=True, default=None)
-
-    def datapoints_from_file(self, file_path: AnyStr):
-        return Datapoints(pd.read_json(file_path, convert_dates=True))
+    _commands_manager = attr.ib(init=False, default=PDCommandsManager)
 
     @property
-    @abc.abstractmethod
-    def commands_manager(self):
-        raise NotImplementedError
+    def commands(self):
+        return self._commands_manager
 
     @property
     @abc.abstractmethod
