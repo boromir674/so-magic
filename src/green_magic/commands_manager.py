@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def __init__(self, receiver, method, *args):
         super().__init__(receiver, *args)
         self._method = method
-        self._args = list(args)  # this is tuple that can be minimally be ()
+        self._args = list(args)  # this is a list that can be minimally be []
 
     def append_arg(self, element):
         self._args.append(element)
@@ -29,6 +29,8 @@ class Command(BaseCommand):
 
     def __copy__(self):
         return Command(copy.copy(self._receiver), self._method, copy.copy(self._args))
+
+
 
 
 @attr.s

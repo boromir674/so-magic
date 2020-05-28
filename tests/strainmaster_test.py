@@ -16,28 +16,25 @@ sample_source_strains = 'sample-strains.jl'
 
 raw_datafile_path = os.path.join(my_dir, sample_source_strains)
 
+# som_master = StrainMaster(datasets_dir, datasets_dir)
+
 dataset_id = 'unittest-dataset'
+
 
 all_vars = ['type', 'effects', 'medical', 'negatives', 'flavors']
 active_vars = ['type', 'effects', 'medical', 'negatives', 'flavors']
 
+
 @pytest.fixture(scope='module')
-def strain_master():
-    sm = StrainMaster(datasets_dir=datasets_dir, maps_dir=graphs_dir)
-    _ = sm.create_strain_dataset(raw_datafile_path, dataset_id)
-    sm.dt.use_variables(active_vars)
-    sm.dt.clean()
-    return sm
+def som_master():
+    return StrainMaster(datasets_dir=datasets_dir, maps_dir=graphs_dir)
 
 
-if not os.path.exists(datasets_dir):
-    os.makedirs(datasets_dir)
-if not os.path.exists(graphs_dir):
-    os.makedirs(graphs_dir)
-
-
-# sm = StrainMaster(datasets_dir=datasets_dir, maps_dir=graphs_dir)
-# r = DistroReporter()
+@pytest.fixture
+def sample_datapoints(som_master):
+    command = som_master.commands_manager.json_line_dataset
+    command.append_arg(raw_datafile_path)
+    som_master.load_dataset(command)
 
 
 class TestStrainMaster:
@@ -47,23 +44,13 @@ class TestStrainMaster:
         shutil.rmtree(datasets_dir)
         shutil.rmtree(graphs_dir)
 
-    def test_dataset_operations(self, strain_master):
+    def test_dataset_operations(self, sample_datapoints, som_master):
         # dt = sm.create_strain_dataset(raw_datafile_path, dataset_id)
         # dt.use_variables(active_vars)
         # sm.dt.clean()
-        assert not strain_master.dt.has_missing_values
-        assert len(strain_master.dt) == 98
-        assert len(strain_master.dt.full_df) == 98
-        strain_master.set_feature_vectors()
-        assert len(strain_master.dt.datapoints) == 98
-        assert len(strain_master.dt.datapoints[0]) == 72
-        strain_master.save_dataset(dataset_id)
-        assert os.path.isfile(os.path.join(strain_master.datasets_dir, '{}-clean.pk'.format(dataset_id)))
-
-        loaded_dt = strain_master.load_dataset(dataset_id + '-clean.pk')
-        assert strain_master.selected_dt_id == loaded_dt.name
-        assert len(strain_master.dt) == 98
-        assert len(strain_master.dt.datapoints[0]) == 72
+        assert len(som_master.dt) == 98
+        assert len(som_master.dt.datapoints[0]) == 72
+        # assert os.path.isfile(os.path.join(som_master.datasets_dir, '{}-clean.pk'.format(dataset_id)))
 
     # @pytest.mark.parametrize("dataset_id, length, nb_datapoints, feature_vector_length", [
     #     ("unittest-dataset", 100, 98, 72),

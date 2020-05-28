@@ -1,8 +1,6 @@
 import os
 import pytest
 
-from green_magic import GreenMaster
-
 
 my_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -25,6 +23,7 @@ def sample_json():
 
 @pytest.fixture
 def green_master():
+    from green_magic import GreenMaster
     return GreenMaster()
 
 @pytest.fixture

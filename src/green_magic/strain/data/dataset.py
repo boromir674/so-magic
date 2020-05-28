@@ -49,3 +49,8 @@ class DatapointsFactory:
 
     def from_json_lines(self, file_path):
         raise NotImplementedError
+
+    def load(self, command):
+        command = som_master.commands_manager.json_line_dataset
+        command.append_arg(raw_datafile_path)
+        som_master.load_dataset(command)

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from collections import Counter
+import attr
 
 
 class CountsComputerInterface(ABC):

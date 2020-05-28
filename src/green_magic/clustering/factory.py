@@ -1,6 +1,7 @@
 from .clustering import ReportingClustering
-from .cluster import Cluster
+from .cluster import SOMCluster
 
+import attr
 
 @attr.s
 class ClusteringFactory(object):
@@ -23,7 +24,7 @@ class ClusteringFactory(object):
         def ex2(datapoints, attribute):
             return datapoints[str(attribute)]
 
-        return ReportingClustering([Cluster(cluster_members) for cluster_members in id2members.values()],
+        return ReportingClustering([SOMCluster(cluster_members) for cluster_members in id2members.values()],
                                    str(dataset)+'-'+str(som),
                                    ex1,
                                    ex2,

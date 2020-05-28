@@ -7,7 +7,6 @@ from setuptools import find_packages, setup
 my_dir = os.path.dirname(os.path.realpath(__file__))
 
 
-
 # CONSTANTS
 src = 'src'
 name = 'green_magic'
@@ -56,7 +55,7 @@ setup(
 
     # what packages/distributions (python) need to be installed when this one is. (Roughly what is imported in source code)
     install_requires=requirements(),
-    #
+
     # A string or list of strings specifying what other distributions need to be present in order for the setup script to run.
     # (Note: projects listed in setup_requires will NOT be automatically installed on the system where the setup script is being run.
     # They are simply downloaded to the ./.eggs directory if they're not locally available already. If you want them to be installed,
@@ -65,7 +64,7 @@ setup(
 
     # Folder where unittest.TestCase-like written modules reside. Specifying this argument enables use of the test command
     # to run the specified test suite, e.g. via setup.py test.
-    test_suite='src/tests',
+    test_suite='tests',
 
     # Declare packages that the project's tests need besides those needed to install it. A string or list of strings specifying
     # what other distributions need to be present for the package's tests to run. Note that these required projects will not be installed on the system where the
@@ -95,7 +94,7 @@ setup(
     author_email='boromir674@hotmail.com',
     # license='GNU GPLv3',
     packages=find_packages(where=src),
-    # package_dir={'': src},  # this is required by distutils
+    package_dir={'': src},  # this is required by distutils
     # py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
     include_package_data=True,  # Include all data files in packages that distutils are aware of through the MANIFEST.in file
     # package_data={
