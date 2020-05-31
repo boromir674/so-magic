@@ -182,51 +182,51 @@ def label_encode(dataframe, columns, encode_callback, code_str='_Code'):
 
 
 #### SELECTION
-
-#define y variable aka target/outcome
-Target = ['Survived']
-
-# FEATURE SLECTION
-# define variables (original and encoded)
-feature_titles = ['Sex','Pclass', 'Embarked', 'Title','SibSp', 'Parch', 'Age', 'Fare', 'FamilySize', 'IsAlone'] #pretty name/values for charts
-feature_names = ['Sex_Code','Pclass', 'Embarked_Code', 'Title_Code','SibSp', 'Parch', 'Age', 'Fare'] #coded for algorithm calculation
-# data1_xy =  Target + data1_x
-# print('Original X Y: ', data1_xy, '\n')
-
-
-#define x variables for original w/bin variables to remove continuous variables
-data1_x_bin = ['Sex_Code','Pclass', 'Embarked_Code', 'Title_Code', 'FamilySize', 'Age_Code', 'Fare_Code']
-# data1_xy_bin = Target + data1_x_bin
-# print('Bin X Y: ', data1_xy_bin, '\n')
-
-
-#define x and y variables for dummy variables original
-data1_dummy = pd.get_dummies(train_data[feature_titles])
-data1_x_dummy = data1_dummy.columns.tolist()
-# data1_xy_dummy = Target + data1_x_dummy
-# print('Dummy X Y: ', data1_xy_dummy, '\n')
-
-
-# SELECT variables
-numerical_feats = ['Pclass', 'Fare_Code', 'Age_Code', 'FamilySize']  # ordering makes sence: eg: class_1 < class_2,
-binary_feats = ['Sex_Code', 'IsAlone']
-categorical_feats = ['Embarked']
-
-assert all(all(x in train_dataframe.columns for x in y) for y in [numerical_feats, binary_feats, categorical_feats])
-
-# convert eg column "color" that takes {'white', 'black'} as values to
-# 2 columns: 'color_white' and 'color_black' (that take 0 or 1)
-pd.get_dummies(train_data[categorical_feats]).head()
-
-
-X_train = pd.concat([train_data[numerical_feats + binary_feats], pd.get_dummies(train_data[categorical_feats])], axis=1)
-X_test = pd.concat([test_data[numerical_feats + binary_feats], pd.get_dummies(test_data[categorical_feats])], axis=1)
-X_train.head()
-
-
-X_train = pd.concat([train_data[numerical_feats + binary_feats], pd.get_dummies(train_data[categorical_feats])], axis=1)
-X_test = pd.concat([test_data[numerical_feats + binary_feats], pd.get_dummies(test_data[categorical_feats])], axis=1)
-X_train.head()
+#
+# #define y variable aka target/outcome
+# Target = ['Survived']
+#
+# # FEATURE SLECTION
+# # define variables (original and encoded)
+# feature_titles = ['Sex','Pclass', 'Embarked', 'Title','SibSp', 'Parch', 'Age', 'Fare', 'FamilySize', 'IsAlone'] #pretty name/values for charts
+# feature_names = ['Sex_Code','Pclass', 'Embarked_Code', 'Title_Code','SibSp', 'Parch', 'Age', 'Fare'] #coded for algorithm calculation
+# # data1_xy =  Target + data1_x
+# # print('Original X Y: ', data1_xy, '\n')
+#
+#
+# #define x variables for original w/bin variables to remove continuous variables
+# data1_x_bin = ['Sex_Code','Pclass', 'Embarked_Code', 'Title_Code', 'FamilySize', 'Age_Code', 'Fare_Code']
+# # data1_xy_bin = Target + data1_x_bin
+# # print('Bin X Y: ', data1_xy_bin, '\n')
+#
+#
+# #define x and y variables for dummy variables original
+# data1_dummy = pd.get_dummies(train_data[feature_titles])
+# data1_x_dummy = data1_dummy.columns.tolist()
+# # data1_xy_dummy = Target + data1_x_dummy
+# # print('Dummy X Y: ', data1_xy_dummy, '\n')
+#
+#
+# # SELECT variables
+# numerical_feats = ['Pclass', 'Fare_Code', 'Age_Code', 'FamilySize']  # ordering makes sence: eg: class_1 < class_2,
+# binary_feats = ['Sex_Code', 'IsAlone']
+# categorical_feats = ['Embarked']
+#
+# assert all(all(x in train_dataframe.columns for x in y) for y in [numerical_feats, binary_feats, categorical_feats])
+#
+# # convert eg column "color" that takes {'white', 'black'} as values to
+# # 2 columns: 'color_white' and 'color_black' (that take 0 or 1)
+# pd.get_dummies(train_data[categorical_feats]).head()
+#
+#
+# X_train = pd.concat([train_data[numerical_feats + binary_feats], pd.get_dummies(train_data[categorical_feats])], axis=1)
+# X_test = pd.concat([test_data[numerical_feats + binary_feats], pd.get_dummies(test_data[categorical_feats])], axis=1)
+# X_train.head()
+#
+#
+# X_train = pd.concat([train_data[numerical_feats + binary_feats], pd.get_dummies(train_data[categorical_feats])], axis=1)
+# X_test = pd.concat([test_data[numerical_feats + binary_feats], pd.get_dummies(test_data[categorical_feats])], axis=1)
+# X_train.head()
 
 
 def get_df_from_json(cls, json_path):

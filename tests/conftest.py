@@ -23,8 +23,8 @@ def sample_json():
 
 @pytest.fixture
 def green_master():
-    from green_magic import GreenMaster
-    return GreenMaster()
+    from green_magic.strainmaster import StrainMaster
+    return StrainMaster()
 
 @pytest.fixture
 def command_invoker(green_master):

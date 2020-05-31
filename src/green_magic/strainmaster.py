@@ -3,11 +3,15 @@ import sys
 import json
 import pickle
 import numpy as np
+import logging
 from .features import StrainLexicon
 from .strain_dataset import StrainDataset, create_dataset_from_pickle
 from .clustering import get_model_quality_reporter
+from .strain.data.dataset import Dataset, DatapointsManager
+from .som import MapManager
+from .commands_manager import CommandsManager, Invoker
+from .strain.data.backend import DataEngine
 
-import logging
 _log = logging.getLogger(__name__)
 
 
@@ -17,14 +21,17 @@ class StrainMaster:
     def __new__(cls, *args, **kwargs):
         if not cls.__instance:
             cls.__instance = super().__new__(cls)
-            cls.__instance._datasets_dir = kwargs.get('datasets_dir', './')
-            cls.__instance._maps_dir = kwargs.get('maps_dir', './')
-            cls.__instance.selected_dt_id = None
-            cls.__instance._id2dataset = {}
-            cls.__instance.map_manager = MapMakerManager(cls.__instance, cls.__instance._maps_dir)
-            cls.__instance.lexicon = StrainLexicon()
-        cls.__instance._datasets_dir = kwargs.get('datasets_dir', cls.__instance._datasets_dir)
-        cls.__instance._maps_dir = kwargs.get('maps_dir', cls.__instance._maps_dir)
+            cls.__instance.datapoints_manager = DatapointsManager()
+            cls.__instance.engine = DataEngine.default_backend(Invoker(), [cls.__instance.datapoints_manager])
+        #     # cls.__instance._datasets_dir = kwargs.get('datasets_dir', './')
+        #     # cls.__instance._maps_dir = kwargs.get('maps_dir', './')
+        #     # cls.__instance.selected_dt_id = None
+        #     # cls.__instance._id2dataset = {}
+        #     # cls.__instance.map_manager = MapManager()
+        #     # cls.__instance.commands_manager = CommandsManager()
+        #     # cls.__instance.lexicon = StrainLexicon()
+        # cls.__instance._datasets_dir = kwargs.get('datasets_dir', cls.__instance._datasets_dir)
+        # cls.__instance._maps_dir = kwargs.get('maps_dir', cls.__instance._maps_dir)
         return cls.__instance
 
     def __call__(self, *args, **kwargs):
@@ -39,6 +46,10 @@ class StrainMaster:
     def __init__(self, datasets_dir=None, maps_dir=None): pass
 
     @property
+    def commands(self):
+        return self.engine.backend.commands
+
+    @property
     def datasets_dir(self):
         return self._datasets_dir
 
@@ -46,7 +57,6 @@ class StrainMaster:
     def datasets_dir(self, dataset_directory_path):
         self._datasets_dir = dataset_directory_path
         # self.map_manager.maps_dir = dataset_directory_path
-
 
     def strain_names(self, coordinates):
         g = ((self.dt.datapoint_index2_id[_], self.som.bmus[_]) for _ in range(len(self.dt)))
@@ -59,9 +69,11 @@ class StrainMaster:
         :return: the reference to the dataset
         :rtype: green_magic.strain_dataset.StrainDataset
         """
-        if self.selected_dt_id not in self._id2dataset:
-            raise InvalidDatasetSelectionError("Requested dataset with id '{}', but StrainMaster knows only of [{}].".format(self.selected_dt_id, ', '.join(self._id2dataset.keys())))
-        return self._id2dataset[self.selected_dt_id]
+        return self.datapoints_manager.datapoints
+
+        # if self.selected_dt_id not in self._id2dataset:
+        #     raise InvalidDatasetSelectionError("Requested dataset with id '{}', but StrainMaster knows only of [{}].".format(self.selected_dt_id, ', '.join(self._id2dataset.keys())))
+        # return self._id2dataset[self.selected_dt_id]
 
     @property
     def som(self):

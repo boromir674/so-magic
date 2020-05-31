@@ -1,3 +1,3 @@
-from .invoker import Invoker
-
-invoker_object = Invoker()
+# from .invoker import Invoker
+#
+# invoker_object = Invoker()

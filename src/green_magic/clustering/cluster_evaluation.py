@@ -1,6 +1,6 @@
 from operator import itemgetter
 import numpy as np
-from sklearn.metrics import homogeneity_score, completeness_score, v_measure_score, silhouette_score, calinski_harabaz_score
+from sklearn.metrics import homogeneity_score, completeness_score, v_measure_score, silhouette_score, calinski_harabasz_score
 
 
 class ModelQualityReporter(object):
@@ -23,7 +23,7 @@ class ModelQualityReporter(object):
         self.strain_id2strainitem = strain_id2strainitem
         self.methods = {
             'silhouette': silhouette_score,
-            'cali-hara': calinski_harabaz_score
+            'cali-hara': calinski_harabasz_score
         }
         # needing ground truth labels
         self.dt_methods = {

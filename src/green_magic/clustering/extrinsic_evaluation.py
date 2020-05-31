@@ -1,7 +1,8 @@
 import abc
 from somoclu import Somoclu
 
-from .cluster import Grouping, Cluster
+from .cluster import Grouping, SOMCluster
+from .clustering import BaseClustering
 from .kernel_determination import kernel_getter
 
 
@@ -26,7 +27,7 @@ class PropertySeparationEvaluation(ExtrinsincEvaluation):
 
     def evaluate(self, clustering, kernel_size=5):
         """Returns a float in [0, 1]. 1 Indicates perfect 'type' separation and 0 worst"""
-        assert isinstance(clustering, Clustering)
+        assert isinstance(clustering, BaseClustering)
         assert self._pr in clustering.freqs
         scores = []
         for cl in clustering:

@@ -12,7 +12,6 @@ class AbstractEncoder(EncoderInterface):
         raise NotImplementedError
 
 
-
 class EncoderFactory:
     @classmethod
     def register_as_subclass(cls, backend_type):
