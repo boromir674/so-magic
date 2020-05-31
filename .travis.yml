@@ -18,6 +18,7 @@ before_install:
   - lsb_release -a
 #  - sudo apt-get --yes update
 #  - sudo apt-get --yes install git make cmake build-essential libboost-all-dev gfortran libblas-dev liblapack-dev
+  - sudo apt-get --yes install libboost-all-dev gfortran libblas-dev liblapack-dev
   - sudo python -m pip install -U pip
   - sudo python -m pip install -U setuptools>=40.0.0
   - python -m pip install -U setuptools>=40.0.0
