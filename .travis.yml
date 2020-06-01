@@ -21,7 +21,7 @@ before_install:
 #  - sudo apt-get --yes install libboost-all-dev gfortran libblas-dev liblapack-dev
   - sudo python -m pip install -U pip
   - sudo python -m pip install -U setuptools>=40.0.0
-  - sudo python -m pip install -U numpy
+  - python -m pip install --user numpy
   - python -m pip install -U setuptools>=40.0.0
   - python -m pip install tox
 
