@@ -27,7 +27,7 @@ before_install:
 
 
 cache: pip
-script: tox -v
+script: tox -vv
 
 jobs:
   fail_fast: true
