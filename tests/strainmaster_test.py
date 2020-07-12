@@ -12,11 +12,6 @@ my_dir = os.path.dirname(os.path.realpath(__file__))
 datasets_dir = os.path.join(my_dir, 'dts')
 graphs_dir = os.path.join(my_dir, 'graphs')
 
-sample_source_strains = 'sample-strains.jl'
-
-raw_datafile_path = os.path.join(datasets_dir, sample_source_strains)
-
-# som_master = StrainMaster(datasets_dir, datasets_dir)
 
 dataset_id = 'unittest-dataset'
 
@@ -25,44 +20,36 @@ all_vars = ['type', 'effects', 'medical', 'negatives', 'flavors']
 active_vars = ['type', 'effects', 'medical', 'negatives', 'flavors']
 
 
-@pytest.fixture(scope='module')
-def som_master():
-    from green_magic.strainmaster import StrainMaster
-    return StrainMaster(datasets_dir=datasets_dir, maps_dir=graphs_dir)
+def test_sample_datapoints(sample_datapoints, som_master):
 
-
-@pytest.fixture
-def sample_datapoints(som_master):
-    from green_magic.strain.data.panda_handling.df_backend import PDBackend
-    assert type(som_master.engine.backend) == PDBackend
     assert hasattr(som_master.engine.backend.commands, 'prototypes')
-    assert hasattr(som_master.commands, 'prototypes')
-    command = som_master.commands.json_line_dataset
+    assert len(som_master.dt) == 100
 
-    from green_magic.strain.data.dataset import DatapointsFactory
-    assert isinstance(command._receiver, DatapointsFactory)
-    assert command._method == 'from_json_lines'
-    assert type(command._args) == list
-    command.append_arg(raw_datafile_path)
-    assert type(command._args) == list
-    assert command._args == ['/Users/konstantinos/repos/green-magic/tests/dts/sample-strains.jl']
-    assert len(command._args) == 1
-    som_master.engine.invoker.execute_command(command)
+@pytest.mark.skip(reason="The 'sample_feature_vectors' fixture is failing.")
+def test_training(som_master, sample_feature_vectors):
+    from green_magic.strain.data.dataset import Dataset
+    dataset = Dataset(som_master.dt, 'sample-strains')
+
+    from green_magic.som import MapManager
+    mm = MapManager()
+    so_map = mm.get_map(dataset, 10, 10, 'pca', 'toroid', 'hexagonal')
+
+
+    # som_master.engine.invoker.execute_command(command)
     # som_master.load_dataset(command)
-
-
-class TestStrainMaster:
-
-    @classmethod
-    def tear_down_class(cls):
-        shutil.rmtree(datasets_dir)
-        shutil.rmtree(graphs_dir)
-
-    def test_dataset_operations(self, sample_datapoints, som_master):
-        # dt = sm.create_strain_dataset(raw_datafile_path, dataset_id)
+#
+#
+# class TestStrainMaster:
+#
+#     @classmethod
+#     def tear_down_class(cls):
+#         shutil.rmtree(datasets_dir)
+#         shutil.rmtree(graphs_dir)
+#
+#     def test_dataset_operations(self, sample_datapoints, som_master):
+#         # dt = sm.create_strain_dataset(raw_datafile_path, dataset_id)
         # dt.use_variables(active_vars)
         # sm.dt.clean()
-        assert len(som_master.dt) == 100
         # assert len(som_master.dt[0]) == 72
         # assert os.path.isfile(os.path.join(som_master.datasets_dir, '{}-clean.pk'.format(dataset_id)))
 

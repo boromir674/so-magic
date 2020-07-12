@@ -1,5 +1,5 @@
 numpy
 nltk
 scikit-learn
-somoclu
+# somoclu
 pandas

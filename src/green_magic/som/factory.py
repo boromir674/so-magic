@@ -26,7 +26,7 @@ class SomapObjectPool(ObjectsPool):
 
 @attr.s
 class MapManager:
-    map_factory = attr.ib(init=True, default=SelfOrganizingMapFactory)
+    map_factory = attr.ib(init=True, default=SelfOrganizingMapFactory())
     pool = attr.ib(init=False, default=attr.Factory(lambda self: SomapObjectPool(self.map_factory.create), takes_self=True))
 
     def get_map(self, *args, **kwargs):

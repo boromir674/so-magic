@@ -26,7 +26,7 @@ class SomTrainer:
 class SomFactory:
     """Implementing from the BaseSomFactory allows other class to register/subscribe on (emulated) 'events'.
        So, when the factory creates a new Som object, other entities can be notified."""
-    trainer = attr.ib(init=True, default=SomTrainer)
+    trainer = attr.ib(init=True, default=SomTrainer())
     observers = attr.ib(init=False, default=[])
 
     def register(self, observer):
@@ -60,7 +60,7 @@ class NoFeatureVectorsError(Exception): pass
 
 @attr.s
 class SelfOrganizingMapFactory:
-    som_factory = attr.ib(init=True, default=SomFactory)
+    som_factory = attr.ib(init=True, default=SomFactory())
 
     def create(self, dataset, nb_cols, nb_rows, **kwargs):
         return SelfOrganizingMap(self.som_factory.create_som(nb_cols, nb_rows, dataset, **kwargs), dataset.name)
