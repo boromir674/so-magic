@@ -37,9 +37,6 @@ jobs:
   - stage: Build_n_test
     env: TOXENV=check
   - stage: Build_n_test
-    python: '3.5'
-    env: TOXENV=clean,py35-cov,report
-  - stage: Build_n_test
     python: '3.6'
     env: TOXENV=clean,py36-cov,report
   - stage: Build_n_test
