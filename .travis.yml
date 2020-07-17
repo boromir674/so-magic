@@ -36,18 +36,16 @@ jobs:
     env: TOXENV=check
   - stage: Build_n_test
     python: '3.6'
-    env: TOXENV=clean,py36-cov,report
+    env: TOXENV=clean,py36-cov
   - stage: Build_n_test
     python: '3.7'
-    env: TOXENV=clean,py37-cov,report
+    env: TOXENV=clean,py37-cov
   - stage: Build_n_test
     python: '3.8'
-    env: TOXENV=clean,py38-cov,report
-  - stage: Codecov
-    env: TOXENV=codecov
+    env: TOXENV=clean,py38-cov
 
-#after_success:
-#  - tox -e codecov
+after_success:
+  - tox -e codecov
 
 #  - stage: Code_quality
 #    python: '3.6'
