@@ -43,9 +43,12 @@ jobs:
   - stage: Build_n_test
     python: '3.8'
     env: TOXENV=clean,py38-cov,report
+  - stage: Codecov
+    python: '3'
+    env: TOXENV=codecov
 
-after_success:
-  - tox -e codecov
+#after_success:
+#  - tox -e codecov
 
 #  - stage: Code_quality
 #    python: '3.6'
