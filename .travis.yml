@@ -44,7 +44,6 @@ jobs:
     python: '3.8'
     env: TOXENV=clean,py38-cov,report
   - stage: Codecov
-    python: '3'
     env: TOXENV=codecov
 
 #after_success:
