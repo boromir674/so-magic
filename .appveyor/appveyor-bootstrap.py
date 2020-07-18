@@ -105,15 +105,18 @@ def install_pip(home):
         print("Executing:", python_path, GET_PIP_PATH)
         check_call([python_path, GET_PIP_PATH])
 
-def upgrade_pip():
+def upgrade_pip(python_home_folder):
+    print('Upgrading pip ..')
     try:
-        check_call(['python', '-m', 'pip', 'install', '--upgrade', 'pip'])
+        check_call([python_home_folder + '/python.exe', '-m', 'pip', 'install', '--upgrade', 'pip'])
     except Exception as e:
         print("Failed to upgade pip: {}".format(e))
 
 
 def install_packages(home, *packages):
-    cmd = [home + "/Scripts/pip.exe", "install"]
+    print('Installing packages [{}]'.format(', '.join(str(_) for _ in packages)))
+    # cmd = [home + "/Scripts/pip.exe", "install"]
+    cmd = [home + "/python.exe", "-m", "pip", "install"]
     cmd.extend(packages)
     check_call(cmd)
 
@@ -121,5 +124,5 @@ def install_packages(home, *packages):
 if __name__ == "__main__":
     install_python(environ['PYTHON_VERSION'], environ['PYTHON_ARCH'], environ['PYTHON_HOME'])
     install_pip(environ['PYTHON_HOME'])
-    upgrade_pip()
-    install_packages(environ['PYTHON_HOME'], "setuptools>=18.0.1", "wheel", "tox", "virtualenv>=14.0.0")
+    upgrade_pip(environ['PYTHON_HOME'])
+    install_packages(environ['PYTHON_HOME'], "setuptools>=40.0.0", "wheel", "tox", "virtualenv>=20.0.0")
