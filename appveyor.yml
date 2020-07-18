@@ -1,0 +1,81 @@
+version: '{branch}-{build}'
+build: off
+cache:
+  - '%LOCALAPPDATA%\pip\Cache'
+
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: notused
+  global:
+    WITH_COMPILER: 'cmd /E:ON /V:ON /C .\.appveyor\appveyor-with-compiler.cmd'
+  matrix:
+
+    - TOXENV: 'clean,py38-cov'
+      TOXPYTHON: C:\Python38\python.exe
+      PYTHON_HOME: C:\Python38
+      PYTHON_VERSION: '3.8'
+      PYTHON_ARCH: '32'
+      platform: x86
+  
+    - TOXENV: 'clean,py37-cov'
+      TOXPYTHON: C:\Python37\python.exe
+      PYTHON_HOME: C:\Python37
+      PYTHON_VERSION: '3.7'
+      PYTHON_ARCH: '32'
+      platform: x86
+    
+    - TOXENV: 'clean,py36-cov'
+      TOXPYTHON: C:\Python36\python.exe
+      PYTHON_HOME: C:\Python36
+      PYTHON_VERSION: '3.6'
+      PYTHON_ARCH: '32'
+      platform: x86
+
+    - TOXENV: 'py38'
+      TOXPYTHON: C:\Python38-x64\python.exe
+      PYTHON_HOME: C:\Python38-x64
+      PYTHON_VERSION: '3.8'
+      PYTHON_ARCH: '64'
+      platform: x64
+    
+    - TOXENV: 'py37'
+      TOXPYTHON: C:\Python37-x64\python.exe
+      PYTHON_HOME: C:\Python37-x64
+      PYTHON_VERSION: '3.7'
+      PYTHON_ARCH: '64'
+      platform: x64
+
+    - TOXENV: 'py36'
+      TOXPYTHON: C:\Python36-x64\python.exe
+      PYTHON_HOME: C:\Python36-x64
+      PYTHON_VERSION: '3.6'
+      PYTHON_ARCH: '64'
+      platform: x64
+
+
+init:
+  - ps: echo $env:TOXENV
+  - ps: ls C:\Python*
+
+
+install:
+  - python -u .appveyor\appveyor-bootstrap.py
+  - '%PYTHON_HOME%\Scripts\virtualenv --version'
+  - '%PYTHON_HOME%\Scripts\easy_install --version'
+  - '%PYTHON_HOME%\Scripts\pip --version'
+  - '%PYTHON_HOME%\Scripts\tox --version'
+  - '%PYTHON_HOME%\python --version'
+  
+test_script:
+  - '%PYTHON_HOME%\Scripts\tox --version'
+  - '%WITH_COMPILER% %PYTHON_HOME%\Scripts\tox -v'
+
+after_test:
+- '%PYTHON_HOME%\python.exe setup.py bdist_wheel'
+- ps: "ls dist"
+
+on_failure:
+  - ps: dir "env:"
+  - ps: get-content .tox\*\log\*
+artifacts:
+  - path: dist\*
