@@ -8,7 +8,7 @@ environment:
     secure: notused
   global:
     MUSIC_LIB_ROOT: '.\music-lib'
-    WITH_COMPILER: 'cmd /E:ON /V:ON /C .\ci\appveyor-with-compiler.cmd'
+    WITH_COMPILER: 'cmd /E:ON /V:ON /C .\.appveyor\appveyor-with-compiler.cmd'
   matrix:
 
     - TOXENV: 'clean,py38-cover'
@@ -60,7 +60,7 @@ init:
 
 
 install:
-  - python -u ci\appveyor-bootstrap.py
+  - python -u .appveyor\appveyor-bootstrap.py
   - '%PYTHON_HOME%\Scripts\virtualenv --version'
   - '%PYTHON_HOME%\Scripts\easy_install --version'
   - '%PYTHON_HOME%\Scripts\pip --version'
