@@ -11,42 +11,42 @@ environment:
     WITH_COMPILER: 'cmd /E:ON /V:ON /C .\.appveyor\appveyor-with-compiler.cmd'
   matrix:
 
-    - TOXENV: 'clean,py38-cover'
+    - TOXENV: 'clean,py38-cov'
       TOXPYTHON: C:\Python38\python.exe
       PYTHON_HOME: C:\Python38
       PYTHON_VERSION: '3.8'
       PYTHON_ARCH: '32'
       platform: x86
 
-    - TOXENV: 'py38-nocov'
+    - TOXENV: 'py38'
       TOXPYTHON: C:\Python38-x64\python.exe
       PYTHON_HOME: C:\Python38-x64
       PYTHON_VERSION: '3.8'
       PYTHON_ARCH: '64'
       platform: x64
 
-    - TOXENV: 'clean,py36-cover'
+    - TOXENV: 'clean,py36-cov'
       TOXPYTHON: C:\Python36\python.exe
       PYTHON_HOME: C:\Python36
       PYTHON_VERSION: '3.6'
       PYTHON_ARCH: '32'
       platform: x86
 
-    - TOXENV: 'py36-nocov'
+    - TOXENV: 'py36'
       TOXPYTHON: C:\Python36-x64\python.exe
       PYTHON_HOME: C:\Python36-x64
       PYTHON_VERSION: '3.6'
       PYTHON_ARCH: '64'
       platform: x64
 
-    - TOXENV: 'clean,py37-cover'
+    - TOXENV: 'clean,py37-cov'
       TOXPYTHON: C:\Python37\python.exe
       PYTHON_HOME: C:\Python37
       PYTHON_VERSION: '3.7'
       PYTHON_ARCH: '32'
       platform: x86
 
-    - TOXENV: 'py37-nocov'
+    - TOXENV: 'py37'
       TOXPYTHON: C:\Python37-x64\python.exe
       PYTHON_HOME: C:\Python37-x64
       PYTHON_VERSION: '3.7'

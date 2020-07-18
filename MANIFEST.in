@@ -10,6 +10,11 @@ include tests/*.py
 
 include .travis.yml
 
+include appveyor.yml
+recursive-include .appveyor *.py
+include .appveyor/appveyor-with-compiler.cmd
+
+
 include .coveragerc
 include tox.ini
 
