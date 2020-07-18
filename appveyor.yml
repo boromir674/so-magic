@@ -30,13 +30,6 @@ environment:
       PYTHON_VERSION: '3.6'
       PYTHON_ARCH: '32'
       platform: x86
-  
-    - TOXENV: 'py36'
-      TOXPYTHON: C:\Python36-x64\python.exe
-      PYTHON_HOME: C:\Python36-x64
-      PYTHON_VERSION: '3.6'
-      PYTHON_ARCH: '64'
-      platform: x64
 
     - TOXENV: 'py38'
       TOXPYTHON: C:\Python38-x64\python.exe
@@ -49,6 +42,13 @@ environment:
       TOXPYTHON: C:\Python37-x64\python.exe
       PYTHON_HOME: C:\Python37-x64
       PYTHON_VERSION: '3.7'
+      PYTHON_ARCH: '64'
+      platform: x64
+
+    - TOXENV: 'py36'
+      TOXPYTHON: C:\Python36-x64\python.exe
+      PYTHON_HOME: C:\Python36-x64
+      PYTHON_VERSION: '3.6'
       PYTHON_ARCH: '64'
       platform: x64
 
