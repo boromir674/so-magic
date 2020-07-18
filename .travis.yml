@@ -6,6 +6,7 @@ env:
     - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
     - SEGFAULT_SIGNALS=all
     - TOX_SKIP_MISSING_INTERPRETERS="False"
+    - secure: SbeD7piafLsAqewW4UWA2YI3d/tPsPrhIuJxsKqc7DTqWH9KeTLnVFRNtNelZ6mz/z4Tv9pnWnFfUgr47/LtH/Iacb/ldPkJk7EECkUZYfWuNsXLmwq0W3ZIot/9pPbeqHrLN3qkwoVp/aKAV+yQipl6Hpe78ajs5d+/LQhHv+LG9KjXwEnSnd9YBEiojT60i+i4nSgbOS9/Zzqy3DydLm6TK6UO8kwzsJlIoevKGYvpymqIE4hoWIE2UTx+mTqndAlSSqINYpX4Sp4gwcV3M+kSZY+98hMiBOoJeZkC73/kK6QJqdU7ppYpA1/MQUM8IaVp7p0/XlTxKBc8ZfpuKmF+alond+xZUEfLwa14MnQ5A0U0V60UJsROmpnWfptHz6XqRLZ4XgUVhnubNz7HGjIoKnUJC/isj4bHdli7qm92TgiYWb0i4pJZYjK+4xy8nItU47/Mn1epqOLJzSt2bHFma/df2HGUFtqjcQCzunnxeUFPDAZ/rD768ocbNxA7QuGdNajp8iV3En7xg7CMScbpz2lKSWMHUKmJgGudBKfxLOkwxpPk6cLFAtlGNLDHS3m9R4BFU4ibIXd/+BfduB+397p91xzyd3M4kF/w5tpFdQKIwN4/b/balDSSNLGVcIVAHtT0RFufU9TZ3+H8gNcCK114lJPIrksipyy1R/g=
 
 before_install:
   - python --version
