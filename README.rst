@@ -3,22 +3,8 @@ Self-organising map
 
 Python library
 
-
-.. start-badges
-
-.. list-table::
-    :stub-columns: 1
-
-    * - tests
-      - | |travis|
-        | |appveyor|
-        | |codacy_coverage|
-        | |better_code_hub|
-        | |codacy_quality|
-        | |scrutinizer_code_quality|
-        | |code_intelligence_status|
-        
-
+|travis| |appveyor| |codacy_coverage| |better_code_hub| 
+|codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
 
 .. |travis| image:: https://travis-ci.org/boromir674/green-magic.svg?branch=dev
     :alt: Travis-CI Build Status
@@ -55,6 +41,3 @@ Python library
 .. |code_intelligence_status| image:: https://scrutinizer-ci.com/g/boromir674/green-magic/badges/code-intelligence.svg?b=dev
     :alt: Code Intelligence
     :target: https://scrutinizer-ci.com/code-intelligence
-
-
-.. end-badges
