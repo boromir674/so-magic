@@ -1,10 +1,15 @@
 SOMAGIC
 Self-organising map
 
-Python library
+Self-Organising MAp Graceful InterfaCe (SO-MAGIC)
 
-|travis| |appveyor| |codacy_coverage| |better_code_hub| 
-|codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
+A python library providing with an elegant interface (API) to infer models of the Self-organing Map family, based on structured data.
+
+
+.. start-badges
+
+|travis| |appveyor| |codacy_coverage| |docs| |better_code_hub| |codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
+
 
 .. |travis| image:: https://travis-ci.org/boromir674/green-magic.svg?branch=dev
     :alt: Travis-CI Build Status
@@ -26,8 +31,8 @@ Python library
     :alt: Codacy Code quality
     :target: https://www.codacy.com/manual/boromir674/green-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/green-magic&amp;utm_campaign=Badge_Grade
 
-.. |docs| image:: https://readthedocs.org/projects/music-album-creator/badge/?version=master
-    :target: https://music-album-creator.readthedocs.io/en/latest/?badge=master
+.. |docs| image:: https://readthedocs.org/projects/so-magic/badge/?version=latest
+    :target: https://so-magic.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
 .. |appveyor| image:: https://ci.appveyor.com/api/projects/status/6u04abdkt9ou802l/branch/dev?svg=true

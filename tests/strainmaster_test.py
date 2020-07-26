@@ -25,11 +25,10 @@ def test_sample_datapoints(sample_datapoints, som_master):
     assert hasattr(som_master.engine.backend.commands, 'prototypes')
     assert len(som_master.dt) == 100
 
-@pytest.mark.skip(reason="The 'sample_feature_vectors' fixture is failing.")
+# @pytest.mark.skip(reason="The 'sample_feature_vectors' fixture is failing.")
 def test_training(som_master, sample_feature_vectors):
     from green_magic.strain.data.dataset import Dataset
     dataset = Dataset(som_master.dt, 'sample-strains')
-
     from green_magic.som import MapManager
     mm = MapManager()
     so_map = mm.get_map(dataset, 10, 10, 'pca', 'toroid', 'hexagonal')

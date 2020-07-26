@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import attr
 
+
 class FeatureInterface(ABC):
     @abstractmethod
     def values(self, dataset):
@@ -41,7 +42,7 @@ class FeatureState:
 
 @attr.s
 class FeatureFunction(BaseFeature):
-    """Example: Assume we hav a datapoint v = [v_1, v_2, .., v_n, and 2 feature functions f_1, f_2\n
+    """Example: Assume we have a datapoint v = [v_1, v_2, .., v_n, and 2 feature functions f_1, f_2\n
     Then we can produce an encoded vector (eg to feed for training a ML model) like: encoded_vector = [f_1(v), f_2(v)]
     """
     function = attr.ib(init=True)
@@ -95,7 +96,7 @@ class StateMachine:
 @attr.s
 class TrackingFeature:
     feature = attr.ib(init=True)
-    sm = attr.ib(init=True)
+    state_machine = attr.ib(init=True)
     variable_type = attr.ib(init=True, default=None)
 
     @classmethod
@@ -104,7 +105,7 @@ class TrackingFeature:
         return TrackingFeature(FeatureFunction(a_callable, label), StateMachine({'raw': a_callable}, 'raw'), variable_type)
 
     def values(self, dataset):
-        return self.sm.state.reporter(dataset)
+        return self.state_machine.state.reporter(dataset)
 
     def label(self):
         return self.feature.label
@@ -112,12 +113,17 @@ class TrackingFeature:
     @property
     def state(self):
         """Returns the current state"""
-        return self.sm.state
+        return self.state_machine.state
 
     def update(self, *args, **kwargs):
-        self.sm.update(*args, **kwargs)
+        self.state_machine.update(*args, **kwargs)
 
 
 @attr.s
 class FeatureIndex:
     keys = attr.ib(init=True, validator=_list_validator)
+
+
+class PhiFeatureFunction:
+    def __call__(self, *args, **kwargs):
+        raise NotImplementedError

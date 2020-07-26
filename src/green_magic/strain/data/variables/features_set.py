@@ -18,9 +18,7 @@ class BaseFeatureSet:
 
     @classmethod
     def from_raw_extractors(cls, data):
-        """
-        Create a Feature for each of the lists in the input data (list). Inner lists must satisfy 0 < len(l)
-        """
+        """Create a Feature for each of the lists in the input data (list). Inner lists must satisfy 0 < len(l)"""
         return [TrackingFeature.from_callable(*args) for args in data]
 
 

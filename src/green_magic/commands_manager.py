@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 import copy
 import attr
-
+from green_magic.utils import ObserverInterface, Subject
+from green_magic.strain.data.features.phi import PhiFunction
 
 class CommandInterface(ABC):
 
@@ -19,14 +20,11 @@ class Command(AbstractCommand):
         super().__init__(receiver)
         self._method = method
         self._args = [_ for _ in args]  # this is a list that can be minimally be []
-        print('GGGGGG')
-        assert self._args == []
+
     def append_arg(self, *args):
         self._args.extend([_ for _ in args])
 
     def execute(self) -> None:
-        print(self._receiver, self._method)
-        print("ARGS", self._args)
         getattr(self._receiver, self._method)(*self._args)
 
     def __copy__(self):
@@ -37,34 +35,46 @@ class Command(AbstractCommand):
 
 
 @attr.s
-class CommandsManager:
+class CommandsManager(ObserverInterface):
     datapoints_factory = attr.ib(init=True)
+    prototypes = attr.ib(init=True, default={})
+
+    def update(self, subject: Subject) -> None:
+        if subject._state
+        self.prototypes
 
     def __getattr__(self, item):
-        return copy.copy(self.prototypes[item])
+        if item not in self.prototypes:
+            raise KeyError(f"Item '{item}' not found in [{', '.join(str(_) for _ in self.prototypes.keys())}]")
+        return self.prototypes[item]
+
 
 @attr.s
 class ObjectsPool:
+    """A generic object pool able to return a reference to an object upon request. Whenever an object is requested a
+    hash is built out of the (request) arguments, which is then checked against the registry of keys to determine
+    whether the object is present in the pool or to create (using the local constructor attribute) and insert a new one
+     (in the pool)."""
     constructor = attr.ib(init=True)
     _objects = attr.ib(init=True, default={})
 
     def get_object(self, *args, **kwargs):
         key = self._build_hash(*args, **kwargs)
-        if key not in ObjectsPool._objects:
-            ObjectsPool._objects[key] = self.constructor(*args, **kwargs)
-        return ObjectsPool._objects[key]
+        if key not in self._objects:
+            self._objects[key] = self.constructor(*args, **kwargs)
+        return self._objects[key]
 
     def _build_hash(self, *args, **kwargs):
         """Construct a unique string out of the arguments that the constructor receives."""
         return hash('-'.join([str(_) for _ in args]))
 
     def __getattr__(self, item):
-        return ObjectsPool._objects[item]
+        return self._objects[item]
 
 
 @attr.s
 class CommandHistory:
-    """ The global command history is just a stack."""
+    """The global command history is just a stack; supports 'push' and 'pop' methods."""
 
     _history = attr.ib(init=False, default=[])
     @_history.validator

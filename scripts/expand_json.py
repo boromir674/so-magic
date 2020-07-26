@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import json
 import sys
 import pandas as pd
@@ -93,34 +95,14 @@ def main():
             _ = list(data[el].keys())
             if _ is None:
                 print(_)
-            # print(list(data[el].keys()))
 
-        # assert all(bool(data[x]) for x in TARGETS)
-        # print(r)
-        # print(data['effects'])
-        # print('----')
-        # assert 'effects' in data
-        # assert 'negatives' in data
-        # assert 'medical' in data
-        # assert all([t in r for t in TARGETS])
-    # for en, i in enumerate(df['effects']):
-    #     print(type(i))
     unique = {key: sorted(list(reduce(lambda i, j: set(list(i) + j), [list(data_dict.keys()) for data_dict in df[key]]))) for key in TARGETS}
-              # sum([list(data_dict.keys()) for data_dict in df[key]])) for key in TARGETS}
-    # unique = {key: set(sum([list(data_dict.keys()) for data_dict in df[key]])) for key in TARGETS}
 
     assert len(unique) == 3
     assert all(key in unique for key in TARGETS)
     print("Stats:\n{}".format('\n'.join([' ' + "'{}': [{}]".format(key, ', '.join(unique[key])) for key in TARGETS])))
     print
     print("Stats:\n{}".format('\n'.join([' ' + "'{}': #{}".format(key, len(unique[key])) for key in TARGETS])))
-
-    # for key, discrete_values in unique.items():
-    #     for inner_key in discrete_values:
-    #         df = add_column(df, inner_key, [row[key].get(inner_key, '') for row in df.itterrows()])
-
-    # for key, discrete_values in unique.items():
-    #     df = add_columns(df, discrete_values, [[row[key].get(inner_key, '') for row in df.itterrows()] for inner_key in discrete_values])
 
     for key in TARGETS:
         discrete_values = sorted(list(unique[key]))
@@ -132,25 +114,19 @@ def main():
     for t in TARGETS:
         del df[t]
     del df[GROW_INFO_FIELD]
-    # for i, row in df.iterrows():
-    #     print(i)
-    #     print(row)
     df.to_json(dest_file, orient='records', lines=True)
 
     dest_df = pd.read_json(path_or_buf=dest_file, lines=True)
-    print(dest_df.columns)
-    for i in dest_df['_id']:
-        if 'mango' in i:
-            print("'{}'".format(i))
-    #     print(i)
-    for id in df['_id']:
-        if id not in set(list(dest_df['_id'])):
-            print("ERROR", id)
-            break
+    print(f"Resulted attributes: {dest_df.columns}")
+    resulted_ids = set(list(dest_df['_id']))
+    missed_ids = []
+    for _id in df['_id']:
+        if _id not in resulted_ids:
+            missed_ids.append(_id)
+    if missed_ids:
+        raise RuntimeError(f"Ids [{', '.join(str(_) for _ in missed_ids)}] are present in the original file, but not in "
+                           f"the target.")
 
-# def add_column(dataframe, name, values):
-#     """Call this method to add a new column with the given values and get a new dataframe reference"""
-#     return dataframe.assign(**{name: values})
 
 def add_columns(dataframe, names, values_list):
     """Call this method to add a new column with the given values and get a new dataframe reference"""

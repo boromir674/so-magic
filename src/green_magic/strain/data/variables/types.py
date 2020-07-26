@@ -1,10 +1,9 @@
 from abc import ABCMeta, abstractmethod, ABC
 
+__all__ = ['NominalVariableType', 'OrdinalVariableType', 'IntervalVariableType', 'RatioVariableType']
 
-class VariableType(type, ABC):
+class VariableType(ABC):
     """
-    Each Concrete Component must implement the `accept` method in such a way
-    that it calls the visitor's method corresponding to the component's class.
     """
     encoded_allowed = []
 
@@ -13,7 +12,7 @@ class VariableType(type, ABC):
 class CategoricalVariableType(VariableType, ABC):
     """Categorical/discrete variable; either 'nominal' or 'ordinal'"""
     pass
-##
+
 class NominalVariableType(CategoricalVariableType):
     """Nominal variable; discrete variables with undefined ordering; eg country-names"""
     # data = {list: lambda x: all(el in [0, 1] for )}
@@ -28,7 +27,7 @@ class OrdinalVariableType(CategoricalVariableType):
 class NumericalVariableType(VariableType, ABC):
     """Numerical/continuous variables; either 'interval' or 'ratio'"""
     pass
-##
+
 class IntervalVariableType(NumericalVariableType):
     """Interval variable; numerical variable where differences are interpretable; supported operations: [+, -]; no true zero; eg temperature in centigrade (ie Celsius)"""
     pass

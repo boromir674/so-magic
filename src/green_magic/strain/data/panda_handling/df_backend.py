@@ -14,10 +14,11 @@ class PDDatapointsFactory(DatapointsFactory):
 
     def from_json_lines(self, file_path, **kwargs):
         self.state = Datapoints(pd.read_json(file_path, lines=True))
-        _id = 'filename'
+        _id = 'filename'  # indicate to automatically assign an id inferred from the file name path
         if 'id' in kwargs:
-            _id = kwargs['id']
+            _id = kwargs['id']  # use user-provided id
         super().from_json_lines(file_path, id=_id)
+
 
 
 @attr.s
@@ -37,3 +38,24 @@ class PDBackend(Backend):
     @property
     def commands(self):
         return self._commands_manager
+
+from green_magic.strain.data.data_attributes import DataAttribute, DataAttributeFactory
+
+class PDDataAttribute(DataAttribute):
+    def values(self, dataset):
+        return dataset[self.name]
+
+
+class PDDataAttributeFactory(DataAttributeFactory):
+    def from_dataset(self, dataset, attribute_name, sortable=True, ratio=True):
+        categorical = dataset.datapoints._get_numeric_data().columns.values
+        if attribute_name in categorical:
+            if sortable:
+                return PDDataAttribute(attribute_name, self.types['ordinal'])
+            return PDDataAttribute(attribute_name, self.types['nominal'])
+        numerical = list(set(dataset.datapoints.columns) - set(categorical))
+        if attribute_name in numerical:
+            if ratio:
+                return PDDataAttribute(attribute_name, self.types['ratio'])
+            return PDDataAttribute(attribute_name, self.types['interval'])
+        raise Exception(f"The '{attribute_name}' attribute was not found in the dataframe columns [{', '.join(str(_ for _ in dataset.datapoints.columns.values))}].")
