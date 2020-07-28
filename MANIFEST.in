@@ -23,3 +23,10 @@ recursive-include src *.py
 recursive-include src *.conf
 
 global-exclude *.py[cod] __pycache__ *.so *.dylib *.log
+
+recursive-include docs *.bat
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs *.txt
+include docs/Makefile
+include docs/spelling_wordlist.txt

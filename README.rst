@@ -11,38 +11,38 @@ A python library providing with an elegant interface (API) to infer models of th
 |travis| |appveyor| |codacy_coverage| |docs| |better_code_hub| |codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
 
 
-.. |travis| image:: https://travis-ci.org/boromir674/green-magic.svg?branch=dev
+.. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=dev
     :alt: Travis-CI Build Status
-    :target: https://travis-ci.org/boromir674/green-magic
+    :target: https://travis-ci.org/boromir674/so-magic
+
+.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/6u04abdkt9ou802l/branch/dev?svg=true
+    :alt: Appveyor Build Status
+    :target: https://ci.appveyor.com/project/boromir674/so-magic/branch/dev
 
 .. |codacy_coverage| image:: https://app.codacy.com/project/badge/Coverage/3c5b20d36ce94865b704e589b89204d4
     :alt: Codacy code coverage
-    :target: https://www.codacy.com/manual/boromir674/green-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/green-magic&amp;utm_campaign=Badge_Coverage
-
-.. |codecov| image:: https://codecov.io/gh/boromir674/green-magic/branch/dev/graph/badge.svg
-    :alt: Codecov.io code coverage
-    :target: https://codecov.io/gh/boromir674/green-magic
-
-.. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/green-magic?branch=dev
-    :alt: Better Code Hub
-    :target: https://bettercodehub.com/
-
-.. |codacy_quality| image:: https://app.codacy.com/project/badge/Grade/3c5b20d36ce94865b704e589b89204d4
-    :alt: Codacy Code quality
-    :target: https://www.codacy.com/manual/boromir674/green-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/green-magic&amp;utm_campaign=Badge_Grade
+    :target: https://www.codacy.com/manual/boromir674/so-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Coverage
 
 .. |docs| image:: https://readthedocs.org/projects/so-magic/badge/?version=latest
     :target: https://so-magic.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/6u04abdkt9ou802l/branch/dev?svg=true
-    :alt: Appveyor Build Status
-    :target: https://ci.appveyor.com/project/boromir674/green-magic/branch/dev
+.. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=dev
+    :alt: Better Code Hub
+    :target: https://bettercodehub.com/
 
-.. |scrutinizer_code_quality| image:: https://scrutinizer-ci.com/g/boromir674/green-magic/badges/quality-score.png?b=dev
+.. |codacy_quality| image:: https://app.codacy.com/project/badge/Grade/3c5b20d36ce94865b704e589b89204d4
+    :alt: Codacy Code quality
+    :target: https://www.codacy.com/manual/boromir674/so-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Grade
+
+.. |scrutinizer_code_quality| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/quality-score.png?b=dev
     :alt: Code Quality
-    :target: https://scrutinizer-ci.com/g/boromir674/green-magic/?branch=dev
+    :target: https://scrutinizer-ci.com/g/boromir674/so-magic/?branch=dev
 
-.. |code_intelligence_status| image:: https://scrutinizer-ci.com/g/boromir674/green-magic/badges/code-intelligence.svg?b=dev
+.. |code_intelligence_status| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/code-intelligence.svg?b=dev
     :alt: Code Intelligence
     :target: https://scrutinizer-ci.com/code-intelligence
+
+.. |codecov| image:: https://codecov.io/gh/boromir674/so-magic/branch/dev/graph/badge.svg
+    :alt: Codecov.io code coverage
+    :target: https://codecov.io/gh/boromir674/so-magic

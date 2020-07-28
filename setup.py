@@ -1,21 +1,20 @@
 import os
 import re
-from collections import OrderedDict
-
-from setuptools import find_packages, setup
+from setuptools import setup
 
 my_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 # CONSTANTS
 SETUP_CFG = 'setup.cfg'
-source_code_repo = 'https://github.com/boromir674/green-magic'
+source_code_repo = 'https://github.com/boromir674/so-magic'
 # changelog = '{}/blob/master/CHANGELOG.rst'.format(source_code_repo)
 
 
 def readme():
     with open(os.path.join(my_dir, 'README.rst')) as f:
         return f.read()
+
 
 def requirements():
     with open(os.path.join(my_dir, 'requirements', 'base.txt')) as fh:
