@@ -41,14 +41,8 @@ jobs:
       - sudo python -m pip install -U pip
       - python -m pip install -U tox
       - sudo apt-get install python-enchant
-    env: TOXENV=spell
-    name: "Check documentation spelling"
-  - stage: Build docs
-    env: TOXENV=docs
+    env: TOXENV=spell,docs
     name: "Build documentation"
-  allow_failures:
-    - env: TOXENV=spell
-
 
 after_success:
   - tox -e codecov

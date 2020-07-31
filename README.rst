@@ -23,8 +23,8 @@ A python library providing with an elegant interface (API) to infer models of th
     :alt: Codacy code coverage
     :target: https://www.codacy.com/manual/boromir674/so-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Coverage
 
-.. |docs| image:: https://readthedocs.org/projects/so-magic/badge/?version=latest
-    :target: https://so-magic.readthedocs.io/en/latest/?badge=latest
+.. |docs| image:: https://readthedocs.org/projects/so-magic/badge/?version=dev
+    :target: https://so-magic.readthedocs.io/en/latest/?badge=dev
     :alt: Documentation Status
 
 .. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=dev
