@@ -8,8 +8,9 @@ CONF_PY = os.path.join(my_dir, '../docs', 'conf.py')
 
 ## CONFIG
 # 1. Automatic extensions registration
-EXTENTIONS = [
+EXTENSIONS = [
     'sphinx.ext.doctest',
+    'sphinx.ext.autodoc',
 ]
 # 2. Automatic parsing of software release version
 CONFIG_INI = os.path.join(repo_root, 'setup.cfg')
@@ -24,7 +25,6 @@ DEPS = ['os', 'sys']
 ## SCRIPT
 def set_extensions(string, extensions):
     """Register sphinx extensions by populating the 'extentions' list."""
-    # return re.sub('(extensions[ \t]*=[ \t\n]*\[\n*)(.*\n*\])', "\\1'sphinx.ext.doctest',\n\\2", data)
     return re.sub('(extensions[ \t]*=[ \t\n]*\[\n*)(.*\n*\])', "\\1" +  ',\n'.join(f"'{x}'" for x in extensions) + ",\n\\2", string)
 
 
@@ -35,7 +35,7 @@ def set_release(string, version_string):
 
 # Automatically compute package vesion from the [semantic_release] section in setup.cfg
 def get_version_string(config_file, section, field):
-    """Read the """
+    """Read the software release version as a string with format xX.Y.Z ie v0.1.0"""
     with open(os.path.join(config_file), 'r') as f:
         regex = r"\[semantic_release\][\w\s=/\.:\d]+version_variable[\ \t]*=[\ \t]*([\w\.]+(?:/[\w\.]+)*):(\w+)"
         m = re.search(regex, f.read(), re.MULTILINE)
@@ -83,8 +83,8 @@ def set_to_sys_path(string, paths, libs):
         search(lines[i])
         i += 1
     path_update_lines = [f"sys.path.insert(0, os.path.abspath('../{relative_path}'))" for relative_path in paths]
-    if i == len(lines): # did not find import statements to uncommend
-        new_lines = ['import os'] + ['import sys'] + path_update_lines + lines
+    if i == len(lines): # did not find import statements, so we do a manual fix here by including them in the file
+        new_lines = [f'import {lib}' for lib in libs] + path_update_lines + lines
     else:
         new_lines = lines[:i] + path_update_lines + lines[i:]
     return '\n'.join(new_lines)
@@ -105,7 +105,7 @@ def main():
     data = fin.read()
 
     # 1. Automatically register extentions
-    data = set_extensions(data, EXTENTIONS)
+    data = set_extensions(data, EXTENSIONS)
 
     # 2. Automatically set the 'release' variable based on semantic_release (see setup.cfg)
     try:
