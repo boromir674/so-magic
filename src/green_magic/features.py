@@ -1,5 +1,4 @@
-from .utils import generate_words, gen_values
-
+from .helpers import generate_words, gen_values
 
 class StrainLexicon(object):
 
