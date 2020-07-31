@@ -37,16 +37,16 @@ jobs:
 #  - stage: Check_distro
 #    env: TOXENV=check
 #    name: "Check source distribution"
-  - stage: Check docs
+  - stage: Build docs
     before_install:
       - sudo python -m pip install -U pip
       - python -m pip install -U tox
       - sudo apt-get install python-enchant
     env: TOXENV=spell
     name: "Check documentation spelling"
-#  - stage: Build docs
-#    env: TOXENV=docs
-#    name: "Build documentation"
+  - stage: Build docs
+    env: TOXENV=docs
+    name: "Build documentation"
   allow_failures:
     - env: TOXENV=spell
 
