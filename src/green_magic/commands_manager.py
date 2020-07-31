@@ -40,8 +40,9 @@ class CommandsManager(ObserverInterface):
     prototypes = attr.ib(init=True, default={})
 
     def update(self, subject: Subject) -> None:
-        if subject._state
-        self.prototypes
+        # if subject._state
+        # self.prototypes
+        pass
 
     def __getattr__(self, item):
         if item not in self.prototypes:

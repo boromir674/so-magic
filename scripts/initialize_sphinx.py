@@ -89,8 +89,10 @@ def main():
     fin = open(conf_py, "rt")
     data = fin.read()
 
-    # data = set_extensions(data, ['sphinx.ext.doctest'])
+    # 1. Automatically register extentions
+    data = set_extensions(data, ['sphinx.ext.doctest'])
 
+    # 2. Automatically set the 'release' variable based on semantic_release (see setup.cfg)
     try:
         version = get_version_string(setup_cfg, 'semantic_release', 'version_variable')
         data = set_release(data, version.replace('v', ''))
@@ -98,6 +100,7 @@ def main():
         print(e)
         print("<<Please set the 'release' variable in conf.py manually.>>")
 
+    # 3. Automatically update $PATH to support using autodoc extention
     deps = ['os', 'sys']
     paths = ['src/so_magic']
     for lib in deps:
