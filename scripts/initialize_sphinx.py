@@ -1,13 +1,27 @@
 import os
 import re
 
-
-## SCRIPT
+# CONSTANSTS
 my_dir = os.path.dirname(os.path.realpath(__file__))
 repo_root = os.path.join(my_dir, '../')
-setup_cfg = os.path.join(repo_root, 'setup.cfg')
+CONF_PY = os.path.join(my_dir, '../docs', 'conf.py')
 
+## CONFIG
+# 1. Automatic extensions registration
+EXTENTIONS = [
+    'sphinx.ext.doctest',
+]
+# 2. Automatic parsing of software release version
+CONFIG_INI = os.path.join(repo_root, 'setup.cfg')
+SECTION = 'semantic_release'
+FIELD = 'version_variable'
+# 3. Automatic updating $PATH to enable working with autodoc
+PATHS = [
+    'src/so_magic',
+]
+DEPS = ['os', 'sys']
 
+## SCRIPT
 def set_extensions(string, extensions):
     """Register sphinx extensions by populating the 'extentions' list."""
     # return re.sub('(extensions[ \t]*=[ \t\n]*\[\n*)(.*\n*\])', "\\1'sphinx.ext.doctest',\n\\2", data)
@@ -83,32 +97,28 @@ def uncomment_import(string, lib_name):
 
 
 def main():
-    conf_py = os.path.join(my_dir, '../docs', 'conf.py')
-
     # read input file
-    fin = open(conf_py, "rt")
+    fin = open(CONF_PY, "rt")
     data = fin.read()
 
     # 1. Automatically register extentions
-    data = set_extensions(data, ['sphinx.ext.doctest'])
+    data = set_extensions(data, EXTENTIONS)
 
     # 2. Automatically set the 'release' variable based on semantic_release (see setup.cfg)
     try:
-        version = get_version_string(setup_cfg, 'semantic_release', 'version_variable')
+        version = get_version_string(CONFIG_INI, SECTION, FIELD)
         data = set_release(data, version.replace('v', ''))
     except (RuntimeError, FileNotFoundError, AttributeError) as e:
         print(e)
         print("<<Please set the 'release' variable in conf.py manually.>>")
 
     # 3. Automatically update $PATH to support using autodoc extention
-    deps = ['os', 'sys']
-    paths = ['src/so_magic']
-    for lib in deps:
+    for lib in DEPS:
         data = uncomment_import(data, lib)
-    data = set_to_sys_path(data, paths)
+    data = set_to_sys_path(data, PATHS)
 
     fin.close()
-    fin = open(conf_py, "wt")
+    fin = open(CONF_PY, "wt")
     # overrite the input file with the resulting data
     fin.write(data)
     fin.close()
