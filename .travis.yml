@@ -40,8 +40,7 @@ jobs:
   - stage: Check docs
     before_install:
       - sudo python -m pip install -U pip
-      - python -m pip install tox
-      - sudo apt-get install pyenchant
+      - python -m pip install -U tox pyenchant
     env: TOXENV=spell
     name: "Check documentation spelling"
   - stage: Build docs
