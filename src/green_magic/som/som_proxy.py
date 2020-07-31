@@ -3,6 +3,9 @@ import numpy as np
 import somoclu
 from sklearn.cluster import KMeans
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class SomTrainer:
 
@@ -11,7 +14,7 @@ class SomTrainer:
         initialcodebook = None, kerneltype = 0, maptype = 'planar', gridtype = 'rectangular',
         compactsupport = False, neighborhood = 'gaussian', std_coeff = 0.5, initialization = None
         """
-        if not dataset.datapoints.feature_vectors:
+        if not getattr(dataset.datapoints, 'feature_vectors', None):
             raise NoFeatureVectorsError("Attempted to train a Som model, but did not find feature vectors in the dataset.")
         som = somoclu.Somoclu(nb_cols, nb_rows, **kwargs)
         som.train(data=np.array(dataset.datapoints.feature_vectors, dtype=np.float32))

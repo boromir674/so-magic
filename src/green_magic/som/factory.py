@@ -13,7 +13,14 @@ class ObjectsPool:
     def get_object(self, *args, **kwargs):
         key = self._build_hash(*args, **kwargs)
         if key not in ObjectsPool._objects:
-            ObjectsPool._objects[key] = self.constructor(*args, **kwargs)
+            try:
+                ObjectsPool._objects[key] = self.constructor(*args, **kwargs)
+            except TypeError as e:
+                print(e)
+                msg = f"DEBUG: Args: [{', '.join(str(_) for _ in args)}], kwargs: {str(kwargs)}"
+                print(f"DEBUG: Args: [{', '.join(str(_) for _ in args)}], kwargs: {str(kwargs)}")
+                raise TypeError(msg)
+                return None
         return ObjectsPool._objects[key]
 
     def _build_hash(self, *args, **kwargs):
@@ -21,7 +28,7 @@ class ObjectsPool:
 
 class SomapObjectPool(ObjectsPool):
     def _build_hash(self, *args, **kwargs):
-        return str(MapId(*args))
+        return str(MapId(*args, kwargs.get('initialization'), kwargs.get('map_type'), kwargs.get('grid_type')))
 
 
 @attr.s

@@ -34,6 +34,7 @@ class PhiFunction(AbstractPhiFunction):
     @classmethod
     def register(cls, a_callable):
         if type(data) == types.FunctionType:
+            pass
 
 
 class PhiFunctionFactory:

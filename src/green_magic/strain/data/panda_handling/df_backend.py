@@ -38,24 +38,24 @@ class PDBackend(Backend):
     @property
     def commands(self):
         return self._commands_manager
-
-from green_magic.strain.data.data_attributes import DataAttribute, DataAttributeFactory
-
-class PDDataAttribute(DataAttribute):
-    def values(self, dataset):
-        return dataset[self.name]
-
-
-class PDDataAttributeFactory(DataAttributeFactory):
-    def from_dataset(self, dataset, attribute_name, sortable=True, ratio=True):
-        categorical = dataset.datapoints._get_numeric_data().columns.values
-        if attribute_name in categorical:
-            if sortable:
-                return PDDataAttribute(attribute_name, self.types['ordinal'])
-            return PDDataAttribute(attribute_name, self.types['nominal'])
-        numerical = list(set(dataset.datapoints.columns) - set(categorical))
-        if attribute_name in numerical:
-            if ratio:
-                return PDDataAttribute(attribute_name, self.types['ratio'])
-            return PDDataAttribute(attribute_name, self.types['interval'])
-        raise Exception(f"The '{attribute_name}' attribute was not found in the dataframe columns [{', '.join(str(_ for _ in dataset.datapoints.columns.values))}].")
+#
+# from green_magic.strain.data.data_attributes import DataAttribute, DataAttributeFactory
+#
+# class PDDataAttribute(DataAttribute):
+#     def values(self, dataset):
+#         return dataset[self.name]
+#
+#
+# class PDDataAttributeFactory(DataAttributeFactory):
+#     def from_dataset(self, dataset, attribute_name, sortable=True, ratio=True):
+#         categorical = dataset.datapoints._get_numeric_data().columns.values
+#         if attribute_name in categorical:
+#             if sortable:
+#                 return PDDataAttribute(attribute_name, self.types['ordinal'])
+#             return PDDataAttribute(attribute_name, self.types['nominal'])
+#         numerical = list(set(dataset.datapoints.columns) - set(categorical))
+#         if attribute_name in numerical:
+#             if ratio:
+#                 return PDDataAttribute(attribute_name, self.types['ratio'])
+#             return PDDataAttribute(attribute_name, self.types['interval'])
+#         raise Exception(f"The '{attribute_name}' attribute was not found in the dataframe columns [{', '.join(str(_ for _ in dataset.datapoints.columns.values))}].")
