@@ -63,15 +63,13 @@ def get_version_string(config_file, section, field):
             raise AttributeError(f"Could not find a match for regex {reg} when applied to:\n{content}")
     return _version
 
-def set_to_sys_path(string, paths):
+def set_to_sys_path(string, paths, libs):
     """Each path is relative to the repo root folder.
 
     Add extensions (or modules to document with autodoc) that are in another directory,
     add these directories to sys.path here. If the directory is relative to the
     documentation root, use os.path.abspath to make it absolute, like shown here.
-
     """
-    libs = ['os', 'sys']
     def search(a_line):
         for lib_name in libs:
             if re.match('import {lib}'.format(lib=lib_name), a_line):
@@ -79,11 +77,16 @@ def set_to_sys_path(string, paths):
                 break
     lines = string.split('\n')
     i = 0
-    while i < len(lines) and bool(libs):
+    exist_lines_to_traverse = i < len(lines)
+    exist_dependencies_to_satisfy = bool(libs)
+    while exist_lines_to_traverse and exist_dependencies_to_satisfy:
         search(lines[i])
         i += 1
     path_update_lines = [f"sys.path.insert(0, os.path.abspath('../{relative_path}'))" for relative_path in paths]
-    new_lines = lines[:i] + path_update_lines + lines[i:]
+    if i == len(lines): # did not find import statements to uncommend
+        new_lines = ['import os'] + ['import sys'] + path_update_lines + lines
+    else:
+        new_lines = lines[:i] + path_update_lines + lines[i:]
     return '\n'.join(new_lines)
 
 
@@ -115,7 +118,7 @@ def main():
     # 3. Automatically update $PATH to support using autodoc extention
     for lib in DEPS:
         data = uncomment_import(data, lib)
-    data = set_to_sys_path(data, PATHS)
+    data = set_to_sys_path(data, PATHS, DEPS)
 
     fin.close()
     fin = open(CONF_PY, "wt")

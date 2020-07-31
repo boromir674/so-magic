@@ -26,9 +26,11 @@ jobs:
   include:
   - stage: Build_n_test
     env: TOXENV=check
+    name: "Check distribution"
   - stage: Build_n_test
     python: '3.6'
     env: TOXENV=clean,py36-cov,report
+    name: "Build, install and unittest with python3.6"
   - stage: Build_n_test
     python: '3.7'
     env: TOXENV=clean,py37-cov,report
