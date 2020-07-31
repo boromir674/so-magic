@@ -4,7 +4,7 @@ import pickle
 from collections import Counter
 from collections import OrderedDict as od
 import pandas as pd
-from .utils import extract_value
+from .helpers import extract_value
 from .definitions import all_vars
 from .features import FeatureComputer
 import logging
