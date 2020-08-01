@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 import copy
 import attr
-from green_magic.utils import ObserverInterface, Subject
-from green_magic.strain.data.features.phi import PhiFunction
+from green_magic.utils import Observer, Subject
+
 
 class CommandInterface(ABC):
 
@@ -35,7 +35,7 @@ class Command(AbstractCommand):
 
 
 @attr.s
-class CommandsManager(ObserverInterface):
+class CommandsManager(Observer):
     datapoints_factory = attr.ib(init=True)
     prototypes = attr.ib(init=True, default={})
 

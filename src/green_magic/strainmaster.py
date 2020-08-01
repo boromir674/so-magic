@@ -1,16 +1,10 @@
-import os
-import sys
-import json
 import pickle
-import numpy as np
 import logging
-from .features import StrainLexicon
-from .strain_dataset import StrainDataset, create_dataset_from_pickle
+from .strain_dataset import create_dataset_from_pickle
 from .clustering import get_model_quality_reporter
-from .strain.data.dataset import Dataset, DatapointsManager
-from .som import MapManager
-from .commands_manager import CommandsManager, Invoker
-from .strain.data.backend import DataEngine
+from .data.dataset import DatapointsManager
+from .commands_manager import Invoker
+from .data.backend import DataEngine
 
 _log = logging.getLogger(__name__)
 
@@ -156,12 +150,10 @@ class StrainMaster:
 
     def mpeta(self):
         from .strain.dataset import Dataset
-        from .strain.data.panda_handling.df_feature_factory import df_features_factory
-        from .strain.data.panda_handling.data_handler import df_receiver_factory
-        from .strain.data.commands import invoker_object
-        from .strain.data.base_handling import DataHandler
-        from .strain.data import data_master
-        from .strain.data.backend import Backend
+        from data import df_features_factory
+        from data import invoker_object
+        from data import DataHandler
+        from data import Backend
 
         # design
         DESIGN = {'name': 'dev-dataset',

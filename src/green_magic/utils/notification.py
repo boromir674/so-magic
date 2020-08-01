@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 import attr
 
-__all__ = ['Subject', 'ObserverInterface']
+__all__ = ['Subject', 'Observer']
 
 
 class ObserverInterface(ABC):

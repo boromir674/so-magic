@@ -1,7 +1,5 @@
 import os
-import shutil
 import pytest
-from random import randint
 
 # from green_magic.strain_dataset import StrainDataset, LoadingInvalidDatasetError
 from green_magic.clustering import ClusteringFactory
@@ -28,7 +26,7 @@ def test_sample_datapoints(sample_datapoints, som_master):
 # def test_training(som_master, sample_feature_vectors):
 # @pytest.mark.skip(reason="The 'sample_feature_vectors' fixture is failing.")
 def test_training(som_master):
-    from green_magic.strain.data.dataset import Dataset
+    from green_magic.data.dataset import Dataset
     from green_magic.som.som_proxy import NoFeatureVectorsError
     from green_magic.som import MapManager
 

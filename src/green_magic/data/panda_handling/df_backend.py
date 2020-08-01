@@ -1,8 +1,8 @@
 import attr
 import pandas as pd
-from green_magic.strain.data.data_commands import CommandsManager
+from green_magic.data.data_commands import CommandsManager
 from ..backend import Backend
-from green_magic.strain.data.dataset import Datapoints, DatapointsFactory
+from green_magic.data.dataset import Datapoints, DatapointsFactory
 
 from green_magic.commands_manager import Command
 

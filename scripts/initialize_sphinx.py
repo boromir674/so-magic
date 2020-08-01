@@ -9,8 +9,9 @@ CONF_PY = os.path.join(my_dir, '../docs', 'conf.py')
 ## CONFIG
 # 1. Automatic extensions registration
 EXTENSIONS = [
-    'sphinx.ext.doctest',
-    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',  # to support doctest builder
+    'sphinx.ext.autodoc',  # to support extracting documentation from docstrings supporting default format rst (javadoc-like)
+    'sphinx.ext.napoleon',  # enable support for google and numpy format for autodoc
 ]
 # 2. Automatic parsing of software release version
 CONFIG_INI = os.path.join(repo_root, 'setup.cfg')

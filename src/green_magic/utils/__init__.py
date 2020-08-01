@@ -1,1 +1,1 @@
-from .notification import Subject, ObserverInterface
+from .notification import Observer, Subject

@@ -1,0 +1,148 @@
+from abc import abstractmethod, ABC
+import types
+from functools import wraps
+from green_magic.data.transformations import Transformer
+from green_magic.utils.singleton import Singleton
+
+
+class ObjectRegistry(ABC):
+    """Simple dict-like retrieval/inserting "store" facility."""
+
+    def __new__(cls, *args, **kwargs):
+        x = super().__new__(cls)
+        if args:
+            x.objects = args[0]
+        else:
+            x.objects = {}
+        return x
+
+    def add(self, key, value):
+        if self.objects.get(key, None):
+            raise ObjectRegistryError(f"Requested to insert value {value} in already existing key {key}."
+                                      f"All keys are [{', '.join(_ for _ in self.objects)}]")
+        self.objects[key] = value
+
+    def remove(self, key):
+        if key not in self.objects:
+            raise ObjectRegistryError(f"Requested to remove item with key {key}, which does not exist.")
+        self.objects.pop(key)
+
+    def pop(self, key):
+        if key not in self.objects:
+            raise ObjectRegistryError(f"Requested to remove item with key {key}, which does not exist.")
+        return self.objects.pop(key)
+
+    def get(self, key):
+        if key not in self.objects:
+            raise ObjectRegistryError(f"Requested to get item with key {key}, which does not exist.")
+        return self.objects[key]
+
+    def __contains__(self, item):
+        return item in self.objects
+
+class ObjectRegistryError(Exception): pass
+
+
+class PhiFunctionRegistry(Singleton, ObjectRegistry):
+    def __new__(cls, *args, **kwargs):
+        x = Singleton.__new__(cls, *args, **kwargs)
+        x = ObjectRegistry(getattr(x, 'objects', {}))
+        return x
+
+    @staticmethod
+    def get_instance():
+        return PhiFunctionRegistry()
+
+
+    @staticmethod
+    def get_name(a_callable):
+        if hasattr(a_callable, 'name'):
+            return a_callable.name
+        if hasattr(a_callable, '__code__') and hasattr(a_callable.__code__, 'co_name'):
+            return a_callable.__code__.co_name
+        if hasattr(type(a_callable), 'name'):
+            return type(a_callable).name
+        if hasattr(type(a_callable), '__name__'):
+            return type(a_callable).__name__
+        return ''
+
+
+phi_registry = PhiFunctionRegistry()
+
+
+class PhiFunctionInterface(ABC):
+    """Each datapoint"""
+    @abstractmethod
+    def __call__(self, data, **kwargs):
+        raise NotImplementedError
+
+
+import inspect
+class PhiFunction(PhiFunctionInterface, Transformer):
+
+    def __call__(self, data, **kwargs):
+        return self.transform(data, **kwargs)
+
+    @classmethod
+    def register(cls, phi_name=''):
+        def wrapper(a_callable):
+            if hasattr(a_callable, '__code__'):  # it a function (def func_name ..)
+                print(f"Registering input function {a_callable.__code__.co_name}")
+                cls._register(a_callable, phi_name=phi_name)
+            else:
+                if not hasattr(a_callable, '__call__'):
+                    raise RuntimeError(f"Expected an class definition with a '__call__' instance method defined 1. Got {type(a_callable)}")
+                members = inspect.getmembers(a_callable)
+                if not ('__call__', a_callable.__call__) in members:
+                    raise RuntimeError(f"Expected an class definition with a '__call__' instance method defined 2. Got {type(a_callable)}")
+                print(f"Registering a class {type(a_callable).__name__}")
+                instance = a_callable()
+                cls._register(instance, phi_name=phi_name)
+            return a_callable
+        return wrapper
+
+    @classmethod
+    def _register(cls, a_callable, phi_name=None):
+        key = phi_name if phi_name else PhiFunctionRegistry.get_name(a_callable)
+        print(f"Registering object {a_callable} at key {key}.")
+        phi_registry.add(key, a_callable)
+
+    @classmethod
+    def my_decorator(cls, f):
+        print(f"Running 'my_decorator' with input type {type(f)}")
+        @wraps(f)
+        def wrapper(*args, **kwds):
+            if hasattr(f, '__code__'):  # it a function (def func_name ..)
+                print(f"Registering input function {a_callable.__code__.co_name}")
+                cls._register(f)
+            else:
+                if not hasattr(f, '__call__'):
+                    raise RuntimeError(f"Expected an class definition with a '__call__' instance method defined 1. Got {type(f)}")
+                members = inspect.getmembers(f)
+                if not ('__call__', f.__call__) in members:
+                    raise RuntimeError(f"Expected an class definition with a '__call__' instance method defined 2. Got {type(f)}")
+                print(f"Registering a class {type(a_callable).name}")
+                instance = f()
+                cls._register(instance)
+            return f(*args, **kwds)
+        return wrapper
+
+
+if __name__ == '__main__':
+    reg1 = PhiFunctionRegistry()
+    reg2 = PhiFunctionRegistry()
+    reg3 = PhiFunctionRegistry.get_instance()
+
+    assert id(reg1) == id(reg2) == id(reg3)
+
+    @PhiFunction.my_decorator
+    def example():
+        """Inherited Docstring"""
+        print('Called example function')
+
+
+    example()
+
+    print(example.__name__)
+    print('--')
+    print(example.__doc__)
