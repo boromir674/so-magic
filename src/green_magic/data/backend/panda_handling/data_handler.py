@@ -1,5 +1,5 @@
 from . import df_operations as dfop
-from ..base_handling import BaseDataHandler
+from green_magic.data.base_handling import BaseDataHandler
 
 
 @BaseDataHandler.register_as_subclass('df-handler')

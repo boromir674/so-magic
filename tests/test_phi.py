@@ -1,5 +1,5 @@
 import pytest
-from green_magic.data.features.phi import PhiFunction, ObjectRegistryError
+from green_magic.data.features.phi import PhiFunction
 
 
 def test_phi_creation():
@@ -41,7 +41,7 @@ def test_phi_creation():
         def __call__(self, data, **kwargs):
             return data - 5
     assert 'Nai' in phi_registry
-
+    from green_magic.utils import ObjectRegistryError
     with pytest.raises(ObjectRegistryError):
         @PhiFunction.register()
         def gg(x):

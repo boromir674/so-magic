@@ -1,46 +1,7 @@
 from abc import abstractmethod, ABC
-import types
 from functools import wraps
-from green_magic.data.transformations import Transformer
-from green_magic.utils.singleton import Singleton
-
-
-class ObjectRegistry(ABC):
-    """Simple dict-like retrieval/inserting "store" facility."""
-
-    def __new__(cls, *args, **kwargs):
-        x = super().__new__(cls)
-        if args:
-            x.objects = args[0]
-        else:
-            x.objects = {}
-        return x
-
-    def add(self, key, value):
-        if self.objects.get(key, None):
-            raise ObjectRegistryError(f"Requested to insert value {value} in already existing key {key}."
-                                      f"All keys are [{', '.join(_ for _ in self.objects)}]")
-        self.objects[key] = value
-
-    def remove(self, key):
-        if key not in self.objects:
-            raise ObjectRegistryError(f"Requested to remove item with key {key}, which does not exist.")
-        self.objects.pop(key)
-
-    def pop(self, key):
-        if key not in self.objects:
-            raise ObjectRegistryError(f"Requested to remove item with key {key}, which does not exist.")
-        return self.objects.pop(key)
-
-    def get(self, key):
-        if key not in self.objects:
-            raise ObjectRegistryError(f"Requested to get item with key {key}, which does not exist.")
-        return self.objects[key]
-
-    def __contains__(self, item):
-        return item in self.objects
-
-class ObjectRegistryError(Exception): pass
+import inspect
+from green_magic.utils import Singleton, Transformer, ObjectRegistry
 
 
 class PhiFunctionRegistry(Singleton, ObjectRegistry):
@@ -52,7 +13,6 @@ class PhiFunctionRegistry(Singleton, ObjectRegistry):
     @staticmethod
     def get_instance():
         return PhiFunctionRegistry()
-
 
     @staticmethod
     def get_name(a_callable):
@@ -77,7 +37,6 @@ class PhiFunctionInterface(ABC):
         raise NotImplementedError
 
 
-import inspect
 class PhiFunction(PhiFunctionInterface, Transformer):
 
     def __call__(self, data, **kwargs):
@@ -88,7 +47,7 @@ class PhiFunction(PhiFunctionInterface, Transformer):
         def wrapper(a_callable):
             if hasattr(a_callable, '__code__'):  # it a function (def func_name ..)
                 print(f"Registering input function {a_callable.__code__.co_name}")
-                cls._register(a_callable, phi_name=phi_name)
+                cls._register(a_callable, key_name=phi_name)
             else:
                 if not hasattr(a_callable, '__call__'):
                     raise RuntimeError(f"Expected an class definition with a '__call__' instance method defined 1. Got {type(a_callable)}")
@@ -97,13 +56,13 @@ class PhiFunction(PhiFunctionInterface, Transformer):
                     raise RuntimeError(f"Expected an class definition with a '__call__' instance method defined 2. Got {type(a_callable)}")
                 print(f"Registering a class {type(a_callable).__name__}")
                 instance = a_callable()
-                cls._register(instance, phi_name=phi_name)
+                cls._register(instance, key_name=phi_name)
             return a_callable
         return wrapper
 
     @classmethod
-    def _register(cls, a_callable, phi_name=None):
-        key = phi_name if phi_name else PhiFunctionRegistry.get_name(a_callable)
+    def _register(cls, a_callable, key_name=None):
+        key = key_name if key_name else PhiFunctionRegistry.get_name(a_callable)
         print(f"Registering object {a_callable} at key {key}.")
         phi_registry.add(key, a_callable)
 

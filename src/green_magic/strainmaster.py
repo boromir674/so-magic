@@ -3,8 +3,8 @@ import logging
 from .strain_dataset import create_dataset_from_pickle
 from .clustering import get_model_quality_reporter
 from .data.dataset import DatapointsManager
-from .commands_manager import Invoker
-from .data.backend import DataEngine
+from green_magic.utils import Invoker, CommandHistory
+from .data.backend.engine import DataEngine
 
 _log = logging.getLogger(__name__)
 
@@ -13,10 +13,27 @@ class StrainMaster:
     __instance = None
 
     def __new__(cls, *args, **kwargs):
+        from green_magic.data.commands_manager import CommandsManager
+        from green_magic.data.backend import Backend
+        from green_magic.data.data_manager import DataManager
+        from green_magic.data.backend import panda_handling
+        from green_magic.data.backend.panda_handling.df_backend import PDEngine
+        print("!1111111", PDEngine.subclasses)
+        print("!1111111", DataEngine.subclasses)
+        pandas_engine = DataEngine.create('pd')
+        datapoints_manager = DatapointsManager()
+        pandas_engine.datapoints_factory.subject.attach(datapoints_manager)
+
+        data_api = DataManager(CommandsManager(), Backend(pandas_engine))
+
         if not cls.__instance:
             cls.__instance = super().__new__(cls)
-            cls.__instance.datapoints_manager = DatapointsManager()
-            cls.__instance.engine = DataEngine.default_backend(Invoker(), [cls.__instance.datapoints_manager])
+            cls.__instance.datapoints_manager = datapoints_manager
+            cls.__instance.engine = pandas_engine
+
+
+
+
         #     # cls.__instance._datasets_dir = kwargs.get('datasets_dir', './')
         #     # cls.__instance._maps_dir = kwargs.get('maps_dir', './')
         #     # cls.__instance.selected_dt_id = None

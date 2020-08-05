@@ -1,5 +1,7 @@
 from abc import ABC
 
+__all__ = ['Singleton']
+
 
 class Singleton(ABC):
     _instance = None

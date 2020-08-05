@@ -1,7 +1,7 @@
 from abc import ABC
 import pandas as pd
 
-from ..discretization import BaseBinner, BinnerFactory
+from data.discretization import BaseBinner, BinnerFactory
 
 
 class BasePDBinner(BaseBinner, ABC):

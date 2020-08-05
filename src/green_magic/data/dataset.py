@@ -1,15 +1,16 @@
 import os
 import attr
+from green_magic.utils import Observer, Subject
 
 
 @attr.s(str=True, repr=True)
 class Dataset:
     datapoints = attr.ib(init=True)
     name = attr.ib(init=True, default=None)
-    _features = attr.ib(init=True, default=[])
 
+    _features = attr.ib(init=True, default=[])
     handler = attr.ib(init=True, default=None)
-    size = attr.ib(init=False, default=attr.Factory(lambda self: len(self.datapoints), takes_self=True))
+    size = attr.ib(init=False, default=attr.Factory(lambda self: len(self.datapoints) if self.datapoints else 0, takes_self=True))
 
     @property
     def features(self):
@@ -19,73 +20,126 @@ class Dataset:
     def features(self, features):
         self._features = features
 
+    # @classmethod
+    # def from_file(cls, file_path, name):
+    #     return Dataset(Datapoints.from_file(file_path), name)
+
+from abc import ABC, abstractmethod
+
+class DatapointsInterface(ABC):
+    """The Datapoints interface gives access to the 'observations' property."""
+    @property
+    @abstractmethod
+    def observations(self):
+        raise NotImplementedError
+
+class StructuredDataInterface(ABC):
+    @property
+    @abstractmethod
+    def attributes(self):
+        raise NotImplementedError
+
+
+class DatapointsFactory:
+    constructors = {}
+
     @classmethod
-    def from_file(cls, file_path, name):
-        return Dataset(Datapoints.from_file(file_path), name)
+    def register_constructor(cls, name):
+        def wrapper(subclass):
+            cls.constructors[name] = subclass
+            return subclass
+        return wrapper
+
+    @classmethod
+    def create(cls, name, *args, **kwargs) -> DatapointsInterface:
+        if name not in cls.constructors:
+            raise ValueError(
+                f"Request Engine of type '{name}'; supported are [{', '.join(sorted(cls.constructors.keys()))}]")
+        return cls.constructors[name](*args, **kwargs)
+
+@attr.s
+class BroadcastingDatapointsFactory(DatapointsFactory):
+    subject = Subject()
+
+    @classmethod
+    def create(cls, name, *args, **kwargs) -> DatapointsInterface:
+        cls.subject.state = super().create(name, *args, **kwargs)
+        cls.subject.name = kwargs.get('id', kwargs.get('name', ''))
+        if args and not cls.name:
+            cls.name = getattr(args[0], 'name', '')
+        cls.subject.notify()
 
 
 @attr.s
-class Datapoints:
+@DatapointsFactory.register_constructor('structured-data')
+class StructuredData(DatapointsInterface, StructuredDataInterface):
+    """Structured data. There are specific attributes/variables per observation.
+
+    Args:
+        observations (object): a reference to an object that encapsulates structured data
+    """
     observations = attr.ib(init=True)
+    _attributes = attr.ib(init=True, converter=lambda x: [x for x in input_value])
 
-    def __getitem__(self, item):
-        return self.observations[item]
+    @property
+    def attributes(self):
+        return self._attributes
 
-    def __iter__(self):
-        return iter(self.observations)
+
+@attr.s
+@DatapointsFactory.register_constructor('tabular-data')
+class TabularData(StructuredData):
+    """Table-like datapoints that are loaded in memory"""
+    retriever = attr.ib(init=True)
+    iterator = attr.ib(init=True)
+
+    def column(self, identifier):
+        return self.retriever.column(identifier, self)
+
+    def row(self, identifier):
+        return self.retriever.row(identifier, self)
+
+    @property
+    def nb_columns(self):
+        return self.retriever.nb_columns(self)
+
+    @property
+    def nb_rows(self):
+        return self.retriever.nb_rows(self)
 
     def __len__(self):
-        return len(self.observations)
+        return self.retriever.nb_rows(self)
 
-    @classmethod
-    def from_file(cls, file_path):
-        import pandas as pd
-        return Datapoints(pd.read_json(file_path))
+    def __iter__(self):
+        return self.iterator.iterrows(self)
+
+    def iterrows(self):
+        return self.iterator.iterrows(self)
+
+    def itercolumns(self):
+        return self.iterator.itercolumns(self)
+
 
 @attr.s
-class DatapointsManager:
+class DatapointsManager(Observer):
     datapoints_objects = attr.ib(init=True, default={})
-    _state = attr.ib(init=False, default='')
+    _last_key = attr.ib(init=False, default='')
 
-    def update(self, *args, **kwargs):
-        datapoints_object = args[0].state
-        key = args[0].name
+    def update(self, subject: Subject):
+        datapoints_object = subject.state
+        key = getattr(subject, 'name', '')
         if key in self.datapoints_objects:
             raise RuntimeError(f"Attempted to register a new Datapoints object at the existing key '{key}'.")
         self.datapoints_objects[key] = datapoints_object
-        self._state = key
+        self._last_key = key
 
     @property
     def state(self):
-        return self._state
+        return self._last_key
+
     @property
     def datapoints(self):
-        return self.datapoints_objects[self._state]
-
-@attr.s
-class DatapointsFactory:
-    observers = attr.ib(init=True, default=[])
-    state = attr.ib(init=False, default=None)
-    name = attr.ib(init=False, default=None)
-
-
-    def subscribe(self, *observers):
-        self.observers.extend([_ for _ in observers])
-        # for observer in observers:
-        #     self.observers.append(observer)
-    def unsubscribe(self, observer):
-        self.observers.remove(observer)
-    def notify(self, *args, **kwargs):
-        """Notify all observers/listeners."""
-        for observer in self.observers:
-            observer.update(*args, **kwargs)
-
-    def from_json(self, file_path):
-        self.notify(self)
-
-    def from_json_lines(self, file_path, **kwargs):
-        if kwargs['id'] == 'filename':
-            self.name = os.path.basename(file_path)
-        else:
-            self.name = kwargs['id']
-        self.notify(self)
+        try:
+            return self.datapoints_objects[self._last_key]
+        except KeyError as e:
+            print(f"{e}. Requested datapoints with id '{self._last_key}', but was not found in registered [{', '.join(_ for _ in self.datapoints_objects.keys())}]")

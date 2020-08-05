@@ -23,7 +23,8 @@ class BaseDiscretizer(AbstractDiscretizer):
 
     def discretize(self, *args, **kwargs):
         """Expects args: dataset, feature and kwargs; 'nb_bins'."""
-        return self.binner(args[1].values(args[0]), args[2])
+        dataset, feature, nb_bins = args[0], args[1], args[2]
+        return self.binner(feature.values(dataset), nb_bins)
 
 
 @attr.s

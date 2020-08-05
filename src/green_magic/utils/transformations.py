@@ -51,8 +51,8 @@ class TransformerInterface(abc.ABC):
 
 class RuntimeTransformer(TransformerInterface, abc.ABC):
     """Examines whether the input object is callable, if it can receive at least one input argument and also
-    whether it can accepts kwargs. Depending on the kwargs check, "configures" the '_transform' method to process
-     any kwargs at runtime andor to ignore them.
+    whether it can accept kwargs. Depending on the kwargs check, "configures" the '_transform' method to process
+     any kwargs at runtime or to ignore them.
 
     Args:
         a_callable (callable): a callable object that can be potentially used to delegate the transformation operation
@@ -101,15 +101,14 @@ def my_decorator(a_callable):
 if __name__ == '__main__':
     tr1 = Transformer(lambda x: x + 1)
     inp = 10
-    print('Input:', inp)
     out = tr1.transform(inp)
-    print('Output:', out)
+    assert 11 == out
 
     def gg(a, b=2):
         return a*b + 1
     tr1 = Transformer(gg)
     inp = 10
-    print('Input:', inp)
     out = tr1.transform(inp)
-    print('Output:', out)
-
+    assert 21 == out
+    out = tr1.transform(inp, b=3)
+    assert 31 == out

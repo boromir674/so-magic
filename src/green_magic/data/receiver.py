@@ -1,47 +1,5 @@
 import attr
-
-
-@attr.s
-class Manager2:
-    def normalize(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def discretize(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def encode(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def do_something(self, a: str) -> None:
-        print(f"\nReceiver: Working on ({a}.)", end="")
-
-    def do_something_else(self, b: str) -> None:
-        print(f"\nReceiver: Also working on ({b}.)", end="")
-
-
-@attr.s
-class BaseReceiver(Manager2):
-    data_handler = attr.ib(init=True, default=None)
-
-    def normalize(self, *args, **kwargs):
-        return args[1].extractor(args[0])
-    def discretize(self, *args, **kwargs):
-        pass
-    def encode(self, *args, **kwargs):
-        pass
-
-
-class ReceiverFactory:
-
-    @classmethod
-    def get_receiver(cls) -> BaseReceiver:
-        pass
-
-
 import abc
-@attr.s
-class Manager:
-    backend = attr.ib(init=True)
 
 
 class Backend(abc.ABC):

@@ -1,4 +1,4 @@
-from ..variables import TrackingFeature, FeatureFactory
+from data.variables import TrackingFeature, FeatureFactory
 
 @FeatureFactory.register_as_subclass('pandas')
 class DFFeatureFactory(FeatureFactory):

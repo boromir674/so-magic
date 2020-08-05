@@ -1,5 +1,5 @@
 import pandas as pd
-from ..encoding import EncoderFactory, AbstractEncoder
+from data.encoding import EncoderFactory, AbstractEncoder
 
 
 class NominalEncoder(AbstractEncoder):
