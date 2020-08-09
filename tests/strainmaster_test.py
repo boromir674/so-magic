@@ -17,7 +17,7 @@ dataset_id = 'unittest-dataset'
 all_vars = ['type', 'effects', 'medical', 'negatives', 'flavors']
 active_vars = ['type', 'effects', 'medical', 'negatives', 'flavors']
 
-
+@pytest.mark.skip
 def test_sample_datapoints(sample_datapoints, som_master):
 
     assert hasattr(som_master.engine.backend.commands, 'prototypes')
