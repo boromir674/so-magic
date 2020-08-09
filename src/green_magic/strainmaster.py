@@ -13,36 +13,19 @@ class StrainMaster:
     __instance = None
 
     def __new__(cls, *args, **kwargs):
-        from green_magic.data.commands_manager import CommandsManager
-        from green_magic.data.backend import Backend
-        from green_magic.data.data_manager import DataManager
-        from green_magic.data.backend import panda_handling
-        from green_magic.data.backend.panda_handling.df_backend import PDEngine
-        print("!1111111", PDEngine.subclasses)
-        print("!1111111", DataEngine.subclasses)
-        pandas_engine = DataEngine.create('pd')
-        datapoints_manager = DatapointsManager()
-        pandas_engine.datapoints_factory.subject.attach(datapoints_manager)
-
-        data_api = DataManager(CommandsManager(), Backend(pandas_engine))
-
         if not cls.__instance:
+            from green_magic.data.commands_manager import CommandsManager
+            from green_magic.data.backend import Backend
+            from green_magic.data.data_manager import DataManager
+            from green_magic.data.backend import panda_handling
+
+            print("!1111111", DataEngine.subclasses)
+
             cls.__instance = super().__new__(cls)
-            cls.__instance.datapoints_manager = datapoints_manager
-            cls.__instance.engine = pandas_engine
-
-
-
-
-        #     # cls.__instance._datasets_dir = kwargs.get('datasets_dir', './')
-        #     # cls.__instance._maps_dir = kwargs.get('maps_dir', './')
-        #     # cls.__instance.selected_dt_id = None
-        #     # cls.__instance._id2dataset = {}
-        #     # cls.__instance.map_manager = MapManager()
-        #     # cls.__instance.commands_manager = CommandsManager()
-        #     # cls.__instance.lexicon = StrainLexicon()
-        # cls.__instance._datasets_dir = kwargs.get('datasets_dir', cls.__instance._datasets_dir)
-        # cls.__instance._maps_dir = kwargs.get('maps_dir', cls.__instance._maps_dir)
+            DataEngine.new('pd')
+            cls.__instance.data_api = DataManager(CommandsManager(), Backend(DataEngine.create('pd')))
+            # make the datapoint_manager listen to newly created Datapoints objects events
+            cls.__instance.data_api.backend.engine.datapoints_factory.subject.attach(cls.__instance.data_api.backend.datapoints_manager)
         return cls.__instance
 
     def __call__(self, *args, **kwargs):
@@ -58,7 +41,8 @@ class StrainMaster:
 
     @property
     def commands(self):
-        return self.engine.backend.commands
+        """Get a Command object from the pool of Command prototypes"""
+        return self.data_api.command
 
     @property
     def datasets_dir(self):
@@ -80,7 +64,7 @@ class StrainMaster:
         :return: the reference to the dataset
         :rtype: green_magic.strain_dataset.StrainDataset
         """
-        return self.datapoints_manager.datapoints
+        return self.data_api.backend.datapoints_manager.datapoints
 
         # if self.selected_dt_id not in self._id2dataset:
         #     raise InvalidDatasetSelectionError("Requested dataset with id '{}', but StrainMaster knows only of [{}].".format(self.selected_dt_id, ', '.join(self._id2dataset.keys())))
@@ -165,32 +149,5 @@ class StrainMaster:
         self.selected_dt_id = wd_id
         return self
 
-    def mpeta(self):
-        from .strain.dataset import Dataset
-        from data import df_features_factory
-        from data import invoker_object
-        from data import DataHandler
-        from data import Backend
-
-        # design
-        DESIGN = {'name': 'dev-dataset',
-                  'variables': ['type', 'name']}
-        json_file = 'p'
-
-        bd = Backend.create('df')
-        # data
-        # dataset = Dataset.from_file(json_file, DESIGN['name'])
-        dataset = Dataset([[1, 2], [3, 4]], )
-
-        dataset.handler = DataHandler.create('df-handler')
-        features = [df_features_factory.get_feature(feat, dataset=dataset) for feat in feats]
-        dataset.features = features
-
-        def get_commands(a_dataset, features_list):
-            return []
-        commands = get_commands(dataset, features)
-
-        for c in commands:
-            invoker_object.execute_command(c)
 
 class InvalidDatasetSelectionError(Exception): pass

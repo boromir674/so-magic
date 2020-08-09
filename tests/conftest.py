@@ -23,13 +23,21 @@ def sample_json(tests_data_root):
 
 @pytest.fixture
 def som_master():
+    from green_magic.data.backend import DataEngine
+    DataEngine.new('pd')
     from green_magic.strainmaster import StrainMaster
     return StrainMaster()
 
 
 @pytest.fixture
 def load_sample_datapoints_cmd(som_master, sample_json):
-    command = som_master.commands.json_line_dataset
+    from green_magic.data.backend import DataEngine
+    DataEngine.new('pd')
+    import pandas
+    @DataEngine.pd.command
+    def observations(file_path):
+        return pandas.read_json(file_path, lines=True)
+    command = som_master.commands.observations
     command.append_arg(sample_json)
     return command
 

@@ -25,3 +25,11 @@ class DataManager:
 
     def __attrs_post_init__(self):
         self.mediator = DataMediator(self.commands_manager, self.backend)
+
+    @property
+    def commands(self):
+        return self.commands_manager.commands_dict
+
+    @property
+    def command(self):
+        return self.commands_manager.command

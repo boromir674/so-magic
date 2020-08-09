@@ -48,8 +48,11 @@ class MyDecorator(type):
     """
     @classmethod
     def magic_decorator(mcs, arg=None):
+        print("DEBUG magic_decorator 1, args:", str(arg))
         def decorator(func):
+            print("DEBUG magic_decorator 2, args:", str(func))
             def wrapper(*a, **ka):
+                print("DEBUG magic_decorator 3, args: [{}]".format(', '.join(str(x) for x in a)))
                 mcs._wrapper(func, *a, **ka)
                 return func(*a, **ka)
             return wrapper
@@ -60,9 +63,11 @@ class MyDecorator(type):
             return decorator  # ... or 'decorator'
 
     def _wrapper(cls, function, *args, **kwargs):
-        pass
+        print('LA8OS')
+        raise NotImplementedError
 
-class EngineCommandRegistrator(MyDecorator):
+
+class CommandRegistrator(MyDecorator):
     """Engines inheriting from this class
 
     Args:
@@ -75,15 +80,17 @@ class EngineCommandRegistrator(MyDecorator):
     def __new__(mcs, *args, **kwargs):
         class_object = super().__new__(mcs, *args, **kwargs)
         class_object.state = None
+        class_object.registry = {}
         return class_object
 
+    # common factory object for all classes/subclasses
     command_factory = MagicCommandFactory()
 
     @classmethod
-    def _wrapper(cls, function, *args, **kwargs):
-        a_callable = function
-        if hasattr(a_callable, '__code__'):  # it a function (def func_name ..)
-            cls.state = (kwargs.get('name', kwargs.get('key', a_callable.__code__.co_name)), cls.command_factory(function))
+    def _wrapper(mcs, a_callable, *args, **kwargs):
+        print("DEBUG CommandRegistrator", str(a_callable))
+        if hasattr(a_callable, '__code__'):  # it is a function (def func_name ..)
+            mcs.registry[kwargs.get('name', kwargs.get('key', a_callable.__code__.co_name))] = mcs.command_factory(function)
         else:
             if not hasattr(a_callable, '__call__'):
                 raise RuntimeError(
@@ -93,36 +100,29 @@ class EngineCommandRegistrator(MyDecorator):
                 raise RuntimeError(
                     f"Expected an class definition with a '__call__' instance method defined 2. Got {type(a_callable)}")
             instance = a_callable()
-            cls.state = (kwargs.get('name', kwargs.get('key', getattr(instance, 'name', type(a_callable).__name__))), cls.command_factory(instance))
+            mcs.registry[kwargs.get('name', kwargs.get('key', getattr(instance, 'name', type(a_callable).__name__)))] = mcs.command_factory(instance)
 
-
-class CommandRegistrator(MyDecorator):
-    command_factory = MagicCommandFactory()
-    state = None
-
-    def _wrapper(cls, function, *args, **kwargs):
-        a_callable = function
-        if hasattr(a_callable, '__code__'):  # it a function (def func_name ..)
-            cls.state = (kwargs.get('name', kwargs.get('key', a_callable.__code__.co_name)), cls.command_factory(function))
-        else:
-            if not hasattr(a_callable, '__call__'):
-                raise RuntimeError(
-                    f"Expected an class definition with a '__call__' instance method defined 1. Got {type(a_callable)}")
-            members = inspect.getmembers(a_callable)
-            if not ('__call__', a_callable.__call__) in members:
-                raise RuntimeError(
-                    f"Expected an class definition with a '__call__' instance method defined 2. Got {type(a_callable)}")
-            instance = a_callable()
-            cls.state = (kwargs.get('name', kwargs.get('key', getattr(instance, 'name', type(a_callable).__name__))), cls.command_factory(instance))
-        return a_callable
+    def __getitem__(self, item):
+        if item not in self.registry:
+            raise RuntimeError(f"Key '{item}' fot found in registry: [{', '.join(str(x) for x in self.registry.keys())}]")
+        return self.registry[item]
 
 
 @attr.s
 class CommandsAccumulator(Observer):
-    commads = attr.ib(init=False, default={})
+    commands = attr.ib(init=False, default={})
 
     def update(self, subject: Subject) -> None:
-        self.commads[subject.name] = subject.state
+        self.commands[getattr(subject, 'name', str(subject.state))] = subject.state
+
+@attr.s
+class CommandGetter:
+    _commands_accumulator = attr.ib(init=True, default=CommandsAccumulator())
+
+    def __getattr__(self, item):
+        if item not in self._commands_accumulator.commands:
+            raise KeyError(f"Item '{item}' not found in [{', '.join(str(_) for _ in self._commands_accumulator.commands.keys())}]")
+        return self._commands_accumulator.commands[item]
 
 
 @attr.s
@@ -133,13 +133,17 @@ class CommandsManager:
         prototypes (dict, optional): initial prototypes to be supplied
         command_factory (callable, optional): a callable that returns an instance of Command
     """
-    _commands_accumulator = attr.ib(init=True, default=CommandsAccumulator())
+    _commands_getter = attr.ib(init=True, default=CommandGetter())
 
     @property
-    def prototypes(self):
-        return self._commands_accumulator.commads
+    def command(self):
+        return self._commands_getter
+
+    @property
+    def commands_dict(self):
+        return self._commands_accumulator.commands
 
     def __getattr__(self, item):
-        if item not in self._commands_accumulator.commads:
-            raise KeyError(f"Item '{item}' not found in [{', '.join(str(_) for _ in self._commands_accumulator.commads.keys())}]")
-        return self._commands_accumulator.commads[item]
+        if item not in self._commands_accumulator.commands:
+            raise KeyError(f"Item '{item}' not found in [{', '.join(str(_) for _ in self._commands_accumulator.commands.keys())}]")
+        return self._commands_accumulator.commands[item]

@@ -1,24 +1,18 @@
 from abc import ABC, abstractmethod
 from .engine import DataEngine
-
+from green_magic.data.dataset import DatapointsManager
 
 class DataBackend(ABC):
 
-    @property
-    @abstractmethod
-    def commands(self):
-        raise NotImplementedError
+    pass
 
 
 class Backend(DataBackend, ABC):
-    engine_type = DataEngine
 
     def __init__(self, engine):
         self._engine = engine
-        self._commands = {}
-    @property
-    def commands(self):
-        self._commands
+        self.datapoints_manager = DatapointsManager()
+
     @property
     def engine(self):
         return self._engine

@@ -2,22 +2,22 @@ import attr
 from green_magic.data.dataset import BroadcastingDatapointsFactory
 from green_magic.utils import BaseComponent
 from green_magic.data.interfaces import TabularRetriever, TabularIterator
-from green_magic.data.commands_manager import EngineCommandRegistrator
+from green_magic.data.commands_manager import CommandRegistrator
 
 
-class EngineType(EngineCommandRegistrator):
+class EngineType(CommandRegistrator):
     def __new__(mcs, *args, **kwargs):
         x = super().__new__(mcs, *args, **kwargs)
         x._commands = {}
         x.retriever = None
         x.iterator = None
+        x.command = mcs.magic_decorator
         return x
 
     def register_as_subclass(cls, engine_type):
         def wrapper(subclass):
             cls.subclasses[engine_type] = subclass
             return subclass
-
         return wrapper
 
     def create(cls, engine_type, *args, **kwargs):
@@ -33,9 +33,17 @@ class DataEngine(BaseComponent, metaclass=EngineType):
     datapoints_factory = BroadcastingDatapointsFactory()
 
     @classmethod
+    def new(cls, engine_name):
+        @DataEngine.register_as_subclass(engine_name)
+        class RuntimeDataEngine(DataEngine):
+            pass
+        RuntimeDataEngine.commands_dict = {}
+
+    @classmethod
     def register_as_subclass(cls, engine_type):
         def wrapper(subclass):
             cls.subclasses[engine_type] = subclass
+            setattr(cls, engine_type, subclass)
             return subclass
         return wrapper
 
@@ -50,11 +58,12 @@ class DataEngine(BaseComponent, metaclass=EngineType):
     def observations(cls, data_structure='tabular-data'):
         def wrapper(function):
             if hasattr(function, '__code__'):  # it a function (def func_name ..)
-                print(f"Registering input function {function.__code__.co_name}")
-                def cmd(file_path, **kwargs):
+                print(f"Observation decor in Engine: {function.__code__.co_name}")
+                def observations(file_path, **kwargs):
                     res = function(file_path, **kwargs)
                     datapoints = cls.datapoints_factory.create(data_structure, res, [_ for _ in cls.iterator.columnnames], cls.retriever, cls.iterator)
-                cls._commands[function.__name__] = cls.command_factory(cmd)
+                cls.registry[function.__code__.co_name] = cls.command_factory(observations)
+                cls._commands[function.__code__.co_name] = cls.command_factory(observations)
             else:
                 raise RuntimeError("Expected a function to be decorated.")
             return function
