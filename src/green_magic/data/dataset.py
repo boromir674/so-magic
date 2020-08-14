@@ -57,7 +57,7 @@ class DatapointsFactory:
                 f"Request Engine of type '{name}'; supported are [{', '.join(sorted(cls.constructors.keys()))}]")
         return cls.constructors[name](*args, **kwargs)
 
-@attr.s
+
 class BroadcastingDatapointsFactory(DatapointsFactory):
     subject = Subject()
 
@@ -65,9 +65,10 @@ class BroadcastingDatapointsFactory(DatapointsFactory):
     def create(cls, name, *args, **kwargs) -> DatapointsInterface:
         cls.subject.state = super().create(name, *args, **kwargs)
         cls.subject.name = kwargs.get('id', kwargs.get('name', ''))
-        if args and not cls.name:
+        if args and not hasattr(cls, '.name'):
             cls.name = getattr(args[0], 'name', '')
         cls.subject.notify()
+        return cls.subject.state
 
 
 @attr.s
@@ -78,13 +79,16 @@ class StructuredData(DatapointsInterface, StructuredDataInterface):
     Args:
         observations (object): a reference to an object that encapsulates structured data
     """
-    observations = attr.ib(init=True)
-    _attributes = attr.ib(init=True, converter=lambda x: [x for x in input_value])
+    _observations = attr.ib(init=True)
+    _attributes = attr.ib(init=True, converter=lambda input_value: [x for x in input_value])
 
     @property
     def attributes(self):
         return self._attributes
 
+    @property
+    def observations(self):
+        return self._observations
 
 @attr.s
 @DatapointsFactory.register_constructor('tabular-data')

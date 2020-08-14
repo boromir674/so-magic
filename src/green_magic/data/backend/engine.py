@@ -3,9 +3,11 @@ from green_magic.data.dataset import BroadcastingDatapointsFactory
 from green_magic.utils import BaseComponent
 from green_magic.data.interfaces import TabularRetriever, TabularIterator
 from green_magic.data.commands_manager import MagicCommandFactory, CommandRegistrator
-
+from green_magic.data.commands_manager import CommandRegistrator
 
 class EngineType(CommandRegistrator):
+    datapoints_factory = BroadcastingDatapointsFactory()
+
     def __new__(mcs, *args, **kwargs):
         x = super().__new__(mcs, *args, **kwargs)
         x._commands = {}
@@ -15,28 +17,33 @@ class EngineType(CommandRegistrator):
         x.command_factory = MagicCommandFactory()
         return x
 
-    def _wrapper(cls, a_callable, *args, **kwargs):
-        print("DEBUG EngineType _wrapper", str(a_callable))
-        if hasattr(a_callable, '__code__'):  # it is a function (def func_name ..)
-            cls.registry[kwargs.get('name', kwargs.get('key', a_callable.__code__.co_name))] = cls.command_factory(
-                function)
-        else:
-            if not hasattr(a_callable, '__call__'):
-                raise RuntimeError(
-                    f"Expected an class definition with a '__call__' instance method defined 1. Got {type(a_callable)}")
-            members = inspect.getmembers(a_callable)
-            if not ('__call__', a_callable.__call__) in members:
-                raise RuntimeError(
-                    f"Expected an class definition with a '__call__' instance method defined 2. Got {type(a_callable)}")
-            instance = a_callable()
-            cls.registry[kwargs.get('name', kwargs.get('key', getattr(instance, 'name', type(
-                a_callable).__name__)))] = cls.command_factory(instance)
-
+    def dec(cls, data_structure='tabular-data'):
+        def wrapper(a_callable):
+            if hasattr(a_callable, '__code__'):  # it a function (def func_name ..)
+                name = a_callable.__code__.co_name
+                print(f"ADW function {name}")
+                obs_funct = a_callable
+                if name == 'observations':
+                    def observations(file_path, **kwargs):
+                        print(f"FP: {file_path}")
+                        print(f"Callable: {a_callable.__code__.co_name}, {a_callable}")
+                        print(f"Kwargs: {kwargs}")
+                        res = a_callable(file_path, **kwargs)
+                        datapoints = cls.datapoints_factory.create(data_structure, res,
+                                                                   [_ for _ in []], cls.retriever,
+                                                                   cls.iterator)
+                        datapoints._attributes = [_ for _ in cls.iterator.columnnames(datapoints)]
+                    obs_funct = lambda json_path: observations(json_path)
+                cls.registry[name] = obs_funct
+                cls._commands[name] = cls.command_factory(obs_funct)
+            else:
+                raise RuntimeError(f"Expected a function to be decorated; got {type(a_callable)}")
+            return a_callable
+        return wrapper
 
 @attr.s
 class DataEngine(BaseComponent, metaclass=EngineType):
     subclasses = {}
-    datapoints_factory = BroadcastingDatapointsFactory()
 
     @classmethod
     def new(cls, engine_name):
@@ -44,7 +51,6 @@ class DataEngine(BaseComponent, metaclass=EngineType):
         class RuntimeDataEngine(DataEngine):
             pass
         RuntimeDataEngine.commands_dict = {}
-
 
     @classmethod
     def register_as_subclass(cls, engine_type):

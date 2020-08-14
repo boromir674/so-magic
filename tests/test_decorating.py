@@ -1,6 +1,6 @@
 
 def test_decorating():
-    from green_magic.data.commands_manager import MyDecorator
+    from green_magic.data.commands_manager import MyDecorator, CommandRegistrator
 
 
     class A(MyDecorator): pass
@@ -34,3 +34,23 @@ def test_decorating():
 
     assert id(A.magic_decorator) != id(Ab.magic_decorator)
     assert len(set([id(o.magic_decorator) for o in objects])) == 1
+
+    class ADecoratorClass(metaclass=CommandRegistrator): pass
+    class BDecoratorClass(metaclass=CommandRegistrator): pass
+    assert not hasattr(MyDecorator, '_commands_hash')
+    assert not hasattr(CommandRegistrator, 'registry')
+    assert not hasattr(CommandRegistrator, 'state')
+
+    @ADecoratorClass.func_decorator()
+    def aa():
+        pass
+
+    assert 'aa' in ADecoratorClass.registry
+    assert 'aa' not in BDecoratorClass.registry
+
+    @BDecoratorClass.func_decorator()
+    def bb():
+        pass
+
+    assert 'bb' in BDecoratorClass.registry
+    assert 'bb' not in ADecoratorClass.registry

@@ -2,6 +2,7 @@ import inspect
 import attr
 from green_magic.utils import Command
 from green_magic.utils import Subject, Observer
+from green_magic.data.dataset import DatapointsFactory
 
 
 class MyDecorator(type):
@@ -15,19 +16,42 @@ class MyDecorator(type):
             print("DEBUG magic_decorator 2, args:", str(func))
             def wrapper(*a, **ka):
                 print("DEBUG magic_decorator 3, args: [{}]".format(', '.join(str(x) for x in a)))
-                mcs._wrapper(func, *a, **ka)
-                return func(*a, **ka)
+                ffunc = a[0]
+                mcs._wrapper(ffunc, *a[1:], **ka)
+                return ffunc
+            print("DEBUG magic_decorator 4, func: {}".format(str(func)))
             return wrapper
 
         if callable(arg):
-            return decorator(arg)  # return 'wrapper'
+            print("Decoration invokation WITHOUT parenthesis")
+            _ = decorator(arg)
+            print("OUT: {}".format(str(_)))
+            print(type(_))
+            return _  # return 'wrapper'
         else:
-            return decorator  # ... or 'decorator'
+            print("Decoration invokation WITH parenthesis")
+            _ = decorator
+            print(f"OUT: {str(_)}")
+            print(type(_))
+            return _  # ... or 'decorator'
 
-    def _wrapper(cls, function, *args, **kwargs):
-        print('LA8OS')
-        raise NotImplementedError
-
+    # @classmethod
+    # def _wrapper(cls, a_callable, *args, **kwargs):
+    #     print("GGGGGGGG EngineType _wrapper", str(a_callable))
+    #     if hasattr(a_callable, '__code__'):  # it is a function (def func_name ..)
+    #         cls.registry[kwargs.get('name', kwargs.get('key', a_callable.__code__.co_name))] = cls.command_factory(
+    #             function)
+    #     else:
+    #         if not hasattr(a_callable, '__call__'):
+    #             raise RuntimeError(
+    #                 f"Expected an class definition with a '__call__' instance method defined 1. Got {type(a_callable)}")
+    #         members = inspect.getmembers(a_callable)
+    #         if not ('__call__', a_callable.__call__) in members:
+    #             raise RuntimeError(
+    #                 f"Expected an class definition with a '__call__' instance method defined 2. Got {type(a_callable)}")
+    #         instance = a_callable()
+    #         cls.registry[kwargs.get('name', kwargs.get('key', getattr(instance, 'name', type(
+    #             a_callable).__name__)))] = cls.command_factory(instance)
 
 class CommandRegistrator(MyDecorator):
     """Classes can use this class as metaclass to obtain a single registration point accessible as class attribute
@@ -43,12 +67,23 @@ class CommandRegistrator(MyDecorator):
             raise RuntimeError(f"Key '{item}' fot found in registry: [{', '.join(str(x) for x in self.registry.keys())}]")
         return self.registry[item]
 
-@attr.s
-class CommandFactory(Subject):
-    """A factory class able to construct new command objects."""
-    command_constructor = attr.ib(init=True, default=Command)
+    def func_decorator(cls):
+        def wrapper(a_callable):
+            if hasattr(a_callable, '__code__'):  # it a function (def func_name ..)
+                print(f"Registering input function {a_callable.__code__.co_name}")
+                cls.registry[a_callable.__code__.co_name] = a_callable
+            else:
+                raise RuntimeError(f"Expected a function to be decorated; got {type(a_callable)}")
+            return a_callable
+        return wrapper
 
-    def create(self, *args) -> Command:
+
+class CommandFactory:
+    """A factory class able to construct new command objects."""
+    command_constructor = Command
+    datapoints_factory = DatapointsFactory()
+    @classmethod
+    def create(cls, *args) -> Command:
         """Call to create a new Command object. The input arguments can be in two formats:
 
         1. create(an_object, method, *arguments)
@@ -62,8 +97,9 @@ class CommandFactory(Subject):
         """
         is_function = hasattr(args[0], '__code__')
         if is_function:  # if receiver is a function; creating from function
-            return self.command_constructor(args[0], '__call__', *args[1:])
-        return self.command_constructor(args[0], args[1], *args[2:])
+            return cls.command_constructor(args[0], '__call__', *args[1:]), args[0].__code__.co_name
+        return cls.command_constructor(args[0], args[1], *args[2:]), type(args[0]) + '-' + args[1]
+
 
 @attr.s
 class MagicCommandFactory(Subject):
@@ -76,7 +112,7 @@ class MagicCommandFactory(Subject):
     command_factory = attr.ib(init=True, default=CommandFactory())
 
     def __call__(self, *args, **kwargs):
-        self._state = self.command_factory.create(*args)
+        self._state, self.name = self.command_factory.create(*args)
         self.notify()
         return self._state
 
@@ -92,6 +128,10 @@ class CommandsAccumulator(Observer):
 @attr.s
 class CommandGetter:
     _commands_accumulator = attr.ib(init=True, default=CommandsAccumulator())
+
+    @property
+    def accumulator(self):
+        return self._commands_accumulator
 
     def __getattr__(self, item):
         if item not in self._commands_accumulator.commands:

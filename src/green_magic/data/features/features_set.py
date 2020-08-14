@@ -1,7 +1,7 @@
 import attr
 
-from .types import NominalVariableType
-from .features import TrackingFeature
+from data.variables.types import NominalVariableType
+from data.features.features import TrackingFeature
 
 @attr.s
 class BaseFeatureSet:

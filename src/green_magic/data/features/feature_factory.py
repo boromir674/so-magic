@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-import attr
 
-from .features import TrackingFeature
+from data.features.features import TrackingFeature
 
 
 class AbstractFeatureFactory(ABC):
