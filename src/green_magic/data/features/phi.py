@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABC
 from functools import wraps
 import inspect
-from green_magic.utils import Singleton, Transformer, ObjectRegistry
+from green_magic.utils import Singleton, Transformer, ObjectRegistry, Subject
 
 
 class PhiFunctionRegistry(Singleton, ObjectRegistry):
@@ -38,6 +38,13 @@ class PhiFunctionInterface(ABC):
 
 
 class PhiFunction(PhiFunctionInterface, Transformer):
+    """A simple mathematics function usually notated with \phi and serves a single transormation operation
+    useful to convert data (eg convert continous to discrete, normalizing, etc)
+
+    Args:
+        function (callable): the function that does the actual operation]
+    """
+    subject = Subject()
 
     def __call__(self, data, **kwargs):
         return self.transform(data, **kwargs)
@@ -65,6 +72,7 @@ class PhiFunction(PhiFunctionInterface, Transformer):
         key = key_name if key_name else PhiFunctionRegistry.get_name(a_callable)
         print(f"Registering object {a_callable} at key {key}.")
         phi_registry.add(key, a_callable)
+        cls.subject.notify()
 
     @classmethod
     def my_decorator(cls, f):

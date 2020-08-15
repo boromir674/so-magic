@@ -1,11 +1,45 @@
 from abc import ABC, abstractmethod
 import attr
+from green_magic.data.variables.types import VariableTypeFactory
 
 
-class FeatureInterface(ABC):
+class AttributeReporter(ABC):
+    """A class implementing this interface has the ability to report information on an attribute/variable
+    of some structured data (observations)
+    """
     @abstractmethod
-    def values(self, dataset):
+    def values(self, datapoints, attribute, **kwargs):
+        """Call to get the values ([N x 1] vector) of all datapoints (N x D) corresponding to the input variable/attribute.
+
+        Args:
+            datapoints (Datapoints): [description]
+            attribute (str): [description]
+
+        Return:
+            (numpy.ndarray): the values in a [N x 1] vector
+        """
         raise NotImplementedError
+
+    @abstractmethod
+    def variable_type(self, datapoints, attribute, **kwargs):
+        """Call to get the variable type of the datapoints, given the attribute.
+
+        Args:
+            datapoints (Datapoints): [description]
+            attribute (str): [description]
+
+        Return:
+            (str): [description]
+        """
+        raise NotImplementedError
+
+
+class BaseAttributeReporter(AttributeReporter):
+    def values(self, datapoints, attribute, **kwargs):
+        return datapoints[attribute]
+    def variable_type(self, datapoints, attribute, **kwargs):
+        return VariableTypeFactory.infer(datapoints, attribute, **kwargs)
+
 
 #### HELPERS
 def _list_validator(self, attribute, value):
@@ -17,18 +51,18 @@ def _string_validator(self, attribute, value):
         raise ValueError(f'Expected a string; instead a {type(value).__name__} was given.')
 
 
-class AbstractFeature(FeatureInterface, ABC):
-    def nb_unique(self):
-        pass
-
-
 @attr.s
-class BaseFeature(AbstractFeature):
+class AttributeReporter:
     label = attr.ib(init=True)
+    reporter = attr.ib(init=True, default=BaseAttributeReporter())
 
-    def values(self, dataset):
+    def values(self, datapoints):
         """A default implementation of the values method"""
-        return dataset[self.label]
+        return self.reporter.values(datapoints, self.label)
+
+    def variable_type(self, datapoints):
+        """A default implementation of the values method"""
+        return self.reporter.variable_type(datapoints, self.label)
 
 
 @attr.s

@@ -16,6 +16,9 @@ class TabularRetriever(ABC):
     @abstractmethod
     def nb_rows(self, data):
         raise NotImplementedError
+    @abstractmethod
+    def get_numerical_attributes(self, data):
+        raise NotImplementedError
 
 
 class TabularIterator(ABC):

@@ -103,6 +103,9 @@ class TabularData(StructuredData):
     def row(self, identifier):
         return self.retriever.row(identifier, self)
 
+    def get_numerical_attributes(self):
+        return self.retriever.get_numerical_attributes(self)
+
     @property
     def nb_columns(self):
         return self.retriever.nb_columns(self)

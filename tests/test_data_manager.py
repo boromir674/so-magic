@@ -45,6 +45,8 @@ def test_data_manager(sample_json):
     import types
     from green_magic.utils.commands import Command
     from green_magic.data.backend.panda_handling.df_backend import PDTabularIterator, PDTabularRetriever
+    from green_magic.data.features.phi import PhiFunction
+
     DataEngine.new('test_pd')
     assert 'test_pd' in DataEngine.subclasses
     assert hasattr(DataEngine, 'state')
@@ -58,7 +60,8 @@ def test_data_manager(sample_json):
 
     data_api.backend.engine.__class__.datapoints_factory.subject.attach(data_api.backend.datapoints_manager)
     DataEngine.test_pd.command_factory.attach(data_api.commands_manager.command.accumulator)
-
+    # PhiFunction.subject.attach(data_api.phis)
+    
     # test runtime command registration
     import pandas as pd
     @DataEngine.test_pd.dec()
@@ -90,6 +93,7 @@ def test_data_manager(sample_json):
     inv = Invoker(CommandHistory())
     inv.execute_command(cmd)
 
-    assert data_api.backend.datapoints_manager.datapoints
-
     assert len(data_api.backend.datapoints_manager.datapoints) == 100
+
+    # from green_magic.data.features.phi import PhiFunction
+

@@ -12,8 +12,8 @@ class TransformerInterface(abc.ABC):
     @abc.abstractmethod
     def transform(self, data, **kwargs):
         """Takes data and optional keyword arguments and transforms them.
-        Input data can represent either a single variable of an observations (scalar)
-        or a vector of observations of the same variable.
+        Input data can represent either a single variable of an observation (scalar)
+        or a vector of observations of the same variable (if N observations then returns a [N x 1] array-like).
 
         Example 1:
         obs1 = [x1, y1, z1]
