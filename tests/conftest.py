@@ -65,11 +65,3 @@ def sample_feature_vectors(som_master, compute_feature_vectors_cmd):
 @pytest.fixture
 def command_invoker(green_master):
     return green_master.invoker
-
-
-###### Built data to test
-
-@pytest.fixture
-def og_kush():
-    from green_magic.strain.strain_class import Strain
-    return Strain('og-kush', 'Og Kush', 'hybrid', ['flavor1', 'flavor2'], ['ef1', 'ef2'], ['n1'], ['m1', 'm2', 'm3'], ['p1', 'p2'], '100-200', '7-9', '251-500', '>2', 'Moderate', [], '')
