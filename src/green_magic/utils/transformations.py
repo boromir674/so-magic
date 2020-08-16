@@ -88,27 +88,3 @@ class Transformer(RuntimeTransformer):
     """Delegates all the transformation operation to its '_transform' method provided by its '_callable' field."""
     def transform(self, data, **kwargs):
         return self._transform(data, **kwargs)
-
-
-def my_decorator(a_callable):
-    @wraps(a_callable)
-    def wrapper(*args, **kwds):
-        print('Calling decorated function')
-        return a_callable(*args, **kwds)
-    return wrapper
-
-
-if __name__ == '__main__':
-    tr1 = Transformer(lambda x: x + 1)
-    inp = 10
-    out = tr1.transform(inp)
-    assert 11 == out
-
-    def gg(a, b=2):
-        return a*b + 1
-    tr1 = Transformer(gg)
-    inp = 10
-    out = tr1.transform(inp)
-    assert 21 == out
-    out = tr1.transform(inp, b=3)
-    assert 31 == out
