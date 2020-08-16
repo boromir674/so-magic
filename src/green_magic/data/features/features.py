@@ -33,12 +33,18 @@ class AttributeReporter(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    def value_set(self, datapoints, attribute, **kwargs):
+        raise NotImplementedError
+
 
 class BaseAttributeReporter(AttributeReporter):
     def values(self, datapoints, attribute, **kwargs):
         return datapoints[attribute]
     def variable_type(self, datapoints, attribute, **kwargs):
         return VariableTypeFactory.infer(datapoints, attribute, **kwargs)
+    def value_set(self, datapoints, attribute, **kwargs):
+        return set([_ for _ in datapoints.column(attribute)])
 
 
 #### HELPERS
@@ -64,6 +70,11 @@ class AttributeReporter:
         """A default implementation of the values method"""
         return self.reporter.variable_type(datapoints, self.label)
 
+    def value_set(self, datapoints):
+        return self.reporter.value_set(datapoints, self.label)
+
+    def __str__(self):
+        return self.label
 
 @attr.s
 class FeatureState:
@@ -75,7 +86,7 @@ class FeatureState:
 
 
 @attr.s
-class FeatureFunction(BaseFeature):
+class FeatureFunction:
     """Example: Assume we have a datapoint v = [v_1, v_2, .., v_n, and 2 feature functions f_1, f_2\n
     Then we can produce an encoded vector (eg to feed for training a ML model) like: encoded_vector = [f_1(v), f_2(v)]
     """

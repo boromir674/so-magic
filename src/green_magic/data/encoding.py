@@ -1,5 +1,6 @@
 import abc
-import attr
+from abc import ABC
+
 
 class EncoderInterface(abc.ABC):
     @abc.abstractmethod
@@ -12,7 +13,9 @@ class AbstractEncoder(EncoderInterface):
         raise NotImplementedError
 
 
-class EncoderFactory:
+class Encoder(AbstractEncoder, ABC):
+    subclasses = {}
+
     @classmethod
     def register_as_subclass(cls, backend_type):
         def wrapper(subclass):
@@ -25,5 +28,3 @@ class EncoderFactory:
         if backend_type not in cls.subclasses:
             raise ValueError('Bad "BinnerFactory Backend type" type \'{}\''.format(backend_type))
         return cls.subclasses[backend_type](*args, **kwargs)
-    def nominal_encoder(self, *args, **kwargs):
-        raise NotImplementedError

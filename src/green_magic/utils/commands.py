@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import copy
 from typing import List
 
-__all__ = ['Command', 'Invoker', 'CommandHistory']
+__all__ = ['Command', 'Invoker', 'CommandHistory', 'CommandInterface']
 
 
 class CommandInterface(ABC):
@@ -49,7 +49,7 @@ class BaseCommand(AbstractCommand):
         self._args = args_list
 
     def execute(self) -> None:
-        getattr(self._receiver, self._method)(*self._args)
+        return getattr(self._receiver, self._method)(*self._args)
 
 
 class Command(BaseCommand):
@@ -73,6 +73,10 @@ class CommandHistory:
     def pop(self) -> Command:
         return self._history.pop(0)
 
+    @property
+    def stack(self):
+        return self._history
+
 
 class Invoker:
     """A class that simply executes a command and pushes it into its internal command history stack.
@@ -84,25 +88,6 @@ class Invoker:
         self.history = history
 
     def execute_command(self, command: Command):
-        if command.execute():
+        print("INPUT COMMAND", command)
+        if command.execute() is not None:
             self.history.push(command)
-
-
-if __name__ == '__main__':
-    class A:
-        def a(self, x):
-            res = x + 1
-            print(res)
-    a = A()
-
-    invoker = Invoker(CommandHistory())
-    cmd1 = Command(a, 'a', 2)
-    invoker.execute_command(cmd1)
-
-    cmd2 = copy.copy(cmd1)
-    cmd2.args = [12]
-    invoker.execute_command(cmd2)
-
-    invoker.execute_command(cmd1)
-    del cmd2
-    invoker.execute_command(cmd1)

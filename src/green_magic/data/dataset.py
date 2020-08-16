@@ -55,7 +55,14 @@ class DatapointsFactory:
         if name not in cls.constructors:
             raise ValueError(
                 f"Request Engine of type '{name}'; supported are [{', '.join(sorted(cls.constructors.keys()))}]")
-        return cls.constructors[name](*args, **kwargs)
+        try:
+            return cls.constructors[name](*args, **kwargs)
+        except TypeError as e:
+            print(f"Datapoints creation failed. Args: [{', '.join(f'{i}: {str(_)}' for i, _ in enumerate(args))}]")
+            print(f"Kwargs: [{', '.join(f'{k}: {v}' for k, v in kwargs.items())}]")
+            print(e)
+            import sys
+            sys.exit(1)
 
 
 class BroadcastingDatapointsFactory(DatapointsFactory):
@@ -96,6 +103,7 @@ class TabularData(StructuredData):
     """Table-like datapoints that are loaded in memory"""
     retriever = attr.ib(init=True)
     iterator = attr.ib(init=True)
+    mutator = attr.ib(init=True, default=None)
 
     def column(self, identifier):
         return self.retriever.column(identifier, self)
@@ -105,6 +113,9 @@ class TabularData(StructuredData):
 
     def get_numerical_attributes(self):
         return self.retriever.get_numerical_attributes(self)
+
+    def get_categorical_attributes(self):
+        return iter(set(self.attributes) - set([_ for _ in self.retriever.get_numerical_attributes(self)]))
 
     @property
     def nb_columns(self):

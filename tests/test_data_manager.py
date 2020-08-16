@@ -1,8 +1,8 @@
+import pytest
 from green_magic.data.commands_manager import CommandsManager
 from green_magic.data.backend import Backend, DataEngine
 from green_magic.data.data_manager import DataManager
 from green_magic.data.backend import panda_handling
-
 
 
 def test_engine_registration():
@@ -60,13 +60,19 @@ def test_data_manager(sample_json):
 
     data_api.backend.engine.__class__.datapoints_factory.subject.attach(data_api.backend.datapoints_manager)
     DataEngine.test_pd.command_factory.attach(data_api.commands_manager.command.accumulator)
-    # PhiFunction.subject.attach(data_api.phis)
-    
+    PhiFunction.subject.attach(data_api.phis)
+
+    assert data_api.backend.engine.__class__.datapoints_factory not in PhiFunction.subject._observers
+
     # test runtime command registration
     import pandas as pd
     @DataEngine.test_pd.dec()
     def observations(file_path):
         return pd.read_json(file_path, lines=True)
+
+    @DataEngine.test_pd.dec()
+    def add_attribute(_datapoints, values, new_attribute):
+        _datapoints.observations[new_attribute] = values
 
     assert type(DataEngine.test_pd) == type(DataEngine)
     assert type(DataEngine.test_pd.registry) == dict
@@ -89,11 +95,16 @@ def test_data_manager(sample_json):
 
     DataEngine.test_pd.retriever = PDTabularRetriever()
     DataEngine.test_pd.iterator = PDTabularIterator()
+    DataEngine.test_pd.mutator = PDTabularIterator()
 
     inv = Invoker(CommandHistory())
     inv.execute_command(cmd)
 
-    assert len(data_api.backend.datapoints_manager.datapoints) == 100
+    datapoints = data_api.backend.datapoints_manager.datapoints
+    assert len(datapoints) == 100
+    assert 'flavors' in datapoints.attributes
 
-    # from green_magic.data.features.phi import PhiFunction
+    from green_magic.data.features.phis import ListToNominal
+
+    # l = ListToNominal(datapoints, 'flavors')
 

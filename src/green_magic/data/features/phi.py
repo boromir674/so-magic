@@ -31,14 +31,15 @@ phi_registry = PhiFunctionRegistry()
 
 
 class PhiFunctionInterface(ABC):
-    """Each datapoint"""
+    """A class implementing this interface has the ability to act as a callable that receives data and returns
+    a transformed version of them"""
     @abstractmethod
     def __call__(self, data, **kwargs):
         raise NotImplementedError
 
 
 class PhiFunction(PhiFunctionInterface, Transformer):
-    """A simple mathematics function usually notated with \phi and serves a single transormation operation
+    """A simple mathematical function usually notated with \phi and serves a single transormation operation
     useful to convert data (eg convert continous to discrete, normalizing, etc)
 
     Args:
@@ -72,6 +73,8 @@ class PhiFunction(PhiFunctionInterface, Transformer):
         key = key_name if key_name else PhiFunctionRegistry.get_name(a_callable)
         print(f"Registering object {a_callable} at key {key}.")
         phi_registry.add(key, a_callable)
+        cls.subject.name = key
+        cls.subject.state = a_callable
         cls.subject.notify()
 
     @classmethod

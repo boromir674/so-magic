@@ -79,7 +79,7 @@ class RuntimeTransformer(TransformerInterface, abc.ABC):
                 return a_callable(data)
             x._transform = types.MethodType(_transform, x)
         else:
-            raise Exception("Something went really bad. Check code above.")
+            raise Exception(f"Something went really bad. Check code above. Parameters: [{', '.join(str(_) for _ in parameters)}]")
         x._callable = a_callable
         return x
 

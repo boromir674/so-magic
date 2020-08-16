@@ -23,6 +23,7 @@ class EngineType(CommandRegistrator):
                 name = a_callable.__code__.co_name
                 print(f"ADW function {name}")
                 obs_funct = a_callable
+                print("DEBUG NAME:", name)
                 if name == 'observations':
                     def observations(file_path, **kwargs):
                         print(f"FP: {file_path}")
@@ -33,9 +34,24 @@ class EngineType(CommandRegistrator):
                                                                    [_ for _ in []], cls.retriever,
                                                                    cls.iterator)
                         datapoints._attributes = [_ for _ in cls.iterator.columnnames(datapoints)]
-                    obs_funct = lambda json_path: observations(json_path)
-                cls.registry[name] = obs_funct
-                cls._commands[name] = cls.command_factory(obs_funct)
+
+                    cls.registry[name] = observations
+                    cls._commands[name] = cls.command_factory(observations)
+                    # obs_funct = lambda json_path: _observations(json_path)
+                elif name == 'add_attribute':
+                    def add_attribute(*args, **kwargs):
+                        a_callable(*args, **kwargs)
+                    cls.registry[name] = add_attribute
+                    cls._commands[name] = cls.command_factory(add_attribute)
+                # try:
+                #     cls._commands[name] = cls.command_factory(obs_funct)
+                # except IndexError as e:
+                #     print(e)
+                #     import inspect
+                #     print(obs_funct, a_callable, name)
+                #     print(inspect.getargs(a_callable.__code__))
+                #     import sys
+                #     sys.exit(1)
             else:
                 raise RuntimeError(f"Expected a function to be decorated; got {type(a_callable)}")
             return a_callable
