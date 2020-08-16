@@ -1,4 +1,4 @@
-from green_magic.data.interfaces import TabularRetriever, TabularIterator
+from green_magic.data.interfaces import TabularRetriever, TabularIterator, TabularReporter
 
 
 class PDTabularRetriever(TabularRetriever):
@@ -29,3 +29,8 @@ class PDTabularIterator(TabularIterator):
 
     def itercolumns(self, data):
         return iter(data.observations[column] for column in data.observations.columns)
+
+class PDTabularReporter(TabularReporter):
+    def column_names(self, data):
+        return data.observations.columns
+

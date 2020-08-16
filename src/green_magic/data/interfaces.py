@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod, ABC
 
-__all__ = ['TabularIterator', 'TabularRetriever', 'Normalization', 'Discretization', 'Encoding', 'Visitor', 'Component']
+__all__ = ['TabularIterator', 'TabularRetriever', 'TabularReporter', 'Normalization', 'Discretization', 'Encoding', 'Visitor', 'Component']
 
 
 class TabularRetriever(ABC):
@@ -30,6 +30,11 @@ class TabularIterator(ABC):
         raise NotImplementedError
     @abstractmethod
     def columnnames(self, data):
+        raise NotImplementedError
+
+class TabularReporter(ABC):
+    @abstractmethod
+    def column_names(self, data):
         raise NotImplementedError
 
 

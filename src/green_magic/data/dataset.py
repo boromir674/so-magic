@@ -103,7 +103,11 @@ class TabularData(StructuredData):
     """Table-like datapoints that are loaded in memory"""
     retriever = attr.ib(init=True)
     iterator = attr.ib(init=True)
-    mutator = attr.ib(init=True, default=None)
+    reporter = attr.ib(init=True)
+
+    @property
+    def attributes(self):
+        return self.reporter.column_names(self)
 
     def column(self, identifier):
         return self.retriever.column(identifier, self)

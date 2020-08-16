@@ -13,6 +13,7 @@ class EngineType(CommandRegistrator):
         x._commands = {}
         x.retriever = None
         x.iterator = None
+        x.reporter = None
         x.command = mcs.magic_decorator
         x.command_factory = MagicCommandFactory()
         return x
@@ -31,9 +32,10 @@ class EngineType(CommandRegistrator):
                         print(f"Kwargs: {kwargs}")
                         res = a_callable(file_path, **kwargs)
                         datapoints = cls.datapoints_factory.create(data_structure, res,
-                                                                   [_ for _ in []], cls.retriever,
-                                                                   cls.iterator)
-                        datapoints._attributes = [_ for _ in cls.iterator.columnnames(datapoints)]
+                                                                   [_ for _ in []], cls.retriever(),
+                                                                   cls.iterator(),
+                                                                   cls.reporter())
+                        # datapoints._attributes = [_ for _ in cls.iterator.columnnames(datapoints)]
 
                     cls.registry[name] = observations
                     cls._commands[name] = cls.command_factory(observations)

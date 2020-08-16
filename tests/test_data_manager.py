@@ -5,6 +5,14 @@ from green_magic.data.data_manager import DataManager
 from green_magic.data.backend import panda_handling
 
 
+@pytest.fixture()
+def test_json_data(sample_json):
+    return {
+        'file_path': sample_json,
+        'nb_lines': 100,
+        'attributes': {'flavors', 'name', 'medical', 'description', 'image_urls', 'parents', 'negatives', 'grow_info', '_id', 'type', 'image_paths', 'effects'},
+    }
+
 def test_engine_registration():
     from green_magic.data.backend import DataEngine
     from green_magic.data.backend.engine import EngineType
@@ -41,10 +49,10 @@ def test_engine_registration():
     # assert all(id(getattr(DataEngine.test_pd, x) != id(getattr(DataEngine.data_lib, x)) for x in ATTRS))
 
 
-def test_data_manager(sample_json):
+def test_data_manager(test_json_data):
     import types
     from green_magic.utils.commands import Command
-    from green_magic.data.backend.panda_handling.df_backend import PDTabularIterator, PDTabularRetriever
+    from green_magic.data.backend.panda_handling.df_backend import PDTabularIterator, PDTabularRetriever, PDTabularReporter
     from green_magic.data.features.phi import PhiFunction
 
     DataEngine.new('test_pd')
@@ -72,6 +80,7 @@ def test_data_manager(sample_json):
 
     @DataEngine.test_pd.dec()
     def add_attribute(_datapoints, values, new_attribute):
+        print("CORRECT")
         _datapoints.observations[new_attribute] = values
 
     assert type(DataEngine.test_pd) == type(DataEngine)
@@ -85,26 +94,33 @@ def test_data_manager(sample_json):
 
     cmd = DataEngine.test_pd._commands['observations']
     # cmd = data_api.command.observations
-    cmd.args = [sample_json]
+    cmd.args = [test_json_data['file_path']]
 
     assert type(cmd._receiver) == types.FunctionType
     assert cmd._method == '__call__'
-    assert cmd.args == [sample_json]
+    assert cmd.args == [test_json_data['file_path']]
 
     from green_magic.utils.commands import Invoker, CommandHistory
 
-    DataEngine.test_pd.retriever = PDTabularRetriever()
-    DataEngine.test_pd.iterator = PDTabularIterator()
-    DataEngine.test_pd.mutator = PDTabularIterator()
+    DataEngine.test_pd.retriever = PDTabularRetriever
+    DataEngine.test_pd.iterator = PDTabularIterator
+    DataEngine.test_pd.reporter = PDTabularReporter
 
     inv = Invoker(CommandHistory())
     inv.execute_command(cmd)
 
     datapoints = data_api.backend.datapoints_manager.datapoints
-    assert len(datapoints) == 100
-    assert 'flavors' in datapoints.attributes
+    assert len(datapoints) == test_json_data['nb_lines']
+    print(datapoints.attributes)
 
-    from green_magic.data.features.phis import ListToNominal
+    assert set(datapoints.attributes) == test_json_data['attributes']
 
-    # l = ListToNominal(datapoints, 'flavors')
+    assert 'add_attribute' in DataEngine.test_pd.registry
 
+    cmd1 = DataEngine.test_pd._commands['add_attribute']
+    # cmd1 = data_api.command.observations
+    cmd1.args = [datapoints, [_ for _ in range(1, len(datapoints) + 1)], 'test_attr']
+
+    cmd1.execute()
+
+    assert set(datapoints.attributes) == set(_ for _ in list(test_json_data['attributes']) + ['test_attr'])
