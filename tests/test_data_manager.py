@@ -92,8 +92,7 @@ def test_data_manager(test_json_data):
 
     assert type(DataEngine.test_pd._commands['observations']) == Command
 
-    cmd = DataEngine.test_pd._commands['observations']
-    # cmd = data_api.command.observations
+    cmd = data_api.command.observations
     cmd.args = [test_json_data['file_path']]
 
     assert type(cmd._receiver) == types.FunctionType
@@ -117,8 +116,7 @@ def test_data_manager(test_json_data):
 
     assert 'add_attribute' in DataEngine.test_pd.registry
 
-    cmd1 = DataEngine.test_pd._commands['add_attribute']
-    # cmd1 = data_api.command.observations
+    cmd1 = data_api.command.add_attribute
     cmd1.args = [datapoints, [_ for _ in range(1, len(datapoints) + 1)], 'test_attr']
 
     cmd1.execute()

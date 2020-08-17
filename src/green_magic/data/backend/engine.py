@@ -45,6 +45,12 @@ class EngineType(CommandRegistrator):
                         a_callable(*args, **kwargs)
                     cls.registry[name] = add_attribute
                     cls._commands[name] = cls.command_factory(add_attribute)
+                else:
+                    def add_attribute(*args, **kwargs):
+                        a_callable(*args, **kwargs)
+
+                    cls.registry[name] = add_attribute
+                    cls._commands[name] = cls.command_factory(add_attribute)
                 # try:
                 #     cls._commands[name] = cls.command_factory(obs_funct)
                 # except IndexError as e:
