@@ -44,6 +44,22 @@ INSTALL_CMD = {
     "3.8": [["{path}", "/quiet", "TargetDir={home}"]],
 }
 
+def command_iterator(version, **kwargs):
+    """Call to iterate through the defined commands, given a python version. Each command is a list of words"""
+    return iter([part.format(home=kwargs['home'], path=kwargs['path']) for part in cmd] for cmd in INSTALL_CMD[version])
+
+
+def exec_command(cmd):
+    print("Running:", " ".join(cmd))
+    try:
+        check_call(cmd)
+        return True
+    except Exception as e:
+        print("Failed command", cmd, "with:", e)
+        if exists("install.log"):
+            with open("install.log") as f:
+                print(f.read())
+        return False
 
 def download_file(url, path):
     print("Downloading: {} (into {})".format(url, path))
@@ -59,26 +75,13 @@ def download_file(url, path):
     return dest
 
 
-def install_python(version, arch, home):
-    print("Installing Python", version, "for", arch, "bit architecture to", home)
-    if exists(home):
+def install_python(python_specs):
+    print("Installing Python", python_specs.version, "for", python_specs.arch, "bit architecture to", python_specs.home)
+    if exists(python_specs.home):
         return
-
-    path = download_python(version, arch)
-    print("Installing", path, "to", home)
-    success = False
-    for cmd in INSTALL_CMD[version]:
-        cmd = [part.format(home=home, path=path) for part in cmd]
-        print("Running:", " ".join(cmd))
-        try:
-            check_call(cmd)
-        except Exception as exc:
-            print("Failed command", cmd, "with:", exc)
-            if exists("install.log"):
-                with open("install.log") as fh:
-                    print(fh.read())
-        else:
-            success = True
+    path = download_python(python_specs.version, python_specs.arch)
+    print("Installing", python_specs.path, "to", python_specs.home)
+    success = any(x == True for x in [exec_command(cmd) for cmd in command_iterator(version, home=python_specs.home, path=python_specs.path)])
     if success:
         print("Installation complete!")
     else:
@@ -122,7 +125,10 @@ def install_packages(home, *packages):
 
 
 if __name__ == "__main__":
-    install_python(environ['PYTHON_VERSION'], environ['PYTHON_ARCH'], environ['PYTHON_HOME'])
+    python_specs = type('PythonSpecs', (object,), {'version': environ['PYTHON_VERSION'],
+                                                   'arch': environ['PYTHON_ARCH'],
+                                                   'home': environ['PYTHON_HOME']})
+    install_python(python_specs)
     install_pip(environ['PYTHON_HOME'])
     upgrade_pip(environ['PYTHON_HOME'])
     install_packages(environ['PYTHON_HOME'], "setuptools>=40.0.0", "wheel", "tox", "virtualenv>=20.0.0")
