@@ -56,7 +56,14 @@ def download_latest_artifacts(account_project, build_id):
             print(u"    {0}, {1} bytes".format(filename, artifact['size']))
 
             url = "https://ci.appveyor.com/api/buildjobs/{}/artifacts/{}".format(job['jobId'], filename)
-            download_url(url, filename, make_auth_headers())
+            ensure_dirs(filename)
+            response = requests.get(url, headers=headers, stream=True)
+            if response.status_code == 200:
+                with open(filename, 'wb') as f:
+                    for chunk in response.iter_content(16 * 1024):
+                        f.write(chunk)
+            else:
+                print(u"    Error downloading {}: {}".format(url, response))
 
             if is_zip:
                 unpack_zipfile(filename)
@@ -68,18 +75,6 @@ def ensure_dirs(filename):
     dirname = os.path.dirname(filename)
     if dirname and not os.path.exists(dirname):
         os.makedirs(dirname)
-
-
-def download_url(url, filename, headers):
-    """Download a file from `url` to `filename`."""
-    ensure_dirs(filename)
-    response = requests.get(url, headers=headers, stream=True)
-    if response.status_code == 200:
-        with open(filename, 'wb') as f:
-            for chunk in response.iter_content(16 * 1024):
-                f.write(chunk)
-    else:
-        print(u"    Error downloading {}: {}".format(url, response))
 
 
 def unpack_zipfile(filename):
