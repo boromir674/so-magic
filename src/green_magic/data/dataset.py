@@ -147,9 +147,6 @@ class DatapointsManager(Observer):
     def update(self, subject: Subject):
         datapoints_object = subject.state
         key = getattr(subject, 'name', '')
-        print(type(datapoints_object))
-        print(dir(subject))
-        print(dir(subject.state))
         if key in self.datapoints_objects:
             raise RuntimeError(f"Attempted to register a new Datapoints object at the existing key '{key}'.")
         self.datapoints_objects[key] = datapoints_object

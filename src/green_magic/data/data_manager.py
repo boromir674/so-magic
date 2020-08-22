@@ -47,3 +47,7 @@ class DataManager:
     @property
     def command(self):
         return self.commands_manager.command
+
+    @property
+    def datapoints(self):
+        return self.backend.datapoints_manager.datapoints

@@ -84,13 +84,11 @@ class BaseCommandFactory(AbstractCommandFactory, ABC):
 @BaseCommandFactory.register_as_subclass('generic')
 class GenericCommandFactory(AbstractCommandFactory):
     def construct(self, *args, **kwargs) -> Command:
-        print("GENERIC", args)
         return Command(*args, **kwargs)
 
 @BaseCommandFactory.register_as_subclass('function')
 class FunctionCommandFactory(AbstractCommandFactory):
     def construct(self, *args, **kwargs) -> Command:
-        print("FUNCTION", args)
         if len(args) < 1:
             raise RuntimeError("Will break")
         return Command(args[0], '__call__', *args[1:])
@@ -136,18 +134,15 @@ class CommandFactory:
         Returns:
             Command: an instance of a command object
         """
-        print("OPA 1", args)
+        print("CMD FCT")
+        print("args: ", args)
+        print("kwargs", kwargs)
 
         key, name = cls.pick(*args, **kwargs)
         print(f"KEY: {key}, NAME: {name}")
         if len(args) < 1:
             raise RuntimeError(args)
-        print("OPA 2", args)
         return cls.constructors[key](*args), name
-        # is_function = hasattr(args[0], '__code__')
-        # if is_function:  # if receiver is a function; creating from function
-        #     return cls.command_constructor(args[0], '__call__', *args[1:]), args[0].__code__.co_name
-        # return cls.command_constructor(args[0], args[1], *args[2:]), type(args[0]) + '-' + args[1]
 
 
 @attr.s
@@ -162,6 +157,6 @@ class MagicCommandFactory(Subject):
 
     def __call__(self, *args, **kwargs):
         assert args
-        self._state, self.name = self.command_factory.create(*args)
+        self._state, self.name = self.command_factory.create(*args, **kwargs)
         self.notify()
         return self._state

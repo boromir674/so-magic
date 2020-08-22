@@ -19,24 +19,19 @@ class EngineType(CommandRegistrator):
         def wrapper(a_callable):
             if hasattr(a_callable, '__code__'):  # it a function (def func_name ..)
                 name = a_callable.__code__.co_name
-                print(f"ADW function {name}")
+                print(f"Engine DEC called: function  {a_callable}")
+                print(f"Engine DEC called: function name {name}")
                 obs_funct = a_callable
-                print("DEBUG NAME:", name)
                 if name == 'observations':
                     def observations(file_path, **kwargs):
-                        print(f"FP: {file_path}")
-                        print(f"Callable: {a_callable.__code__.co_name}, {a_callable}")
-                        print(f"Kwargs: {kwargs}")
                         _observations = a_callable(file_path, **kwargs)
                         datapoints = cls.datapoints_factory.create(data_structure, _observations, [_ for _ in []],
                                                                    cls.retriever(),
                                                                    cls.iterator(),
                                                                    cls.mutator())
-                        # datapoints._attributes = [_ for _ in cls.iterator.columnnames(datapoints)]
 
                     cls.registry[name] = observations
                     cls._commands[name] = cls.command_factory(observations)
-                    # obs_funct = lambda json_path: _observations(json_path)
                 elif name == 'add_attribute':
                     def add_attribute(*args, **kwargs):
                         a_callable(*args, **kwargs)

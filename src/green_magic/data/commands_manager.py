@@ -10,6 +10,9 @@ class CommandsAccumulator(Observer):
     def update(self, subject) -> None:
         self.commands[getattr(subject, 'name', str(subject.state))] = subject.state
 
+    def __contains__(self, item):
+        return item in self.commands
+
 @attr.s
 class CommandGetter:
     _commands_accumulator = attr.ib(init=True, default=CommandsAccumulator())
@@ -41,8 +44,3 @@ class CommandsManager:
     @property
     def commands_dict(self):
         return self._commands_accumulator.commands
-
-    # def __getattr__(self, item):
-    #     if item not in self._commands_accumulator.commands:
-    #         raise KeyError(f"Item '{item}' not found in [{', '.join(str(_) for _ in self._commands_accumulator.commands.keys())}]")
-    #     return self._commands_accumulator.commands[item]

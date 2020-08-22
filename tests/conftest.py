@@ -33,55 +33,29 @@ def test_json_data(sample_json):
 
 
 @pytest.fixture
-def r_data_manager():
-    from green_magic.data.data_manager import DataManager
-
-
-
-@pytest.fixture
 def data_manager():
-    from green_magic.data.backend import Backend, DataEngine, pd_engine
-    from green_magic.data.data_manager import DataManager
-    from green_magic.data.commands_manager import CommandsManager
+    from green_magic.data import data_manager
+
+    datapoints_fact = data_manager.backend.engine.__class__.datapoints_factory
+    cmd_fact = data_manager.backend.engine.command_factory
+
+    # test 1
     from green_magic.data.dataset import DatapointsFactory
     from green_magic.data.command_factories import MagicCommandFactory
     from green_magic.data.features.phi import PhiFunction
-
-    data_api = DataManager(Backend(DataEngine.create('test_pd')))
-
-    datapoints_fact = data_api.backend.engine.__class__.datapoints_factory
-    cmd_fact = DataEngine.test_pd.command_factory
     assert isinstance(datapoints_fact, DatapointsFactory)
     assert isinstance(cmd_fact, MagicCommandFactory)
 
     subjects = [datapoints_fact.subject, cmd_fact, PhiFunction.subject]
     assert len(set([id(x._observers) for x in subjects])) == len(subjects)
 
-    for s in subjects:
-        s._observers = []
-        # print('FFFF', type(s), id(s), id(s._observers), len(s._observers))
-    assert all(len(x._observers) == 0 for x in subjects)
-
-    data_api.backend.engine.__class__.datapoints_factory.subject.attach(data_api.backend.datapoints_manager)
-    DataEngine.test_pd.command_factory.attach(data_api.commands_manager.command.accumulator)
-    PhiFunction.subject.attach(data_api.phis)
-
-    print(f"dtp-fact: {type(datapoints_fact)} -> observers: [{', '.join(str(_) for _ in datapoints_fact.subject._observers)}]")
-    print(
-        f"cmd-fact: {type(cmd_fact)} -> observers: [{', '.join(str(_) for _ in cmd_fact._observers)}]")
-    print('----------------------')
-    print(
-        f"dtp-fact: {type(datapoints_fact)} -> observers: [{', '.join(str(_) for _ in datapoints_fact.subject._observers)}]")
-    print(
-        f"cmd-fact: {type(cmd_fact)} -> observers: [{', '.join(str(_) for _ in cmd_fact._observers)}]")
-
-
-    assert datapoints_fact.subject._observers[0] == data_api.backend.datapoints_manager
-    assert cmd_fact._observers[0] == data_api.commands_manager.command.accumulator
+    assert datapoints_fact.subject._observers[0] == data_manager.backend.datapoints_manager
+    assert cmd_fact._observers[0] == data_manager.commands_manager.command.accumulator
+    assert PhiFunction.subject._observers[0] == data_manager.built_phis
 
     assert all(len(x._observers) == 1 for x in subjects)
 
-    return data_api
+    return data_manager
 
 
 @pytest.fixture
@@ -107,10 +81,6 @@ def test_engine(data_manager):
         data_manager.backend.engine.__class__.datapoints_factory.subject._observers,
         DataEngine.test_pd.command_factory._observers,
     )])
-    # DataEngine.test_pd.command_factory(data_structure, res, [_ for _ in []],
-    #                                                                cls.retriever(),
-    #                                                                cls.iterator(),
-    #                                                                cls.mutator())
     return DataEngine.test_pd
 
 
