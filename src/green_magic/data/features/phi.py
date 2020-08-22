@@ -45,9 +45,16 @@ class PhiFunction(PhiFunctionInterface, Transformer):
     Args:
         function (callable): the function that does the actual operation]
     """
-    subject = Subject()
+    subject = Subject([])
 
     def __call__(self, data, **kwargs):
+        """[summary]
+
+        Args:
+            data (scalar or [N x 1] list-like): the input data
+        Returns:
+            scalar or [N x 1] list-like: the output data
+        """
         return self.transform(data, **kwargs)
 
     @classmethod

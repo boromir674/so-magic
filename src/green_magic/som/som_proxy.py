@@ -20,10 +20,6 @@ class SomTrainer:
         som.train(data=np.array(dataset.datapoints.feature_vectors, dtype=np.float32))
         return som
 
-    def fit_data(self, som, feature_vectors):
-        som.train(data=np.array(feature_vectors, dtype=np.float32))
-        return som
-
 
 @attr.s
 class SomFactory:

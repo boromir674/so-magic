@@ -23,9 +23,9 @@ class StrainMaster:
 
             cls.__instance = super().__new__(cls)
             DataEngine.new('pd')
-            cls.__instance.data_api = DataManager(CommandsManager(), Backend(DataEngine.create('pd')))
+            cls.__instance.data_api = DataManager(Backend(DataEngine.create('pd')))
             # make the datapoint_manager listen to newly created Datapoints objects events
-            cls.__instance.data_api.backend.engine.datapoints_factory.subject.attach(cls.__instance.data_api.backend.datapoints_manager)
+            # cls.__instance.data_api.backend.engine.datapoints_factory.subject.attach(cls.__instance.data_api.backend.datapoints_manager)
         return cls.__instance
 
     def __call__(self, *args, **kwargs):

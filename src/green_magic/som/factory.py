@@ -18,8 +18,7 @@ class ObjectsPool:
             except TypeError as e:
                 print(e)
                 msg = f"DEBUG: Args: [{', '.join(str(_) for _ in args)}], kwargs: {str(kwargs)}"
-                print(f"DEBUG: Args: [{', '.join(str(_) for _ in args)}], kwargs: {str(kwargs)}")
-                raise TypeError(msg)
+                # raise TypeError(msg)
                 return None
         return ObjectsPool._objects[key]
 

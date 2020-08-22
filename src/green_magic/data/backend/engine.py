@@ -1,9 +1,6 @@
-import attr
 from green_magic.data.dataset import BroadcastingDatapointsFactory
-from green_magic.utils import BaseComponent
-from green_magic.data.interfaces import TabularRetriever, TabularIterator
-from green_magic.data.commands_manager import MagicCommandFactory, CommandRegistrator
-from green_magic.data.commands_manager import CommandRegistrator
+from green_magic.data.command_factories import MagicCommandFactory, CommandRegistrator
+
 
 class EngineType(CommandRegistrator):
     datapoints_factory = BroadcastingDatapointsFactory()
@@ -13,7 +10,7 @@ class EngineType(CommandRegistrator):
         x._commands = {}
         x.retriever = None
         x.iterator = None
-        x.reporter = None
+        x.mutator = None
         x.command = mcs.magic_decorator
         x.command_factory = MagicCommandFactory()
         return x
@@ -30,11 +27,11 @@ class EngineType(CommandRegistrator):
                         print(f"FP: {file_path}")
                         print(f"Callable: {a_callable.__code__.co_name}, {a_callable}")
                         print(f"Kwargs: {kwargs}")
-                        res = a_callable(file_path, **kwargs)
-                        datapoints = cls.datapoints_factory.create(data_structure, res,
-                                                                   [_ for _ in []], cls.retriever(),
+                        _observations = a_callable(file_path, **kwargs)
+                        datapoints = cls.datapoints_factory.create(data_structure, _observations, [_ for _ in []],
+                                                                   cls.retriever(),
                                                                    cls.iterator(),
-                                                                   cls.reporter())
+                                                                   cls.mutator())
                         # datapoints._attributes = [_ for _ in cls.iterator.columnnames(datapoints)]
 
                     cls.registry[name] = observations
@@ -46,27 +43,16 @@ class EngineType(CommandRegistrator):
                     cls.registry[name] = add_attribute
                     cls._commands[name] = cls.command_factory(add_attribute)
                 else:
-                    def add_attribute(*args, **kwargs):
+                    def a_function(*args, **kwargs):
                         a_callable(*args, **kwargs)
-
-                    cls.registry[name] = add_attribute
-                    cls._commands[name] = cls.command_factory(add_attribute)
-                # try:
-                #     cls._commands[name] = cls.command_factory(obs_funct)
-                # except IndexError as e:
-                #     print(e)
-                #     import inspect
-                #     print(obs_funct, a_callable, name)
-                #     print(inspect.getargs(a_callable.__code__))
-                #     import sys
-                #     sys.exit(1)
+                    cls.registry[name] = a_function
+                    cls._commands[name] = cls.command_factory(a_function, name=name)
             else:
                 raise RuntimeError(f"Expected a function to be decorated; got {type(a_callable)}")
             return a_callable
         return wrapper
 
-@attr.s
-class DataEngine(BaseComponent, metaclass=EngineType):
+class DataEngine(metaclass=EngineType):
     subclasses = {}
 
     @classmethod
@@ -74,7 +60,7 @@ class DataEngine(BaseComponent, metaclass=EngineType):
         @DataEngine.register_as_subclass(engine_name)
         class RuntimeDataEngine(DataEngine):
             pass
-        RuntimeDataEngine.commands_dict = {}
+        return RuntimeDataEngine
 
     @classmethod
     def register_as_subclass(cls, engine_type):

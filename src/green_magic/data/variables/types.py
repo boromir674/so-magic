@@ -64,8 +64,8 @@ class VariableTypeFactory:
         numerical = datapoints.get_numerical_attributes()
         if attribute in numerical:
             #
-            # TODO check for negative values -> probably ratio
-            # TODO check for all integers -> probably interval
+            # TODO if all integers -> probably interval
+            # TODO if there are negative values -> probably ratio
             if ratio:
                 return RatioVariableType()
             return IntervalVariableType()

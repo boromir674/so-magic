@@ -1,10 +1,21 @@
 import pytest
-from green_magic.data.features.phi import PhiFunction
+
+@pytest.fixture
+def registering_phi_at_the_same_key_error():
+    from green_magic.utils.registry import ObjectRegistryError
+    return ObjectRegistryError
 
 
-def test_phi_creation():
+def test_phi_creation(data_manager, registering_phi_at_the_same_key_error):
+    from green_magic.data.features.phi import PhiFunction, phi_registry
     from green_magic.data.features.phi import phi_registry
+    from green_magic.data.data_manager import Phis
+
     assert phi_registry.objects == {}
+    assert 'aa' not in phi_registry
+    assert len(PhiFunction.subject._observers) == 1
+    assert type(PhiFunction.subject._observers[0]) == Phis
+
     @PhiFunction.register('aa')
     def ela(x):
         """ela Docstring"""
@@ -41,8 +52,8 @@ def test_phi_creation():
         def __call__(self, data, **kwargs):
             return data - 5
     assert 'Nai' in phi_registry
-    from green_magic.utils import ObjectRegistryError
-    with pytest.raises(ObjectRegistryError):
+
+    with pytest.raises(registering_phi_at_the_same_key_error):
         @PhiFunction.register()
         def gg(x):
             return x

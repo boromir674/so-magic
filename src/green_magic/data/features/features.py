@@ -39,10 +39,13 @@ class AttributeReporter(ABC):
 
 
 class BaseAttributeReporter(AttributeReporter):
+
     def values(self, datapoints, attribute, **kwargs):
         return datapoints[attribute]
+
     def variable_type(self, datapoints, attribute, **kwargs):
         return VariableTypeFactory.infer(datapoints, attribute, **kwargs)
+
     def value_set(self, datapoints, attribute, **kwargs):
         return set([_ for _ in datapoints.column(attribute)])
 

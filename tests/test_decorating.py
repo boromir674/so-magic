@@ -1,6 +1,6 @@
 
 def test_decorating():
-    from green_magic.data.commands_manager import MyDecorator, CommandRegistrator
+    from green_magic.data.command_factories import MyDecorator, CommandRegistrator
 
 
     class A(MyDecorator): pass

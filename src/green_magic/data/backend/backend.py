@@ -3,12 +3,14 @@ from .engine import DataEngine
 from green_magic.data.dataset import DatapointsManager
 
 class DataBackend(ABC):
-
     pass
 
 
 class Backend(DataBackend, ABC):
-
+    """
+        Args:
+            engine (DataEngine): a data engine represented as a class object (eg class MyClass: pass)
+    """
     def __init__(self, engine):
         self._engine = engine
         self.datapoints_manager = DatapointsManager()

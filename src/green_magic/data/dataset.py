@@ -1,5 +1,7 @@
+from abc import ABC, abstractmethod
 import os
 import attr
+
 from green_magic.utils import Observer, Subject
 
 
@@ -20,11 +22,6 @@ class Dataset:
     def features(self, features):
         self._features = features
 
-    # @classmethod
-    # def from_file(cls, file_path, name):
-    #     return Dataset(Datapoints.from_file(file_path), name)
-
-from abc import ABC, abstractmethod
 
 class DatapointsInterface(ABC):
     """The Datapoints interface gives access to the 'observations' property."""
@@ -66,7 +63,7 @@ class DatapointsFactory:
 
 
 class BroadcastingDatapointsFactory(DatapointsFactory):
-    subject = Subject()
+    subject = Subject([])
 
     @classmethod
     def create(cls, name, *args, **kwargs) -> DatapointsInterface:
@@ -103,11 +100,11 @@ class TabularData(StructuredData):
     """Table-like datapoints that are loaded in memory"""
     retriever = attr.ib(init=True)
     iterator = attr.ib(init=True)
-    reporter = attr.ib(init=True)
+    mutator = attr.ib(init=True)
 
     @property
     def attributes(self):
-        return self.reporter.column_names(self)
+        return self.iterator.columnnames(self)
 
     def column(self, identifier):
         return self.retriever.column(identifier, self)

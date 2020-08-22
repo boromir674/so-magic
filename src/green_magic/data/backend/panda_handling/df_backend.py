@@ -1,7 +1,10 @@
-from green_magic.data.interfaces import TabularRetriever, TabularIterator, TabularReporter
+from green_magic.data.backend.engine_specs import EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator
+
+__all__ = ['PDTabularRetriever', 'PDTabularIterator', 'PDTabularMutator']
 
 
-class PDTabularRetriever(TabularRetriever):
+@EngineTabularRetriever.register_as_subclass('pd')
+class PDTabularRetriever(EngineTabularRetriever):
     """The observation object is the same as the one your return from 'from_json_lines'"""
     def column(self, identifier, data):
         return data.observations[identifier]
@@ -18,7 +21,9 @@ class PDTabularRetriever(TabularRetriever):
     def get_numerical_attributes(self, data):
         return data.observations._get_numeric_data().columns.values
 
-class PDTabularIterator(TabularIterator):
+
+@EngineTabularIterator.register_as_subclass('pd')
+class PDTabularIterator(EngineTabularIterator):
     """The observation object is the same as the one your return from 'from_json_lines'"""
 
     def columnnames(self, data):
@@ -30,7 +35,8 @@ class PDTabularIterator(TabularIterator):
     def itercolumns(self, data):
         return iter(data.observations[column] for column in data.observations.columns)
 
-class PDTabularReporter(TabularReporter):
-    def column_names(self, data):
-        return data.observations.columns
 
+@EngineTabularMutator.register_as_subclass('pd')
+class PDTabularMutator(EngineTabularMutator):
+    def add_column(self, datapoints, values, new_attribute, **kwargs):
+        datapoints.observations[new_attribute] = values
