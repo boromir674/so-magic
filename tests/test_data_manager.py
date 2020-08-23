@@ -1,8 +1,6 @@
 import pytest
-from green_magic.data.commands_manager import CommandsManager
-from green_magic.data.backend import Backend, DataEngine
-from green_magic.data.data_manager import DataManager
-from green_magic.data.backend import panda_handling
+
+from green_magic.data.backend import DataEngine
 
 
 def test_engine_registration():

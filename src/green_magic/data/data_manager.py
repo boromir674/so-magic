@@ -28,6 +28,7 @@ class Phis(ObjectRegistry, Observer):
 @attr.s
 class DataManager:
     backend = attr.ib(init=True)
+    _phi_function_class = attr.ib(init=True)
     commands_manager = attr.ib(init=True, default=CommandsManager())
     mediator = attr.ib(init=False, default=attr.Factory(lambda self: DataMediator(self.commands_manager, self.backend), takes_self=True))
     built_phis = attr.ib(init=False, default=Phis())
@@ -35,6 +36,7 @@ class DataManager:
     def __attrs_post_init__(self):
         self.backend.engine.__class__.datapoints_factory.subject.attach(self.backend.datapoints_manager)
         self.backend.engine.command_factory.attach(self.commands_manager.command.accumulator)
+        self._phi_function_class.subject.attach(self.built_phis)
 
     @property
     def phis(self):

@@ -3,8 +3,8 @@ from .features.phi import PhiFunction
 
 
 def init_data_manager(a_backend):
-    data_manager = DataManager(a_backend)
-    PhiFunction.subject.attach(data_manager.built_phis)
+    import copy
+    data_manager = DataManager(a_backend, copy.copy(PhiFunction))
 
     @data_manager.backend.engine.dec()
     def encode_nominal_subsets(datapoints, attribute, new_attribute):
