@@ -41,6 +41,19 @@ class MapManager:
         """
         return self.pool.get_object(*args, **kwargs)
 
+    def train(self, dataset, nb_cols, nb_rows, **kwargs):
+        """"""
+        return self.map_factory.create(dataset, nb_cols, nb_rows, **kwargs)
+
+
+@attr.s
+class MagicMapManager:
+    so_master = attr.ib(init=True)
+    manager = attr.ib(init=False, default=MapManager())
+
+    def train(self, nb_cols, nb_rows, **kwargs):
+        return self.manager.train(self.so_master.dataset, nb_cols, nb_rows, **kwargs)
+
 
 @attr.s
 class MapId:

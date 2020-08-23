@@ -1,4 +1,6 @@
 from green_magic.data.backend.engine_specs import EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator
+from green_magic.data.backend.engine import DataEngine
+import pandas as pd
 
 __all__ = ['PDTabularRetriever', 'PDTabularIterator', 'PDTabularMutator']
 
@@ -40,3 +42,7 @@ class PDTabularIterator(EngineTabularIterator):
 class PDTabularMutator(EngineTabularMutator):
     def add_column(self, datapoints, values, new_attribute, **kwargs):
         datapoints.observations[new_attribute] = values
+
+@DataEngine.dec()
+def observations(file_path):
+    return pd.read_json(file_path, lines=True)

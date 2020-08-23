@@ -1,1 +1,1 @@
-from .factory import MapManager
+from .factory import MagicMapManager

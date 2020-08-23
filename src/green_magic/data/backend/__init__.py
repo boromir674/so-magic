@@ -2,18 +2,24 @@ from .backend import Backend
 from .engine import DataEngine
 from .engine_specs import EngineSpecifications
 
+ENGINES = {
+    'pd': {
+        'abbr': 'pd',
+        'name': 'pandas',
+    },
+}
 
-PANDAS_ABBR = 'pd'
-PANDAS_NAME = 'pandas'
-from .panda_handling.df_backend import *
+def init_backend(engine_type='pd'):
+    from green_magic.data.backend.panda_handling.df_backend import PDTabularRetriever, PDTabularIterator, PDTabularMutator
+    # create/register new empty/canvas engine
+    pd_engine = DataEngine.new(ENGINES[engine_type]['abbr'])
 
-# create/register new empty/canvas engine
-pd_engine = DataEngine.new(PANDAS_ABBR)
+    # create supporting object that can initialize an engine
+    pandas_engine_specs = EngineSpecifications(ENGINES[engine_type]['abbr'], ENGINES[engine_type]['name'])
 
-# create supporting object that can initialize an engine
-pandas_engine_specs = EngineSpecifications(PANDAS_ABBR, PANDAS_NAME)
+    # initialize engine
+    pandas_engine_specs(pd_engine)
 
-# initialize engine
-pandas_engine_specs(pd_engine)
+    magic_backend = Backend(pd_engine)
 
-magic_backend = Backend(pd_engine)
+    return magic_backend

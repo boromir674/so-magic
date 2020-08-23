@@ -25,11 +25,16 @@ class EngineType(CommandRegistrator):
                 if name == 'observations':
                     def observations(file_path, **kwargs):
                         _observations = a_callable(file_path, **kwargs)
+                        print("<OBS>")
+                        print(file_path)
+                        print("MID")
+                        print(kwargs)
+                        print("</OBS>")
                         datapoints = cls.datapoints_factory.create(data_structure, _observations, [_ for _ in []],
                                                                    cls.retriever(),
                                                                    cls.iterator(),
-                                                                   cls.mutator())
-
+                                                                   cls.mutator(),
+                                                                   file_path=file_path)
                     cls.registry[name] = observations
                     cls._commands[name] = cls.command_factory(observations)
                 elif name == 'add_attribute':

@@ -6,22 +6,18 @@ def registering_phi_at_the_same_key_error():
     return ObjectRegistryError
 
 
-def test_phi_creation(data_manager, registering_phi_at_the_same_key_error):
+def test_phi_creation(registering_phi_at_the_same_key_error):
     from green_magic.data.features.phi import PhiFunction, phi_registry
-    from green_magic.data.features.phi import phi_registry
-    from green_magic.data.data_manager import Phis
 
     assert phi_registry.objects == {}
-    assert 'aa' not in phi_registry
-    assert len(PhiFunction.subject._observers) == 1
-    assert type(PhiFunction.subject._observers[0]) == Phis
+    assert 'pame' not in phi_registry
 
-    @PhiFunction.register('aa')
+    @PhiFunction.register('pame')
     def ela(x):
         """ela Docstring"""
         return x + 1
 
-    assert 'aa' in phi_registry
+    assert 'pame' in phi_registry
     assert ela.__name__ == 'ela'
     assert ela.__doc__ == 'ela Docstring'
 
@@ -41,12 +37,14 @@ def test_phi_creation(data_manager, registering_phi_at_the_same_key_error):
             return data + 5
     assert 'edw' in phi_registry
     assert phi_registry.get('edw')(3) == 8
+
     @PhiFunction.register('')
     class qw:
         def __call__(self, data, **kwargs):
             return data - 5
     assert phi_registry.get('qw')(3) == -2
     assert 'qw' in phi_registry
+
     @PhiFunction.register()
     class Nai:
         def __call__(self, data, **kwargs):

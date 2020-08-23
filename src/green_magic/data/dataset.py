@@ -11,7 +11,6 @@ class Dataset:
     name = attr.ib(init=True, default=None)
 
     _features = attr.ib(init=True, default=[])
-    handler = attr.ib(init=True, default=None)
     size = attr.ib(init=False, default=attr.Factory(lambda self: len(self.datapoints) if self.datapoints else 0, takes_self=True))
 
     @property
@@ -66,9 +65,17 @@ class BroadcastingDatapointsFactory(DatapointsFactory):
     subject = Subject([])
 
     @classmethod
-    def create(cls, name, *args, **kwargs) -> DatapointsInterface:
-        cls.subject.state = super().create(name, *args, **kwargs)
-        cls.subject.name = kwargs.get('id', kwargs.get('name', ''))
+    def create(cls, datapoints_factory_type, *args, **kwargs) -> DatapointsInterface:
+        print("START")
+        print(args)
+        print("MID")
+        print(kwargs)
+        print("END")
+        cls.subject.name = kwargs.pop('id', kwargs.pop('name', kwargs.pop('file_path', '')))
+        if kwargs:
+            msg = f"Kwargs: [{', '.join(f'{k}: {v}' for k, v in kwargs.items())}]"
+            raise RuntimeError("The 'create' method of DatapointsFactory does not support kwargs:", msg)
+        cls.subject.state = super().create(datapoints_factory_type, *args, **kwargs)
         if args and not hasattr(cls, '.name'):
             cls.name = getattr(args[0], 'name', '')
         cls.subject.notify()
@@ -147,6 +154,8 @@ class DatapointsManager(Observer):
     def update(self, subject: Subject):
         datapoints_object = subject.state
         key = getattr(subject, 'name', '')
+        if key == '':
+            raise RuntimeError(f"Subject {Subject} with state {str(subject.state)} resulted in an empty string as key (to use in dict/hash).")
         if key in self.datapoints_objects:
             raise RuntimeError(f"Attempted to register a new Datapoints object at the existing key '{key}'.")
         self.datapoints_objects[key] = datapoints_object
