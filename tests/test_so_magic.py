@@ -11,14 +11,9 @@ def test_somagic_scenario(train_args, somagic, sample_collaped_json):
         cmd = somagic._data_manager.command.select_variables
         cmd.args = [['type', 'flavours']]
         cmd.execute()
-        #
-        # cmd = somagic._data_manager.command.encode_nominal_scalar
-        # cmd.args = ['type']
-        # cmd.execute()
 
-        # cmd = somagic._dataset_manager.command.select_variables
-        # cmd.args = ['type', 'flavours']
-        # cmd.execute()
+        assert somagic._data_manager.feature_manager.feature_configuration == ['type', 'flavours']
+        
     # som = somagic.map.train(*train_args[:2])
     #
     # attrs = ('height', 'width', 'type', 'grid_type')
