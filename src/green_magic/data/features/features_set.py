@@ -1,7 +1,8 @@
 import attr
 
-from data.variables.types import NominalVariableType
-from data.features.features import TrackingFeature
+from green_magic.data.variables.types import NominalVariableType
+from green_magic.data.features.features import TrackingFeature
+
 
 @attr.s
 class BaseFeatureSet:
@@ -41,3 +42,16 @@ class FeatureSet(BaseFeatureSet):
         for feature in self.features:
             if not isinstance(feature.var_type, NominalVariableType):
                 yield feature
+
+
+@attr.s
+class FeatureManager:
+    _feature_configuration = attr.ib(init=True)
+
+    @property
+    def feature_configuration(self):
+        return self._feature_configuration
+
+    @feature_configuration.setter
+    def feature_configuration(self, feature_configuration):
+        self._feature_configuration = feature_configuration

@@ -34,6 +34,7 @@ class MyDecorator(type):
             print(type(_))
             return _  # ... or 'decorator'
 
+
 class CommandRegistrator(MyDecorator):
     """Classes can use this class as metaclass to obtain a single registration point accessible as class attribute
     """
@@ -156,7 +157,44 @@ class MagicCommandFactory(Subject):
     command_factory = attr.ib(init=True, default=CommandFactory())
 
     def __call__(self, *args, **kwargs):
-        assert args
         self._state, self.name = self.command_factory.create(*args, **kwargs)
+        self.notify()
+        return self._state
+
+
+class DataManagerCommandFactory(AbstractCommandFactory, ABC):
+
+    subclasses = {}
+
+    @classmethod
+    def register_as_subclass(cls, factory_type):
+        def wrapper(subclass):
+            cls.subclasses[factory_type] = subclass
+            return subclass
+        return wrapper
+
+    @classmethod
+    def create(cls, factory_type, *args, **kwargs):
+        if factory_type not in cls.subclasses:
+            raise ValueError('Bad "Factory type" \'{}\''.format(factory_type))
+        return cls.subclasses[factory_type](*args, **kwargs)
+
+
+@DataManagerCommandFactory.register_as_subclass('select_variables')
+class SelectVariablesCommandFactory(DataManagerCommandFactory):
+
+    def construct(self, *args, **kwargs) -> Command:
+        def command(variables):
+            args[0].feature_manager.feature_configuration = variables
+        return Command(command, '__call__', *args[1:])
+
+
+@attr.s
+class MegaCommandFactory(Subject):
+    _data_manager = attr.ib(init=True)
+    command_factory = attr.ib(init=True, default=DataManagerCommandFactory)
+
+    def __call__(self, command_type, *args, **kwargs):
+        self._state, self.name = self.command_factory.create(command_type).construct(self._data_manager, *args, **kwargs), command_type
         self.notify()
         return self._state

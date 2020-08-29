@@ -6,12 +6,18 @@ def registering_phi_at_the_same_key_error():
     return ObjectRegistryError
 
 
-def test_phi_creation(registering_phi_at_the_same_key_error):
-    from green_magic.data.features.phi import PhiFunction, phi_registry
+@pytest.fixture
+def app_phi_function(somagic):
+    return somagic._data_manager.phi_class
+
+
+def test_phi_creation(app_phi_function, registering_phi_at_the_same_key_error):
+    from green_magic.data.features.phi import phi_registry
 
     assert phi_registry.objects == {}
     assert 'pame' not in phi_registry
 
+    PhiFunction = app_phi_function
     @PhiFunction.register('pame')
     def ela(x):
         """ela Docstring"""

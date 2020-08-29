@@ -21,5 +21,6 @@ def init_backend(engine_type='pd'):
     pandas_engine_specs(pd_engine)
 
     magic_backend = Backend(pd_engine)
+    pd_engine.backend = magic_backend
 
     return magic_backend

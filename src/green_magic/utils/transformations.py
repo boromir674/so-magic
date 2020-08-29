@@ -54,8 +54,10 @@ class RuntimeTransformer(TransformerInterface, abc.ABC):
     whether it can accept kwargs. Depending on the kwargs check, "configures" the '_transform' method to process
      any kwargs at runtime or to ignore them.
 
+    Delegates all the transformation operation to its '_transform' method provided by its '_callable' field.
+
     Args:
-        a_callable (callable): a callable object that can be potentially used to delegate the transformation operation
+        a_callable (callable): a callable object used to delegate the transformation operation
     """
     def __new__(cls, *args, **kwargs):
         x = super().__new__(cls)
@@ -83,8 +85,7 @@ class RuntimeTransformer(TransformerInterface, abc.ABC):
         x._callable = a_callable
         return x
 
-
-class Transformer(RuntimeTransformer):
-    """Delegates all the transformation operation to its '_transform' method provided by its '_callable' field."""
     def transform(self, data, **kwargs):
         return self._transform(data, **kwargs)
+
+class Transformer(RuntimeTransformer): pass

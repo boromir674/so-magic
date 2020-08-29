@@ -1,9 +1,7 @@
-from green_magic.data.dataset import BroadcastingDatapointsFactory
 from green_magic.data.command_factories import MagicCommandFactory, CommandRegistrator
 
 
 class EngineType(CommandRegistrator):
-    datapoints_factory = BroadcastingDatapointsFactory()
 
     def __new__(mcs, *args, **kwargs):
         x = super().__new__(mcs, *args, **kwargs)
@@ -11,6 +9,7 @@ class EngineType(CommandRegistrator):
         x.retriever = None
         x.iterator = None
         x.mutator = None
+        x.backend = None
         x.command = mcs.magic_decorator
         x.command_factory = MagicCommandFactory()
         return x
@@ -21,7 +20,6 @@ class EngineType(CommandRegistrator):
                 name = a_callable.__code__.co_name
                 print(f"Engine DEC called: function  {a_callable}")
                 print(f"Engine DEC called: function name {name}")
-                obs_funct = a_callable
                 if name == 'observations':
                     def observations(file_path, **kwargs):
                         _observations = a_callable(file_path, **kwargs)
@@ -30,18 +28,13 @@ class EngineType(CommandRegistrator):
                         print("MID")
                         print(kwargs)
                         print("</OBS>")
-                        datapoints = cls.datapoints_factory.create(data_structure, _observations, [_ for _ in []],
+                        datapoints = cls.backend.datapoints_factory.create(data_structure, _observations, [_ for _ in []],
                                                                    cls.retriever(),
                                                                    cls.iterator(),
                                                                    cls.mutator(),
                                                                    file_path=file_path)
                     cls.registry[name] = observations
                     cls._commands[name] = cls.command_factory(observations)
-                elif name == 'add_attribute':
-                    def add_attribute(*args, **kwargs):
-                        a_callable(*args, **kwargs)
-                    cls.registry[name] = add_attribute
-                    cls._commands[name] = cls.command_factory(add_attribute)
                 else:
                     def a_function(*args, **kwargs):
                         a_callable(*args, **kwargs)
@@ -51,6 +44,7 @@ class EngineType(CommandRegistrator):
                 raise RuntimeError(f"Expected a function to be decorated; got {type(a_callable)}")
             return a_callable
         return wrapper
+
 
 class DataEngine(metaclass=EngineType):
     subclasses = {}

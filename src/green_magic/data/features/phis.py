@@ -1,6 +1,4 @@
 import attr
-from green_magic.data.encoding import Encoder
-from .phi import PhiFunction
 from .features import AttributeReporter
 
 
@@ -48,4 +46,3 @@ class ListOfCategoricalPhi:
     @staticmethod
     def _order(x):
         return iter(_ for _ in sorted(x))
-

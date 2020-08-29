@@ -1,12 +1,11 @@
-from abc import ABC, abstractmethod
-from .engine import DataEngine
 from green_magic.data.dataset import DatapointsManager
+from green_magic.data.dataset import BroadcastingDatapointsFactory
+from green_magic.utils import Subject
 
-class DataBackend(ABC):
+class DataBackend:
     pass
 
-
-class Backend(DataBackend, ABC):
+class Backend(DataBackend):
     """
         Args:
             engine (DataEngine): a data engine represented as a class object (eg class MyClass: pass)
@@ -14,6 +13,7 @@ class Backend(DataBackend, ABC):
     def __init__(self, engine):
         self._engine = engine
         self.datapoints_manager = DatapointsManager()
+        self.datapoints_factory = BroadcastingDatapointsFactory(Subject([]))
 
     @property
     def engine(self):

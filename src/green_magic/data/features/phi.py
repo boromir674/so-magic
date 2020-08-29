@@ -30,32 +30,14 @@ class PhiFunctionRegistry(Singleton, ObjectRegistry):
 phi_registry = PhiFunctionRegistry()
 
 
-class PhiFunctionInterface(ABC):
-    """A class implementing this interface has the ability to act as a callable that receives data and returns
-    a transformed version of them"""
-    @abstractmethod
-    def __call__(self, data, **kwargs):
-        raise NotImplementedError
+class PhiFunctionMetaclass(type):
+    def __new__(mcs, *args, **kwargs):
+        x = super().__new__(mcs, *args, **kwargs)
+        x.subject = Subject([])
+        return x
 
 
-class PhiFunction(PhiFunctionInterface, Transformer):
-    """A simple mathematical function usually notated with \phi and serves a single transormation operation
-    useful to convert data (eg convert continous to discrete, normalizing, etc)
-
-    Args:
-        function (callable): the function that does the actual operation]
-    """
-    subject = Subject([])
-
-    def __call__(self, data, **kwargs):
-        """[summary]
-
-        Args:
-            data (scalar or [N x 1] list-like): the input data
-        Returns:
-            scalar or [N x 1] list-like: the output data
-        """
-        return self.transform(data, **kwargs)
+class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
 
     @classmethod
     def register(cls, phi_name=''):
@@ -112,7 +94,7 @@ if __name__ == '__main__':
 
     assert id(reg1) == id(reg2) == id(reg3)
 
-    @PhiFunction.my_decorator
+    @PhiFunctionRegistrator.my_decorator
     def example():
         """Inherited Docstring"""
         print('Called example function')

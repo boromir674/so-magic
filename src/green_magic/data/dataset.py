@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import os
 import attr
 
-from green_magic.utils import Observer, Subject
+from green_magic.utils import Observer
 
 
 @attr.s(str=True, repr=True)
@@ -60,26 +60,20 @@ class DatapointsFactory:
             import sys
             sys.exit(1)
 
-
+@attr.s
 class BroadcastingDatapointsFactory(DatapointsFactory):
-    subject = Subject([])
+    subject = attr.ib(init=True)
 
-    @classmethod
-    def create(cls, datapoints_factory_type, *args, **kwargs) -> DatapointsInterface:
-        print("START")
-        print(args)
-        print("MID")
-        print(kwargs)
-        print("END")
-        cls.subject.name = kwargs.pop('id', kwargs.pop('name', kwargs.pop('file_path', '')))
+    def create(self, datapoints_factory_type, *args, **kwargs) -> DatapointsInterface:
+        self.subject.name = kwargs.pop('id', kwargs.pop('name', kwargs.pop('file_path', '')))
         if kwargs:
             msg = f"Kwargs: [{', '.join(f'{k}: {v}' for k, v in kwargs.items())}]"
             raise RuntimeError("The 'create' method of DatapointsFactory does not support kwargs:", msg)
-        cls.subject.state = super().create(datapoints_factory_type, *args, **kwargs)
-        if args and not hasattr(cls, '.name'):
-            cls.name = getattr(args[0], 'name', '')
-        cls.subject.notify()
-        return cls.subject.state
+        self.subject.state = super().create(datapoints_factory_type, *args, **kwargs)
+        if args and not hasattr(self, '.name'):
+            self.name = getattr(args[0], 'name', '')
+        self.subject.notify()
+        return self.subject.state
 
 
 @attr.s
@@ -151,7 +145,7 @@ class DatapointsManager(Observer):
     datapoints_objects = attr.ib(init=True, default={})
     _last_key = attr.ib(init=False, default='')
 
-    def update(self, subject: Subject):
+    def update(self, subject):
         datapoints_object = subject.state
         key = getattr(subject, 'name', '')
         if key == '':
