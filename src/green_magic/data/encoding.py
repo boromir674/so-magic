@@ -28,3 +28,8 @@ class Encoder(AbstractEncoder, ABC):
         if backend_type not in cls.subclasses:
             raise ValueError('Bad "BinnerFactory Backend type" type \'{}\''.format(backend_type))
         return cls.subclasses[backend_type](*args, **kwargs)
+
+
+class NominalAttributeEncoder(Encoder, ABC):
+    def __init__(self, attribute_variable_values=None):
+        self.values_set = attribute_variable_values if attribute_variable_values else []

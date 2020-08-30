@@ -78,6 +78,10 @@ import pandas as pd
 }
 """
 
+# It can happen that a strain does not have any associated flavors.
+# in this case the Json has 'null' as value for the flavors field (eg "flavors": null, instead of eg "flavors": [chocolate, banana])
+# parsing to dataframe results in None values wherever null is found
+
 TARGETS = ['effects', 'medical', 'negatives']
 GROW_INFO_FIELD = 'grow_info'
 GROW_INFO_FIELDS = ['difficulty', 'flowering', 'height', 'stretch', 'yield']

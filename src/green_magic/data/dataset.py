@@ -95,6 +95,10 @@ class StructuredData(DatapointsInterface, StructuredDataInterface):
     def observations(self):
         return self._observations
 
+    @observations.setter
+    def observations(self, observations):
+        self._observations = observations
+
 @attr.s
 @DatapointsFactory.register_constructor('tabular-data')
 class TabularData(StructuredData):

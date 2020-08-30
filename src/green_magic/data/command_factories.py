@@ -10,28 +10,18 @@ class MyDecorator(type):
     """
     @classmethod
     def magic_decorator(mcs, arg=None):
-        print("DEBUG magic_decorator 1, args:", str(arg))
         def decorator(func):
-            print("DEBUG magic_decorator 2, args:", str(func))
             def wrapper(*a, **ka):
-                print("DEBUG magic_decorator 3, args: [{}]".format(', '.join(str(x) for x in a)))
                 ffunc = a[0]
                 mcs._wrapper(ffunc, *a[1:], **ka)
                 return ffunc
-            print("DEBUG magic_decorator 4, func: {}".format(str(func)))
             return wrapper
 
         if callable(arg):
-            print("Decoration invokation WITHOUT parenthesis")
             _ = decorator(arg)
-            print("OUT: {}".format(str(_)))
-            print(type(_))
             return _  # return 'wrapper'
         else:
-            print("Decoration invokation WITH parenthesis")
             _ = decorator
-            print(f"OUT: {str(_)}")
-            print(type(_))
             return _  # ... or 'decorator'
 
 
@@ -52,7 +42,6 @@ class CommandRegistrator(MyDecorator):
     def func_decorator(cls):
         def wrapper(a_callable):
             if hasattr(a_callable, '__code__'):  # it a function (def func_name ..)
-                print(f"Registering input function {a_callable.__code__.co_name}")
                 cls.registry[a_callable.__code__.co_name] = a_callable
             else:
                 raise RuntimeError(f"Expected a function to be decorated; got {type(a_callable)}")
@@ -135,12 +124,7 @@ class CommandFactory:
         Returns:
             Command: an instance of a command object
         """
-        print("CMD FCT")
-        print("args: ", args)
-        print("kwargs", kwargs)
-
         key, name = cls.pick(*args, **kwargs)
-        print(f"KEY: {key}, NAME: {name}")
         if len(args) < 1:
             raise RuntimeError(args)
         return cls.constructors[key](*args), name
@@ -179,7 +163,7 @@ class DataManagerCommandFactory(AbstractCommandFactory, ABC):
             raise ValueError('Bad "Factory type" \'{}\''.format(factory_type))
         return cls.subclasses[factory_type](*args, **kwargs)
 
-
+#### Register command factories
 @DataManagerCommandFactory.register_as_subclass('select_variables')
 class SelectVariablesCommandFactory(DataManagerCommandFactory):
 
@@ -188,6 +172,15 @@ class SelectVariablesCommandFactory(DataManagerCommandFactory):
             args[0].feature_manager.feature_configuration = variables
         return Command(command, '__call__', *args[1:])
 
+@DataManagerCommandFactory.register_as_subclass('select_variables')
+class ReplaceNoneCommandFactory(DataManagerCommandFactory):
+
+    def construct(self, *args, **kwargs) -> Command:
+        def command(variables):
+            args[0].feature_manager.feature_configuration = variables
+        return Command(command, '__call__', *args[1:])
+
+#################
 
 @attr.s
 class MegaCommandFactory(Subject):
