@@ -52,6 +52,7 @@ jobs:
     install:
       - scripts/install_anaconda.sh
       - export CONDA_EXE=/home/travis/miniconda/bin/conda
+      - sudo apt-get install python-enchant
     env: TOXENV=spell,docs
     script: tox
     name: "Build documentation"
