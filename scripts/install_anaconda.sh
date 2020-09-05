@@ -14,7 +14,7 @@ HOME=/home/travis
 bash miniconda.sh -b -p "$HOME/miniconda"
 
 printf "\n ---- SOURCING ----\n"
-source "$(HOME)/miniconda/etc/profile.d/conda.sh"
+source "$HOME/miniconda/etc/profile.d/conda.sh"
 
 printf "\n ---- HASHING ----\n"
 hash -r
