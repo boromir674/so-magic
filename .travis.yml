@@ -44,13 +44,21 @@ jobs:
     before_install:
       - sudo python -m pip install -U pip
       - python -m pip install -U tox
+      - chmod +x scripts/install_anaconda.sh
+      - scripts/install_anaconda.sh
+      - export CONDA_EXE=/home/travis/miniconda/bin/conda
+    script: tox
     name: "Check source distribution"
   - stage: Build docs
     before_install:
       - sudo python -m pip install -U pip
       - python -m pip install -U tox
       - sudo apt-get install python-enchant
+      - chmod +x scripts/install_anaconda.sh
+      - scripts/install_anaconda.sh
+      - export CONDA_EXE=/home/travis/miniconda/bin/conda
     env: TOXENV=spell,docs
+    script: tox
     name: "Build documentation"
 
 after_success:
