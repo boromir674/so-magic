@@ -14,10 +14,10 @@ class SomTrainer:
         initialcodebook = None, kerneltype = 0, maptype = 'planar', gridtype = 'rectangular',
         compactsupport = False, neighborhood = 'gaussian', std_coeff = 0.5, initialization = None
         """
-        if not getattr(dataset.datapoints, 'feature_vectors', None):
+        if not hasattr(dataset, 'feature_vectors'):
             raise NoFeatureVectorsError("Attempted to train a Som model, but did not find feature vectors in the dataset.")
         som = somoclu.Somoclu(nb_cols, nb_rows, **kwargs)
-        som.train(data=np.array(dataset.datapoints.feature_vectors, dtype=np.float32))
+        som.train(data=np.array(dataset.feature_vectors, dtype=np.float32))
         return som
 
 
@@ -47,7 +47,7 @@ class SomFactory:
     def create_som(self, nb_cols, nb_rows, dataset, **kwargs):
         try:
             map_obj = self.trainer.infer_map(nb_cols, nb_rows, dataset, **kwargs)
-            self.update_observers(*args, self.nb_rows, self.nb_cols, map_object=map_obj)
+            self.update_observers(nb_rows, nb_cols, map_object=map_obj)
             return map_obj
         except NoFeatureVectorsError as e:
             logger.info(f"{e}. Fire up an 'encode' command.")
@@ -70,7 +70,23 @@ class SelfOrganizingMap:
     som = attr.ib(init=True)
     dataset_name = attr.ib(init=True)
 
-    def __getattribute__(self, item):
+    @property
+    def height(self):
+        return self.som._n_rows
+
+    @property
+    def width(self):
+        return self.som._n_columns
+
+    @property
+    def type(self):
+        return self.som._map_type
+
+    @property
+    def grid_type(self):
+        return self.som._grid_type
+
+    def __getattr__(self, item):
         if item in ('n_rows', 'n_columns', 'initialization', 'map_type', 'grid_type'):
             item = f'_{item}'
         return getattr(self.som, item)
@@ -111,3 +127,5 @@ class SelfOrganizingMap:
         for j in range(self.som.umatrix.shape[0]):
             b += ' '.join(' ' * (max_len - len(str(i))) + str(i) for i in self.som.clusters[j, :]) + '\n'
         return b
+
+

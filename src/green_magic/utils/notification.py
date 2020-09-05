@@ -59,7 +59,6 @@ class Subject(SubjectInterface):
 
     def attach(self, observer: ObserverInterface) -> None:
         self._observers.append(observer)
-        print(f"\nATTACH:\nSubject:\n{self}\nOBSERVED BY\n{observer}")
 
     def detach(self, observer: ObserverInterface) -> None:
         self._observers.remove(observer)

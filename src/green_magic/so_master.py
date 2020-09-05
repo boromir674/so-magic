@@ -10,6 +10,8 @@ class SoMaster:
     _map_manager = attr.ib(init=False, default=attr.Factory(lambda self: self._magic_map_manager_constructor(self), takes_self=True))
     _last_path = attr.ib(init=False, default='')
 
+    _datasets = attr.ib(init=False, default={})
+
     def load_data(self, file_path, id=''):
         cmd = self._data_manager.command.observations
         cmd.args = [file_path]
@@ -27,10 +29,13 @@ class SoMaster:
 
     @property
     def dataset(self):
-        return self._dataset_constructor(
-            self._data_manager.backend.datapoints_manager.datapoints,
-            self._last_path,
-        )
+        datapoints_id = id(self._data_manager.backend.datapoints_manager.datapoints)
+        if datapoints_id not in self._datasets:
+            self._datasets[datapoints_id] = self._dataset_constructor(
+                self._data_manager.backend.datapoints_manager.datapoints,
+                self._last_path,
+            )
+        return self._datasets[datapoints_id]
 
     @classmethod
     def create(cls, data_manager):

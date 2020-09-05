@@ -18,16 +18,9 @@ class EngineType(CommandRegistrator):
         def wrapper(a_callable):
             if hasattr(a_callable, '__code__'):  # it a function (def func_name ..)
                 name = a_callable.__code__.co_name
-                print(f"Engine DEC called: function  {a_callable}")
-                print(f"Engine DEC called: function name {name}")
                 if name == 'observations':
                     def observations(file_path, **kwargs):
                         _observations = a_callable(file_path, **kwargs)
-                        print("<OBS>")
-                        print(file_path)
-                        print("MID")
-                        print(kwargs)
-                        print("</OBS>")
                         datapoints = cls.backend.datapoints_factory.create(data_structure, _observations, [_ for _ in []],
                                                                    cls.retriever(),
                                                                    cls.iterator(),
@@ -75,7 +68,6 @@ class DataEngine(metaclass=EngineType):
     def observations(cls, data_structure='tabular-data'):
         def wrapper(function):
             if hasattr(function, '__code__'):  # it a function (def func_name ..)
-                print(f"Observation decor in Engine: {function.__code__.co_name}")
                 def observations(file_path, **kwargs):
                     res = function(file_path, **kwargs)
                     datapoints = cls.datapoints_factory.create(data_structure, res, [_ for _ in cls.iterator.columnnames], cls.retriever, cls.iterator)

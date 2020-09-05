@@ -1,5 +1,7 @@
+from collections import OrderedDict
 import attr
 
+from green_magic.utils import Observer, Subject
 from green_magic.data.variables.types import NominalVariableType
 from green_magic.data.features.features import TrackingFeature
 
@@ -45,8 +47,33 @@ class FeatureSet(BaseFeatureSet):
 
 
 @attr.s
+class FeatureConfiguration(Observer):
+    _variables = attr.ib(init=True)
+    _feature_vectors = attr.ib(init=True, default=attr.Factory(lambda self: OrderedDict([(variable_dict['variable'], []) for variable_dict in self._variables]), takes_self=True))
+
+    @property
+    def variables(self):
+        return self._variables
+
+    @variables.setter
+    def variables(self, variables):
+        self._variables = variables
+
+    @property
+    def valid_variables(self):
+        return [self.valid_encoding(x) for x in self._variables]
+
+    def valid_encoding(self, feature):
+        return feature.valid_encoding(self.datapoints, self._feature_vectors[feature.variable])
+
+    def update(self, subject: Subject) -> None:
+        self._feature_vectors[subject.variable] = subject.columns
+
+
+@attr.s
 class FeatureManager:
     _feature_configuration = attr.ib(init=True)
+    subject = attr.ib(init=True, default=Subject([]))
 
     @property
     def feature_configuration(self):
@@ -54,4 +81,4 @@ class FeatureManager:
 
     @feature_configuration.setter
     def feature_configuration(self, feature_configuration):
-        self._feature_configuration = feature_configuration
+        self._feature_configuration = FeatureConfiguration(feature_configuration)

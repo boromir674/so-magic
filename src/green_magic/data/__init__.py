@@ -35,6 +35,7 @@ def init_data_manager(a_backend):
             prefix_separator = '_'
             dataframe = pd.get_dummies(datapoints.observations[attribute], prefix=attribute, prefix_sep='_', drop_first=False)
             self.values_set = [x.replace(f'{attribute}{prefix_separator}', '') for x in dataframe.columns]
+            self.columns = [x for x in dataframe.columns]
             return dataframe
 
     from green_magic.data.command_factories import DataManagerCommandFactory
@@ -63,15 +64,15 @@ def init_data_manager(a_backend):
             datapoints = args[0]
             attribute = args[1]
             self.values_set = reduce(lambda i, j: set(i).union(set(j)), [_ for _ in datapoints.observations[attribute] if type(_) == list])
-            self.ordered_values = [_ for _ in self.values_set]
-            return pd.DataFrame([self._yield_vector(datarow, attribute) for index, datarow in datapoints.iterrows()], columns=self.ordered_values)
+            self.columns = [_ for _ in self.values_set]
+            return pd.DataFrame([self._yield_vector(datarow, attribute) for index, datarow in datapoints.iterrows()], columns=self.columns)
 
         def _yield_vector(self, datarow, attribute):
             decision = {True: self._encode, False: self._encode_none}
             return decision[type(datarow[attribute]) == list](datarow, attribute)
 
         def _encode(self, datarow, attribute):
-            return [OneHotListEncoder.binary_transformer[column in datarow[attribute]] for column in self.ordered_values]
+            return [OneHotListEncoder.binary_transformer[column in datarow[attribute]] for column in self.columns]
 
         def _encode_none(self, datarow, attribute):
             return [0.0] * len(self.values_set)

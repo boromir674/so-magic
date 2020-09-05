@@ -106,8 +106,6 @@ class CommandFactory:
     def pick(cls, *args, **kwargs):
         decision = {True: 'function', False: 'generic'}
         is_function = hasattr(args[0], '__code__')
-        print(f'is function?: {is_function}')
-        print(f'PICK: {args}')
         dec2 = {'function': lambda x: x[0].__code__.co_name, 'generic': lambda x: type(x[0]).__name__ + '-' + x[1]}
         return decision[is_function], kwargs.get('name', dec2[decision[is_function]](args))
 
@@ -172,8 +170,9 @@ class SelectVariablesCommandFactory(DataManagerCommandFactory):
             args[0].feature_manager.feature_configuration = variables
         return Command(command, '__call__', *args[1:])
 
+
 @DataManagerCommandFactory.register_as_subclass('select_variables')
-class ReplaceNoneCommandFactory(DataManagerCommandFactory):
+class SelectVariablesCommandFactory(DataManagerCommandFactory):
 
     def construct(self, *args, **kwargs) -> Command:
         def command(variables):

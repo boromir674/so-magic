@@ -13,13 +13,7 @@ class ObjectsPool:
     def get_object(self, *args, **kwargs):
         key = self._build_hash(*args, **kwargs)
         if key not in ObjectsPool._objects:
-            try:
-                ObjectsPool._objects[key] = self.constructor(*args, **kwargs)
-            except TypeError as e:
-                print(e)
-                msg = f"DEBUG: Args: [{', '.join(str(_) for _ in args)}], kwargs: {str(kwargs)}"
-                # raise TypeError(msg)
-                return None
+            ObjectsPool._objects[key] = self.constructor(*args, **kwargs)
         return ObjectsPool._objects[key]
 
     def _build_hash(self, *args, **kwargs):
