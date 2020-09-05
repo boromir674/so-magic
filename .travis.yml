@@ -39,6 +39,9 @@ jobs:
     env: TOXENV=clean,py38-cov,report
   - stage: Check_distro
     env: TOXENV=check
+    before_install:
+      - sudo python -m pip install -U pip
+      - python -m pip install -U tox
     name: "Check source distribution"
   - stage: Build docs
     before_install:
