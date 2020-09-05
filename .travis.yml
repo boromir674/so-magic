@@ -15,9 +15,11 @@ before_install:
   - lsb_release -a
   - sudo python -m pip install -U pip
   - python -m pip install tox
+  - chmod +x scripts/install_anaconda.sh
+
+install:
   - sudo apt-get install jq
   - curl -LSs "$(curl -LSs https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets | map({name, browser_download_url} | select(.name | endswith(".jar"))) | .[0].browser_download_url')" -o codacy-coverage-reporter-assembly.jar
-  - chmod +x scripts/install_anaconda.sh
   - scripts/install_anaconda.sh
   - printenv
   - export CONDA_EXE=/home/travis/miniconda/bin/conda
@@ -41,20 +43,13 @@ jobs:
     env: TOXENV=clean,py38-cov,report,codecov
   - stage: Check_distro
     env: TOXENV=check
-    before_install:
-      - sudo python -m pip install -U pip
-      - python -m pip install -U tox
-      - chmod +x scripts/install_anaconda.sh
+    install:
       - scripts/install_anaconda.sh
       - export CONDA_EXE=/home/travis/miniconda/bin/conda
     script: tox
     name: "Check source distribution"
   - stage: Build docs
-    before_install:
-      - sudo python -m pip install -U pip
-      - python -m pip install -U tox
-      - sudo apt-get install python-enchant
-      - chmod +x scripts/install_anaconda.sh
+    install:
       - scripts/install_anaconda.sh
       - export CONDA_EXE=/home/travis/miniconda/bin/conda
     env: TOXENV=spell,docs
@@ -62,13 +57,16 @@ jobs:
     name: "Build documentation"
 
 after_success:
-  - echo "Everything in the pipeline has succeeded!
-  - echo "Potentially any of (Unittests, integrations tests, functional tests, regression tests, stress tests)."
-  - echo "You can use this 'point' to \"send stuff in production\""
+  - echo "This job succeeded!
 
 after_failure:
   - more .tox/log/* | cat
   - more .tox/*/log/* | cat
+
+
+# In this stage ALL jobs have succeeded!
+# - echo "Potentially any of (Unittests, integrations tests, functional tests, regression tests, stress tests)."
+# - echo "You can use this 'point' to \"send stuff in production\""
 
 #deploy:
 #  provider: script
