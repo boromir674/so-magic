@@ -55,6 +55,7 @@ setup(
     long_description="TODO long description",
     long_description_content_type='text/x-rst',
     test_suite='tests',
+    install_requires=['attrs', 'numpy', 'scikit-learn', 'pandas', 'somoclu'],
     # project_urls=OrderedDict([
     #     # ("1-Tracker", "https://github.com/blahblah/gavgav/issues"),
     #     ("1-Changelog", changelog),
