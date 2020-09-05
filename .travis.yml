@@ -20,6 +20,9 @@ before_install:
   - chmod +x scripts/install_anaconda.sh
   - printenv
   - scripts/install_anaconda.sh
+  - printenv
+  - export PATH=$PATH:/home/travis/miniconda/bin/conda
+  - export PATH=$PATH:$CONDA_EXE
 
 cache: pip
 script: tox
