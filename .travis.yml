@@ -18,11 +18,10 @@ before_install:
   - sudo apt-get install jq
   - curl -LSs "$(curl -LSs https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets | map({name, browser_download_url} | select(.name | endswith(".jar"))) | .[0].browser_download_url')" -o codacy-coverage-reporter-assembly.jar
   - chmod +x scripts/install_anaconda.sh
-  - printenv
   - scripts/install_anaconda.sh
   - printenv
-  - export PATH=$PATH:/home/travis/miniconda/bin/conda
-  - export PATH=$PATH:$CONDA_EXE
+  - export CONDA_EXE=/home/travis/miniconda/bin/conda
+  - echo $CONDA_EXE
 
 cache: pip
 script: tox
