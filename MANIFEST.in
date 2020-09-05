@@ -31,3 +31,5 @@ recursive-include docs *.rst
 recursive-include docs *.txt
 include docs/Makefile
 include docs/spelling_wordlist.txt
+
+include scripts/install_anaconda.sh
