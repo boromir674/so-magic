@@ -1,7 +1,7 @@
-[paths]
+[run]
 source =
-    src
-    */site-packages
+    green_magic
+    tests
 
 [report]
 show_missing = true
