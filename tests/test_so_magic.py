@@ -60,19 +60,12 @@ def test_somagic_scenario(train_args, somagic, sample_collaped_json):
     assert hasattr(somagic.dataset, 'feature_vectors')
 
     print("ID", id(somagic.dataset))
+
+    attrs = ('width', 'height', 'type', 'grid_type')
+
     som = somagic.map.train(*train_args[:2], maptype=train_args[2], gridtype=train_args[3])
-
-    attrs = ('height', 'width', 'type', 'grid_type')
-    assert hasattr(som, 'dataset_name')
-
     assert som.dataset_name == sample_collaped_json
-
-    assert all(hasattr(som, x) for x in attrs)
-
-    assert som.width == train_args[0]
-    assert som.height == train_args[1]
-    assert som.type == train_args[2]
-    assert som.grid_type == train_args[3]
+    assert all(parameter == getattr(som, attribute) for attribute, parameter in zip(attrs, train_args))
 
 
 @pytest.mark.parametrize('nb_objects, nb_observers', [
