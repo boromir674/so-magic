@@ -1,78 +1,32 @@
 import attr
-import logging
-from .som_proxy import SelfOrganizingMapFactory
-
-logger = logging.getLogger(__name__)
+from green_magic.utils import Subject
+from .self_organising_map import SomTrainer, SelfOrganizingMap
 
 
 @attr.s
-class ObjectsPool:
-    constructor = attr.ib(init=True)
-    _objects = {}
+class SomFactory:
+    """Implementing from the BaseSomFactory allows other class to register/subscribe on (emulated) 'events'.
+       So, when the factory creates a new Som object, other entities can be notified."""
+    trainer = attr.ib(init=True, default=SomTrainer())
+    subject = attr.ib(init=True, default=Subject([]))
 
-    def get_object(self, *args, **kwargs):
-        key = self._build_hash(*args, **kwargs)
-        if key not in ObjectsPool._objects:
-            ObjectsPool._objects[key] = self.constructor(*args, **kwargs)
-        return ObjectsPool._objects[key]
-
-    def _build_hash(self, *args, **kwargs):
-        return hash('-'.join([str(_) for _ in args]))
-
-class SomapObjectPool(ObjectsPool):
-    def _build_hash(self, *args, **kwargs):
-        return str(MapId(*args, kwargs.get('initialization'), kwargs.get('map_type'), kwargs.get('grid_type')))
-
-
-@attr.s
-class MapManager:
-    map_factory = attr.ib(init=True, default=SelfOrganizingMapFactory())
-    pool = attr.ib(init=False, default=attr.Factory(lambda self: SomapObjectPool(self.map_factory.create), takes_self=True))
-
-    def get_map(self, *args, **kwargs):
-        """
-        'dataset', 'n_rows', 'n_columns', 'initialization', 'map_type', 'grid_type'
-        """
-        return self.pool.get_object(*args, **kwargs)
-
-    def train(self, dataset, nb_cols, nb_rows, **kwargs):
-        """"""
-        return self.map_factory.create(dataset, nb_cols, nb_rows, **kwargs)
+    def create_som(self, nb_cols, nb_rows, dataset, **kwargs):
+        try:
+            map_obj = self.trainer.infer_map(nb_cols, nb_rows, dataset, **kwargs)
+            self.subject.state = map_obj
+            self.subject.notify()
+            return map_obj
+        except NoFeatureVectorsError as e:
+            logger.info(f"{e}. Fire up an 'encode' command.")
+            raise e
 
 
 @attr.s
-class MagicMapManager:
-    so_master = attr.ib(init=True)
-    manager = attr.ib(init=False, default=MapManager())
+class SelfOrganizingMapFactory:
+    som_factory = attr.ib(init=True, default=SomFactory())
 
-    def train(self, nb_cols, nb_rows, **kwargs):
-        return self.manager.train(self.so_master.dataset, nb_cols, nb_rows, **kwargs)
-
-
-@attr.s
-class MapId:
-    dataset_name = attr.ib(init=True)
-    _n_columns = attr.ib(init=True)
-    _n_rows = attr.ib(init=True)
-    initialization = attr.ib(init=True)
-    map_type = attr.ib(init=True)
-    grid_type = attr.ib(init=True)
-
-    @staticmethod
-    def from_self_organizing_map(somap, **kwargs):
-        return MapId(kwargs.get('dataset_name', somap.dataset_name), *[getattr(somap, attribute.name) for attribute in MapId.__attrs_attrs__[1:]])
-
-    def __dir__(self):
-        return sorted([attribute.name for attribute in self.__attrs_attrs__])
-
-    def __iter__(self):
-        """Default implementation of __iter__ to allow dict(self) in client code"""
-        return iter([(k, getattr(self, k)) for k in self.__dir__()])
-
-    def __str__(self):
-        return '-'.join(str(getattr(self, _)) for _ in dir(self))
+    def create(self, dataset, nb_cols, nb_rows, **kwargs):
+        return SelfOrganizingMap(self.som_factory.create_som(nb_cols, nb_rows, dataset, **kwargs), dataset.name)
 
 
-if __name__ == '__main__':
-    map_manager = MapManager()
-
+class NoFeatureVectorsError(Exception): pass

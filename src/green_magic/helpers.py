@@ -1,6 +1,6 @@
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 from nltk.tokenize import word_tokenize as nltk_tokenize
-from .definitions import grow_info, stop_words
+from legacy.definitions import grow_info, stop_words
 
 
 def gen_values(extr_output):

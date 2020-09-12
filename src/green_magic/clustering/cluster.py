@@ -36,6 +36,9 @@ class BaseCluster(Grouping):
 def _is_coordinate_value(self, attribute, value):
     if value < 0:
         raise ValueError("Expected the input coordinate to be a positive number.")
+    if int(value) != value:
+        raise ValueError(f"Expected the input coordinate to be an integer number; instead {value} was given")
+
 
 @attr.s
 class Coordinates:

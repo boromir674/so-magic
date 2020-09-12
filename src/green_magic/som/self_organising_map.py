@@ -2,8 +2,8 @@ import attr
 import numpy as np
 import somoclu
 from sklearn.cluster import KMeans
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -19,50 +19,6 @@ class SomTrainer:
         som = somoclu.Somoclu(nb_cols, nb_rows, **kwargs)
         som.train(data=np.array(dataset.feature_vectors, dtype=np.float32))
         return som
-
-
-@attr.s
-class SomFactory:
-    """Implementing from the BaseSomFactory allows other class to register/subscribe on (emulated) 'events'.
-       So, when the factory creates a new Som object, other entities can be notified."""
-    trainer = attr.ib(init=True, default=SomTrainer())
-    observers = attr.ib(init=False, default=[])
-
-    def register(self, observer):
-        if observer not in self.observers:
-            self.observers.append(observer)
-
-    def unregister(self, observer):
-        if observer in self.observers:
-            self.observers.remove(observer)
-
-    def unregister_all(self):
-        if self.observers:
-            del self.observers[:]
-
-    def update_observers(self, *args, **kwargs):
-        for observer in self.observers:
-            observer.update(*args, **kwargs)
-
-    def create_som(self, nb_cols, nb_rows, dataset, **kwargs):
-        try:
-            map_obj = self.trainer.infer_map(nb_cols, nb_rows, dataset, **kwargs)
-            self.update_observers(nb_rows, nb_cols, map_object=map_obj)
-            return map_obj
-        except NoFeatureVectorsError as e:
-            logger.info(f"{e}. Fire up an 'encode' command.")
-            raise e
-
-
-class NoFeatureVectorsError(Exception): pass
-
-
-@attr.s
-class SelfOrganizingMapFactory:
-    som_factory = attr.ib(init=True, default=SomFactory())
-
-    def create(self, dataset, nb_cols, nb_rows, **kwargs):
-        return SelfOrganizingMap(self.som_factory.create_som(nb_cols, nb_rows, dataset, **kwargs), dataset.name)
 
 
 @attr.s
@@ -118,7 +74,7 @@ class SelfOrganizingMap:
         pass
 
     def cluster(self, nb_clusters, random_state=None):
-        som.cluster(algorithm=KMeans(n_clusters=nb_clusters, random_state=random_state))
+        self.som.cluster(algorithm=KMeans(n_clusters=nb_clusters, random_state=random_state))
 
     @property
     def visual_umatrix(self):
@@ -127,5 +83,3 @@ class SelfOrganizingMap:
         for j in range(self.som.umatrix.shape[0]):
             b += ' '.join(' ' * (max_len - len(str(i))) + str(i) for i in self.som.clusters[j, :]) + '\n'
         return b
-
-
