@@ -33,34 +33,32 @@ after_success:
 
 jobs:
   include:
-  - stage: Build_n_test
-    python: '3.6'
-    env: TOXENV=clean,py36-cov
-  - stage: Build_n_test
-    python: '3.7'
-    env: TOXENV=clean,py37-cov
-  - stage: Build_n_test
-    python: '3.8'
-    env: TOXENV=clean,py38-cov
-  - stage: Check_distro
-    env: TOXENV=check
-    name: "Check source distribution"
+#  - stage: Build_n_test
+#    python: '3.6'
+#    env: TOXENV=clean,py36-cov
+#  - stage: Build_n_test
+#    python: '3.7'
+#    env: TOXENV=clean,py37-cov
+#  - stage: Build_n_test
+#    python: '3.8'
+#    env: TOXENV=clean,py38-cov
+#  - stage: Check_distro
+#    env: TOXENV=check
+#    name: "Check source distribution"
+  - stage: Staging-Integration-test
+    env: TOXENV=integration-test
+    name: "Do an emulated real-world-scenario test using the staging server: install lib from test-pypi and run tests"
   - stage: Build docs
     install:
       - sudo apt-get install python-enchant
     env: TOXENV=spell,docs
     name: "Build documentation"
-  - stage: release
-    if: tag IS present
+  - stage: deploy to staging (pypi test server)
     deploy:
-      provider: pypi
-      user: praekelt.org
-      password:
-      secure: <encrypted password>
-      distributions: sdist bdist_wheel
+    - provider: script
+      script: tox -e deploy-pypi
       on:
-        tags: true
-
+        branch: staging
     install: skip
     script: skip
     after_success: skip
@@ -74,17 +72,17 @@ after_failure:
 # In this stage ALL jobs have succeeded!
 # - echo "Potentially any of (Unittests, integrations tests, functional tests, regression tests, stress tests)."
 # - echo "You can use this 'point' to \"send stuff in production\""
-deploy:
-  - provider: script
-    skip_cleanup: true
-    script: assh -p22 $STAGING_SERVER_USER@$STAGING_SERVER "mkdir -p $STAGING_PATH_STABLE" && ssh -p22 $STAGING_SERVER_USER@$STAGING_SERVER "mkdir -p $STAGING_PATH_TRUNK" && rsync -rav -e ssh --exclude='.git/' --exclude=scripts/ --exclude='.travis.yml' --delete-excluded ./ $STAGING_SERVER_USER@$STAGING_SERVER:$STAGING_PATH_TRUNK && rsync -rav -e ssh --exclude='.git/' --exclude=scripts/ --exclude='.travis.yml' --delete-excluded ./ $STAGING_SERVER_USER@$STAGING_SERVER:$STAGING_PATH_STABLE
-    on:
-      branch: staging
-  - provider: script
-    skip_cleanup: true
-    script: ssh -p22 $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER "mkdir -p $PRODUCTION_SERVER_THEMES_PATH/_tmp-bornholm"&& ssh -p22 $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER "mkdir -p $PRODUCTION_SERVER_THEMES_PATH/bornholm" && rsync -rav -e ssh --exclude='.git/' --exclude=scripts/ --exclude='.travis.yml' --delete-excluded ./ $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER:$PRODUCTION_SERVER_THEMES_PATH/_tmp-bornholm && ssh -p22 $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER "mv $PRODUCTION_SERVER_THEMES_PATH/bornholm $PRODUCTION_SERVER_THEMES_PATH/_old-bornholm && mv $PRODUCTION_SERVER_THEMES_PATH/_tmp-bornholm $PRODUCTION_SERVER_THEMES_PATH/bornholm" && ssh -p22 $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER "rm -rf $PRODUCTION_SERVER_THEMES_PATH/_old-bornholm"
-    on:
-      branch: master
+#deploy:
+#  - provider: script
+#    skip_cleanup: true
+#    script: assh -p22 $STAGING_SERVER_USER@$STAGING_SERVER "mkdir -p $STAGING_PATH_STABLE" && ssh -p22 $STAGING_SERVER_USER@$STAGING_SERVER "mkdir -p $STAGING_PATH_TRUNK" && rsync -rav -e ssh --exclude='.git/' --exclude=scripts/ --exclude='.travis.yml' --delete-excluded ./ $STAGING_SERVER_USER@$STAGING_SERVER:$STAGING_PATH_TRUNK && rsync -rav -e ssh --exclude='.git/' --exclude=scripts/ --exclude='.travis.yml' --delete-excluded ./ $STAGING_SERVER_USER@$STAGING_SERVER:$STAGING_PATH_STABLE
+#    on:
+#      branch: staging
+#  - provider: script
+#    skip_cleanup: true
+#    script: ssh -p22 $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER "mkdir -p $PRODUCTION_SERVER_THEMES_PATH/_tmp-bornholm"&& ssh -p22 $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER "mkdir -p $PRODUCTION_SERVER_THEMES_PATH/bornholm" && rsync -rav -e ssh --exclude='.git/' --exclude=scripts/ --exclude='.travis.yml' --delete-excluded ./ $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER:$PRODUCTION_SERVER_THEMES_PATH/_tmp-bornholm && ssh -p22 $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER "mv $PRODUCTION_SERVER_THEMES_PATH/bornholm $PRODUCTION_SERVER_THEMES_PATH/_old-bornholm && mv $PRODUCTION_SERVER_THEMES_PATH/_tmp-bornholm $PRODUCTION_SERVER_THEMES_PATH/bornholm" && ssh -p22 $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER "rm -rf $PRODUCTION_SERVER_THEMES_PATH/_old-bornholm"
+#    on:
+#      branch: master
 #deploy:
 #  provider: script
 #  script: .travis/deploy.sh
@@ -96,3 +94,19 @@ deploy:
 #  email:
 #    on_success: never
 #    on_failure: never
+
+
+#- stage: release
+#    if: tag IS present
+#    deploy:
+#      provider: pypi
+#      user: praekelt.org
+#      password:
+#      secure: <encrypted password>
+#      distributions: sdist bdist_wheel
+#      on:
+#        tags: true
+#
+#    install: skip
+#    script: skip
+#    after_success: skip
