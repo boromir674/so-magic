@@ -25,7 +25,7 @@ def pip_install_lib(python, package_name='so_magic', pypi_index_url='https://tes
 def main():
     # CONSTANTS
     MY_DIR = os.path.dirname(os.path.realpath(__file__))
-    tools = type('Executables', (object,), {'python': 'python', 'conda': 'conda'})
+    tools = type('Executables', (object,), {'python': 'python', 'conda': os.environ.get('CONDA_EXE', 'conda')})
     ENV_NAME = 'integration-env'
     ENV_PATH = os.path.join(MY_DIR, f'../{ENV_NAME}')
     try:
