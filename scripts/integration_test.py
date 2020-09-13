@@ -50,7 +50,7 @@ def main():
     check_call([tools.conda, 'create', '-p', ENV_PATH, '-y'])
     print('------------ ACTIVATING ENV -------------')
     check_call([tools.conda, 'activate', ENV_PATH])
-    
+
     # activate_conda_env(tools.conda, ENV_PATH)
     # install_dependencies(tools.python, tools.conda)
     # pip_install_lib(tools.python)

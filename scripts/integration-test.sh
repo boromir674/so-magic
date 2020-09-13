@@ -55,15 +55,14 @@ conda activate $ENV_PATH
 echo '------------ INSTALLING PYTHON DEPS -------------'
 python -m pip install -U pip
 python -m pip install -U wheel
+conda install somoclu --channel conda-forge
 python -m pip install -r requirements/base.txt
 python -m pip install -r requirements/dev.txt
-conda install somoclu --channel conda-forge
-
 echo '------------ INSTALLING SO_MAGIC FROM TEST-PYPI -------------'
 # use this command because test pypi absolutely not guarantees that it can satsify dependencies (--no-deps flag) by
 # looking for the packages in the index, simply because they might not exist
 python -m pip install --index-url https://test.pypi.org/simple/ --no-deps so_magic
-python -m pip install -U attrs
+#python -m pip install -U attrs
 python -c 'import so_magic'
 
 echo "SUCCESS!!!"
