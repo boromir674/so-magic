@@ -13,7 +13,15 @@ if [[ $? != 0 ]]; then
     echo "CONDA NOT FOUND"
     echo '------------ INSTALLING CONDA -------------'
     chmod +x scripts/install_anaconda.sh
-    scripts/install_anaconda.shexport conda=$CONDA_EXE
+    scripts/install_anaconda.sh
+    if [[ $(echo "$HOME") ]]; then
+      echo "\$HOME variable is populated, so probably we are running on a 'local' machine";
+    else
+      HOME=/home/travis
+      echo "Assuming we are running on travis CI; setting variable HOME=$HOME"
+    fi
+    export CONDA_EXE=$HOME/miniconda/bin/conda
+    export PATH=$PATH:$HOME/miniconda/bin/
   else
     echo '------------ CONDA IS ALREADY INSTALLED -------------'
   fi
