@@ -50,6 +50,8 @@ jobs:
     script:
       - chmod +x scripts/integration-test.sh
       - scripts/integration-test.sh
+    after_success: skip
+
     name: "Do an emulated real-world-scenario test using the staging server: install lib from test-pypi and run tests"
   - stage: Build docs
     install:
@@ -59,9 +61,10 @@ jobs:
   - stage: deploy to staging (pypi test server)
     deploy:
     - provider: script
-      script: tox -e deploy-pypi
+      script: tox -e deploy-pypi -vv
       on:
         branch: staging
+    before_install: skip
     install: skip
     script: skip
     after_success: skip
