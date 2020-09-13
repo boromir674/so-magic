@@ -30,12 +30,14 @@ def main():
     ENV_PATH = os.path.join(MY_DIR, f'../{ENV_NAME}')
     try:
         check_call([tools.conda, '--help'])
+        print('------------ CONDA IS ALREADY INSTALLED -------------')
     except CalledProcessError as ex:  # this exception fires if the exit code of the above is not 0
         print(ex)
         tools.conda = None
 
     if tools.conda is None:
         print("Will try to automatically install anaconda ..")
+        print('------------ INSTALLING CONDA -------------')
         check_call(['chmod', '+x', './scripts/install_anaconda.sh'])
         try:
             check_call(['bash', 'scripts/install_anaconda.sh'])
