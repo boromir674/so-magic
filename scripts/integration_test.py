@@ -47,9 +47,9 @@ def main():
                   "required by one test case.\n Exitting with 1.")
             raise ex2
     print('------------ CREATING ENV -------------')
-    check_call([conda, 'create', '-p', env_path, '-y'])
+    check_call([tools.conda, 'create', '-p', ENV_PATH, '-y'])
     print('------------ ACTIVATING ENV -------------')
-    check_call([conda, 'activate', env_path])
+    check_call([tools.conda, 'activate', ENV_PATH])
     
     # activate_conda_env(tools.conda, ENV_PATH)
     # install_dependencies(tools.python, tools.conda)
