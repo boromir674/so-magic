@@ -5,21 +5,21 @@ MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ENV_NAME="integration-env"
 ENV_PATH=$MY_DIR/../$ENV_NAME
 
+if [[ $(echo "$HOME") ]]; then
+  echo "\$HOME variable is already populated.";
+else
+  HOME=/home/travis
+fi
+
 which conda
 if [[ $? != 0 ]]; then
-  export PATH=$PATH:$CONDA_EXE
+  export PATH=$PATH:$HOME/miniconda/bin/
   which conda
   if [[ $? != 0 ]]; then
     echo "CONDA NOT FOUND"
     echo '------------ INSTALLING CONDA -------------'
     chmod +x scripts/install_anaconda.sh
     scripts/install_anaconda.sh
-    if [[ $(echo "$HOME") ]]; then
-      echo "\$HOME variable is populated, so probably we are running on a 'local' machine";
-    else
-      HOME=/home/travis
-      echo "Assuming we are running on travis CI; setting variable HOME=$HOME"
-    fi
     export CONDA_EXE=$HOME/miniconda/bin/conda
     export PATH=$PATH:$HOME/miniconda/bin/
   else
