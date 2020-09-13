@@ -22,7 +22,7 @@ before_install:
   - echo $CONDA_EXE
 
 script:
-  - tox
+  - tox -vv
 
 after_success:
   - tox -e report,codecov
