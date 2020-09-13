@@ -46,8 +46,12 @@ def main():
             print("Failed to install anaconda, so cannot satisfy the somoclu feature of training a new map, which is "
                   "required by one test case.\n Exitting with 1.")
             raise ex2
+    print('------------ CREATING ENV -------------')
+    check_call([conda, 'create', '-p', env_path, '-y'])
     print('------------ ACTIVATING ENV -------------')
-    activate_conda_env(tools.conda, ENV_PATH)
+    check_call([conda, 'activate', env_path])
+    
+    # activate_conda_env(tools.conda, ENV_PATH)
     # install_dependencies(tools.python, tools.conda)
     # pip_install_lib(tools.python)
 
