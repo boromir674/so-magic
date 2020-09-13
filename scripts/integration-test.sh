@@ -7,10 +7,16 @@ ENV_PATH=$MY_DIR/../$ENV_NAME
 
 which conda
 if [[ $? != 0 ]]; then
-  echo "CONDA NOT FOUND"
-  echo '------------ INSTALLING CONDA -------------'
-  chmod +x scripts/install_anaconda.sh
-  scripts/install_anaconda.sh
+  export PATH=$PATH:$CONDA_EXE
+  which conda
+  if [[ $? != 0 ]]; then
+    echo "CONDA NOT FOUND"
+    echo '------------ INSTALLING CONDA -------------'
+    chmod +x scripts/install_anaconda.sh
+    scripts/install_anaconda.shexport conda=$CONDA_EXE
+  else
+    echo '------------ CONDA IS ALREADY INSTALLED -------------'
+  fi
 else
   echo '------------ CONDA IS ALREADY INSTALLED -------------'
 fi
