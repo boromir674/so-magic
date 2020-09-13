@@ -1,7 +1,7 @@
 from abc import ABC
 import attr
 
-from green_magic.data.interfaces import TabularRetriever, TabularIterator, TabularMutator
+from so_magic.data.interfaces import TabularRetriever, TabularIterator, TabularMutator
 
 
 class EngineTabularRetriever(TabularRetriever, ABC):

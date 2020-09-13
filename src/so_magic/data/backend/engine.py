@@ -1,4 +1,4 @@
-from green_magic.data.command_factories import MagicCommandFactory, CommandRegistrator
+from so_magic.data.command_factories import MagicCommandFactory, CommandRegistrator
 
 
 class EngineType(CommandRegistrator):

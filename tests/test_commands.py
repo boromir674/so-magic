@@ -3,19 +3,19 @@ import pytest
 
 @pytest.fixture
 def command_interface():
-    from green_magic.utils.commands import CommandInterface
+    from so_magic.utils.commands import CommandInterface
     return CommandInterface
 
 
 @pytest.fixture
 def command_class():
-    from green_magic.utils.commands import Command
+    from so_magic.utils.commands import Command
     return Command
 
 
 @pytest.fixture
 def invoker():
-    from green_magic.utils.commands import Invoker, CommandHistory
+    from so_magic.utils.commands import Invoker, CommandHistory
     return Invoker(CommandHistory())
 
 

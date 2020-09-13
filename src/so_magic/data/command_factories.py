@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 import attr
-from green_magic.utils import Command
-from green_magic.utils import Subject
+from so_magic.utils import Command, Subject
 
 
 class MyDecorator(type):
@@ -86,8 +85,9 @@ class FunctionCommandFactory(AbstractCommandFactory):
 
 @BaseCommandFactory.register_as_subclass('encode_nominal_subsets')
 class NominalAttributeListEncodeCommandFactory(AbstractCommandFactory):
+
     def construct(self, *args, **kwargs) -> Command:
-        from green_magic.data.features.phis import ListOfCategoricalPhi, DatapointsAttributePhi
+        from so_magic.data.features.phis import ListOfCategoricalPhi, DatapointsAttributePhi
         assert len(args) > 0
         datapoints = args[0]
         attribute = args[1]

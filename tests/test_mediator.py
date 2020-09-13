@@ -1,6 +1,6 @@
 
 def test_mediator_scenario():
-    from green_magic.utils import GenericMediator, BaseComponent
+    from so_magic.utils import GenericMediator, BaseComponent
     # The client code.
     class ConcreteMediator(GenericMediator):
         def notify(self, sender: object, event: str) -> None:

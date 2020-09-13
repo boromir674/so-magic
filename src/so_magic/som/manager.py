@@ -1,7 +1,7 @@
 import attr
 import logging
 
-from green_magic.utils import ObjectsPool
+from so_magic.utils import ObjectsPool
 from .factory import SelfOrganizingMapFactory
 
 logger = logging.getLogger(__name__)

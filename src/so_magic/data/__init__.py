@@ -13,7 +13,7 @@ def init_data_manager(a_backend):
 
     @data_manager.backend.engine.dec()
     def encode_nominal_subsets(datapoints, attribute, new_attribute):
-        from green_magic.data.features.phis import ListOfCategoricalPhi, DatapointsAttributePhi
+        from so_magic.data.features.phis import ListOfCategoricalPhi, DatapointsAttributePhi
         phi = ListOfCategoricalPhi(DatapointsAttributePhi(datapoints))
         new_values = phi(attribute)
         datapoints.mutator.add_column(datapoints, new_values, new_attribute)
@@ -24,7 +24,7 @@ def init_data_manager(a_backend):
     def observations(file_path):
         return pd.read_json(file_path, lines=True)
 
-    from green_magic.data.encoding import NominalAttributeEncoder
+    from so_magic.data.encoding import NominalAttributeEncoder
 
     @NominalAttributeEncoder.register_as_subclass('one_hot')
     class OneHotEncoder(NominalAttributeEncoder):
@@ -38,8 +38,8 @@ def init_data_manager(a_backend):
             self.columns = [x for x in dataframe.columns]
             return dataframe
 
-    from green_magic.data.command_factories import DataManagerCommandFactory
-    from green_magic.utils import Command
+    from so_magic.data.command_factories import DataManagerCommandFactory
+    from so_magic.utils import Command
 
     @DataManagerCommandFactory.register_as_subclass('one_hot_encoding')
     class EncodeNominalCommandFactory(DataManagerCommandFactory):

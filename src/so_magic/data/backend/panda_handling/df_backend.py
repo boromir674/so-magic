@@ -1,5 +1,5 @@
-from green_magic.data.backend.engine_specs import EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator
-from green_magic.data.backend.engine import DataEngine
+from so_magic.data.backend.engine_specs import EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator
+from so_magic.data.backend.engine import DataEngine
 import pandas as pd
 
 __all__ = ['PDTabularRetriever', 'PDTabularIterator', 'PDTabularMutator']

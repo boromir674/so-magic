@@ -2,13 +2,13 @@ import pytest
 
 @pytest.fixture
 def subject():
-    from green_magic.utils import Subject
+    from so_magic.utils import Subject
     return Subject
 
 
 @pytest.fixture
 def observer_class():
-    from green_magic.utils import Observer
+    from so_magic.utils import Observer
     return Observer
 
 

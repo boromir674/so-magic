@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABC
 from functools import wraps
 import inspect
-from green_magic.utils import Singleton, Transformer, ObjectRegistry, Subject
+from so_magic.utils import Singleton, Transformer, ObjectRegistry, Subject
 
 
 class PhiFunctionRegistry(Singleton, ObjectRegistry):

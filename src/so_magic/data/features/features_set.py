@@ -1,9 +1,9 @@
 from collections import OrderedDict
 import attr
 
-from green_magic.utils import Observer, Subject
-from green_magic.data.variables.types import NominalVariableType
-from green_magic.data.features.features import TrackingFeature
+from so_magic.utils import Observer, Subject
+from so_magic.data.variables.types import NominalVariableType
+from so_magic.data.features.features import TrackingFeature
 
 
 @attr.s

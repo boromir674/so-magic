@@ -1,11 +1,8 @@
-from green_magic.data.dataset import DatapointsManager
-from green_magic.data.dataset import BroadcastingDatapointsFactory
-from green_magic.utils import Subject
+from so_magic.data.dataset import BroadcastingDatapointsFactory, DatapointsManager
+from so_magic.utils import Subject
 
-class DataBackend:
-    pass
 
-class Backend(DataBackend):
+class Backend:
     """
         Args:
             engine (DataEngine): a data engine represented as a class object (eg class MyClass: pass)
@@ -33,7 +30,7 @@ class Backend(DataBackend):
         return wrapper
 
     @classmethod
-    def create(cls, backend_type, *args, **kwargs) -> DataBackend:
+    def create(cls, backend_type, *args, **kwargs):
         if backend_type not in cls.subclasses:
             raise ValueError(f"Request Backend of type '{backend_type}'; supported are [{', '.join(sorted(cls.subclasses.keys()))}]")
         return cls.subclasses[backend_type](*args, **kwargs)

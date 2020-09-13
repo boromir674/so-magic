@@ -2,7 +2,7 @@ import pytest
 
 @pytest.fixture
 def registering_phi_at_the_same_key_error():
-    from green_magic.utils.registry import ObjectRegistryError
+    from so_magic.utils.registry import ObjectRegistryError
     return ObjectRegistryError
 
 
@@ -12,7 +12,7 @@ def app_phi_function(somagic):
 
 
 def test_phi_creation(app_phi_function, registering_phi_at_the_same_key_error):
-    from green_magic.data.features.phi import phi_registry
+    from so_magic.data.features.phi import phi_registry
 
     assert phi_registry.objects == {}
     assert 'pame' not in phi_registry

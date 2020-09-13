@@ -73,7 +73,7 @@ def test_somagic_scenario(train_args, somagic, sample_collaped_json):
          (1, 1, 1)]),
 ])
 def test_somagic_objects(nb_objects, nb_observers):
-    from green_magic import init_so_magic
+    from so_magic import init_so_magic
     so_magic_instances = [init_so_magic() for _ in range(nb_objects)]
 
     assert id(so_magic_instances[0]._data_manager.backend) != id(so_magic_instances[1]._data_manager.backend)

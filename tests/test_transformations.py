@@ -3,7 +3,7 @@ import pytest
 
 @pytest.fixture
 def transformers():
-    from green_magic.utils import Transformer
+    from so_magic.utils import Transformer
     def gg(a, b=2):
         return a * b + 1
     return {'lambda': Transformer(lambda x: x + 1), 'gg': Transformer(gg)}
@@ -40,7 +40,7 @@ def false_arguments(request):
 
 
 def test_false_arguments(false_arguments):
-    from green_magic.utils import Transformer
+    from so_magic.utils import Transformer
     with pytest.raises(false_arguments['exception']) as e:
         _ = Transformer(*false_arguments['args'])
         assert false_arguments['exception_text'] == str(e)

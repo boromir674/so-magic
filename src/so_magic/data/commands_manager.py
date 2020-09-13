@@ -1,5 +1,5 @@
 import attr
-from green_magic.utils import Observer
+from so_magic.utils import Observer
 
 
 @attr.s

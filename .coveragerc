@@ -1,6 +1,6 @@
 [run]
 source =
-    green_magic
+    so_magic
     tests
 
 [report]

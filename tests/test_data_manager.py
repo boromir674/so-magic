@@ -2,11 +2,11 @@ import pytest
 
 
 def test_engine_registration():
-    from green_magic.data.backend import DataEngine
-    from green_magic.data.backend.engine import EngineType
+    from so_magic.data.backend import DataEngine
+    from so_magic.data.backend.engine import EngineType
     assert type(EngineType) == type
     assert type(DataEngine) == EngineType
-    from green_magic.data.command_factories import CommandRegistrator
+    from so_magic.data.command_factories import CommandRegistrator
 
     ATTRS = ('registry', '_commands', 'command')
     DataEngine.new('test_pd')

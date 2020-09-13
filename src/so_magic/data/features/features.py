@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import attr
-from green_magic.data.variables.types import VariableTypeFactory
+from so_magic.data.variables.types import VariableTypeFactory
 
 
 class AttributeReporter(ABC):

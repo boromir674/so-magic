@@ -10,7 +10,7 @@ ENGINES = {
 }
 
 def init_backend(engine_type='pd'):
-    from green_magic.data.backend.panda_handling.df_backend import PDTabularRetriever, PDTabularIterator, PDTabularMutator
+    from so_magic.data.backend.panda_handling.df_backend import PDTabularRetriever, PDTabularIterator, PDTabularMutator
     # create/register new empty/canvas engine
     pd_engine = DataEngine.new(ENGINES[engine_type]['abbr'])
 

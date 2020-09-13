@@ -33,7 +33,7 @@ A python library providing with an elegant interface (API) to infer models of th
 
 .. |codacy_quality| image:: https://app.codacy.com/project/badge/Grade/3c5b20d36ce94865b704e589b89204d4
     :alt: Codacy Code quality
-    :target: https://www.codacy.com/manual/boromir674/green-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/green-magic&amp;utm_campaign=Badge_Grade
+    :target: https://www.codacy.com/manual/boromir674/so-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Grade
 
 .. |scrutinizer_code_quality| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/quality-score.png?b=dev
     :alt: Code Quality

@@ -1,5 +1,5 @@
 import attr
-from green_magic.utils import Subject
+from so_magic.utils import Subject
 
 
 @attr.s

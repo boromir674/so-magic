@@ -1,6 +1,6 @@
 
 def test_singleton():
-    from green_magic.utils import Singleton
+    from so_magic.utils import Singleton
 
     class ObjectRegistry(Singleton):
         def __new__(cls, *args, **kwargs):

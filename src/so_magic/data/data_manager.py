@@ -1,6 +1,6 @@
 from enum import Enum
 import attr
-from green_magic.utils import GenericMediator, BaseComponent, ObjectRegistry, Observer
+from so_magic.utils import GenericMediator, BaseComponent, ObjectRegistry, Observer
 from .commands_manager import CommandsManager
 
 

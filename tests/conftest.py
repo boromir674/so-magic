@@ -34,7 +34,7 @@ def test_json_data(sample_json):
 
 @pytest.fixture
 def somagic():
-    from green_magic import init_so_magic
+    from so_magic import init_so_magic
     _ = init_so_magic()
     return _
 
@@ -42,8 +42,8 @@ def somagic():
 @pytest.fixture
 def data_manager():
     def getter():
-        from green_magic.data import init_data_manager
-        from green_magic.data.backend import init_backend
+        from so_magic.data import init_data_manager
+        from so_magic.data.backend import init_backend
 
         data_manager = init_data_manager(init_backend(engine_type='pd'))
 
@@ -51,8 +51,8 @@ def data_manager():
         cmd_fact = data_manager.backend.engine.command_factory
 
         # test 1
-        from green_magic.data.dataset import DatapointsFactory
-        from green_magic.data.command_factories import MagicCommandFactory
+        from so_magic.data.dataset import DatapointsFactory
+        from so_magic.data.command_factories import MagicCommandFactory
 
         assert isinstance(datapoints_fact, DatapointsFactory)
         assert isinstance(cmd_fact, MagicCommandFactory)
