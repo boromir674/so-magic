@@ -57,6 +57,7 @@ python -m pip install -U pip
 python -m pip install -U wheel
 python -m pip install -r requirements/base.txt
 python -m pip install -r requirements/dev.txt
+conda install somoclu
 
 echo '------------ INSTALLING SO_MAGIC FROM TEST-PYPI -------------'
 # use this command because test pypi absolutely not guarantees that it can satsify dependencies (--no-deps flag) by
