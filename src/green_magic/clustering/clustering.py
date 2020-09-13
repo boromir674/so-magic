@@ -20,8 +20,8 @@ class BaseClustering:
     def members_n_assigned_clusters(self):
         """Generate tuples of cluster members and their assigned cluster index"""
         for i, cl in enumerate(self.clusters):
-            for strain_id in iter(cl):
-                yield strain_id, i
+            for member_id in iter(cl):
+                yield member_id, i
 
 
 @attr.s
