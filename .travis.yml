@@ -46,18 +46,17 @@ jobs:
 #    env: TOXENV=check
 #    name: "Check source distribution"
   - stage: Staging-Integration-test
+    name: "Do an emulated real-world-scenario test using the staging server: install lib from test-pypi and run tests"
     python: '3.8'
     script:
       - chmod +x scripts/integration-test.sh
       - scripts/integration-test.sh
     after_success: skip
-
-    name: "Do an emulated real-world-scenario test using the staging server: install lib from test-pypi and run tests"
-  - stage: Build docs
-    install:
-      - sudo apt-get install python-enchant
-    env: TOXENV=spell,docs
-    name: "Build documentation"
+#  - stage: Build docs
+#    install:
+#      - sudo apt-get install python-enchant
+#    env: TOXENV=spell,docs
+#    name: "Build documentation"
   - stage: deploy to staging (pypi test server)
     deploy:
     - provider: script
