@@ -47,7 +47,9 @@ jobs:
 #    name: "Check source distribution"
   - stage: Staging-Integration-test
     python: '3.8'
-    script: python scripts/integration_test.py
+    script:
+      - chmod +x scripts/integration-test.sh
+      - scripts/integration-test.sh
     name: "Do an emulated real-world-scenario test using the staging server: install lib from test-pypi and run tests"
   - stage: Build docs
     install:
