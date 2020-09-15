@@ -65,5 +65,10 @@ python -m pip install --index-url https://test.pypi.org/simple/ --no-deps so_mag
 #python -m pip install -U attrs
 python -c 'import so_magic'
 
-echo "SUCCESS!!!"
+
 echo "Successfully installed the library emnulating the real 'pip install' scenario using the test-pypi server."
+
+python -m pip install tox
+
+
+echo "SUCCESS!!!"
