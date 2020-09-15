@@ -48,7 +48,7 @@ jobs:
 #    env: TOXENV=check
 #    name: "Check source distribution"
   - stage Integration-Test
-    name: "Upload package/distribution (source & wheel) to test-pypi"
+    name: "Upload package to test-pypi"
     python: '3.8'
     script:
       - export PYPI_USERNAME=$TEST_PYPI_USERNAME
