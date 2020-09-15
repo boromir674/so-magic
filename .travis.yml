@@ -57,34 +57,34 @@ jobs:
       - chmod +x scripts/integration-test.sh
       - scripts/integration-test.sh
     after_success: skip
-  - stage Integration-Test
-    name: "Install lib from test-pypi and run tests"
-    env: TOXENV=clean,py38-cov
-    python: '3.8'
-    after_success: skip
-  - stage: Staging-Integration-test
-    name: "Do an emulated real-world-scenario test using the staging server: install lib from test-pypi and run tests"
-    python: '3.8'
-    script:
-      - tox -e deploy-pypi -vv
-      - chmod +x scripts/integration-test.sh
-      - scripts/integration-test.sh
-    after_success: skip
-#  - stage: Build docs
-#    install:
-#      - sudo apt-get install python-enchant
-#    env: TOXENV=spell,docs
-#    name: "Build documentation"
-  - stage: deploy to staging (pypi test server)
-    deploy:
-    - provider: script
-      script: tox -e deploy-pypi -vv
-      on:
-        branch: staging
-    before_install: skip
-    install: skip
-    script: skip
-    after_success: skip
+#  - stage Integration-Test
+#    name: "Install lib from test-pypi and run tests"
+#    env: TOXENV=clean,py38-cov
+#    python: '3.8'
+#    after_success: skip
+#  - stage: Staging-Integration-test
+#    name: "Do an emulated real-world-scenario test using the staging server: install lib from test-pypi and run tests"
+#    python: '3.8'
+#    script:
+#      - tox -e deploy-pypi -vv
+#      - chmod +x scripts/integration-test.sh
+#      - scripts/integration-test.sh
+#    after_success: skip
+##  - stage: Build docs
+##    install:
+##      - sudo apt-get install python-enchant
+##    env: TOXENV=spell,docs
+##    name: "Build documentation"
+#  - stage: deploy to staging (pypi test server)
+#    deploy:
+#    - provider: script
+#      script: tox -e deploy-pypi -vv
+#      on:
+#        branch: staging
+#    before_install: skip
+#    install: skip
+#    script: skip
+#    after_success: skip
 
 
 after_failure:
