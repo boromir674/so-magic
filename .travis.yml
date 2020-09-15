@@ -47,29 +47,24 @@ jobs:
 #  - stage: Check_distro
 #    env: TOXENV=check
 #    name: "Check source distribution"
-  - stage Integration-Test
-    name: "Upload package to test-pypi"
-    python: '3.8'
-    script:
-      - export PYPI_USERNAME=$TEST_PYPI_USERNAME
-      - export PYPI_PASSWORD=$TEST_PYPI_PASSWORD
-      - tox -e deploy-pypi
-      - chmod +x scripts/integration-test.sh
-      - scripts/integration-test.sh
-    after_success: skip
 #  - stage Integration-Test
-#    name: "Install lib from test-pypi and run tests"
-#    env: TOXENV=clean,py38-cov
-#    python: '3.8'
-#    after_success: skip
-#  - stage: Staging-Integration-test
-#    name: "Do an emulated real-world-scenario test using the staging server: install lib from test-pypi and run tests"
+#    name: "Upload package to test-pypi"
 #    python: '3.8'
 #    script:
-#      - tox -e deploy-pypi -vv
+#      - export PYPI_USERNAME=$TEST_PYPI_USERNAME
+#      - export PYPI_PASSWORD=$TEST_PYPI_PASSWORD
+#      - tox -e deploy-pypi
 #      - chmod +x scripts/integration-test.sh
 #      - scripts/integration-test.sh
 #    after_success: skip
+  - stage: Staging-Integration-test
+    name: "Do an emulated real-world-scenario test using the staging server: install lib from test-pypi and run tests"
+    python: '3.8'
+    script:
+      - tox -e deploy-pypi -vv
+      - chmod +x scripts/integration-test.sh
+      - scripts/integration-test.sh
+    after_success: skip
 ##  - stage: Build docs
 ##    install:
 ##      - sudo apt-get install python-enchant
