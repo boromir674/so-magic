@@ -1,6 +1,7 @@
 from collections import Counter, OrderedDict
 import attr
 
+
 @attr.s
 class Grouping:
     """A Cluster is basically a group of objects"""
@@ -24,6 +25,7 @@ class Grouping:
     def __pass(self, x, **kwargs):
         return x
 
+
 @attr.s
 class BaseCluster(Grouping):
     """
@@ -33,21 +35,29 @@ class BaseCluster(Grouping):
     def alphabetical(self):
         return self.gen_members(sort=True)
 
+
 def _is_coordinate_value(self, attribute, value):
     if value < 0:
         raise ValueError("Expected the input coordinate to be a positive number.")
     if int(value) != value:
-        raise ValueError(f"Expected the input coordinate to be an integer number; instead {value} was given")
+        raise ValueError(f"Expected the input coordinate to be an integer number; instead {value} was given. Expected an integer for the coordinates. Self-organising map clusters the datapoints by putting the into distrete points on the x-y latice. These points have rounded/integer coordinates")
 
 
 @attr.s
-class Coordinates:
+class PositiveIntegerCoordinates:
+    """A base class to encapsulate objects behaving as 2D (x, y) coordinates
+
+     Args:
+        x (number): equal to the distance from the vertical axis at x=0
+        y (number): equal to the distance from the horizontal axis at y=0
+    """
     x = attr.ib(init=True, validator=_is_coordinate_value)
     y = attr.ib(init=True, validator=_is_coordinate_value)
 
     @staticmethod
     def from_duo(two_element_list_like):
-        return Coordinates(*list(iter(two_element_list_like)))
+        return SomClusterMemberCoordinates(*list(iter(two_element_list_like)))
+
 
 @attr.s
 class SOMCluster(BaseCluster):
