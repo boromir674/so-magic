@@ -7,7 +7,7 @@ include tests/dts/sample-strains-colapsed.jl
 include tests/dts/test-clean.pk
 include tests/dts/unittest-dataset-clean.pk
 
-include tests/*.py
+recursive-include tests *.py
 
 include .travis.yml
 
