@@ -12,6 +12,8 @@ recursive-include tests *.py
 include .travis.yml
 
 include appveyor.yml
+include bandit.yml
+
 recursive-include .appveyor *.py
 include .appveyor/appveyor-with-compiler.cmd
 
