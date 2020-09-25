@@ -2,6 +2,7 @@ import pytest
 from so_magic.utils import MapOnLinearSpace
 from so_magic.utils.linear_mapping import LinearScale
 
+
 @pytest.mark.parametrize('lower_bound, upper_bound, wrong_index', [
     (20, 100, 2),
     pytest.param(20, 20, 2, marks=pytest.mark.xfail(raises=ValueError, reason="lower_bound < upper_bound should be true; The lower bound of a linear scale is restricted to be strictly smaller than the upper bound")),
@@ -9,12 +10,10 @@ from so_magic.utils.linear_mapping import LinearScale
 ])
 def test_linear_scale(lower_bound, upper_bound, wrong_index):
     scale = LinearScale(lower_bound, upper_bound)
-    assert scale[0] == lower_bound
-    assert scale[1] == upper_bound
+    assert scale.lower_bound == lower_bound
+    assert scale.upper_bound == upper_bound
     assert len(scale) == 2
-    with pytest.raises(IndexError) as e:
-        _ = scale[wrong_index]
-        assert f'You can only request the 0 (lower bound) or 1 (upper bound) indexed item on the linear scale. You requested {wrong_index}' == str(e)
+
 
 @pytest.mark.parametrize('from_scale, target_scale, reverse, input_value, output_value', [
     ([0, 400], [0, 100], True, 50, 87.5),

@@ -12,15 +12,8 @@ class LinearScale:
                 f'The linear scale, should have lower_bound < upper_bound. Instead lower_bound={self.lower_bound}, upper_bound={upper_bound}')
 
     def __len__(self):
+        """Returns 2, since the lower and upper bound values are sufficient to define a linear scale"""
         return 2
-
-    def __getitem__(self, item):
-        if item == 0:
-            return self.lower_bound
-        if item == 1:
-            return self.upper_bound
-        raise IndexError(
-            f'You can only request the 0 (lower bound) or 1 (upper bound) indexed item on the linear scale. You requested {item}')
 
     @classmethod
     def create(cls, two_element_list_like):
@@ -55,8 +48,7 @@ class MapOnLinearSpace:
         return self.__transform
 
     def transform(self, number):
-        """Transform the input number to a different linear scale
-        """
+        """Transform the input number to a different linear scale"""
         return self._transform_callback(number)
 
     @property
