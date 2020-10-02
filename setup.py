@@ -1,6 +1,8 @@
 import os
 import re
+import sys
 from setuptools import setup
+import subprocess
 from collections import OrderedDict
 
 
@@ -8,14 +10,14 @@ my_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 # CONSTANTS
+project_slug = 'so-magic'
 setup_cfg_filename = 'setup.cfg'
 readme_filename = 'README.rst'
 changelog_filename = 'CHANGELOG.rst'
-source_code_repo = 'https://github.com/boromir674/so-magic'
-# changelog = '{}/blob/master/CHANGELOG.rst'.format(source_code_repo)
+source_code_repo = f'https://github.com/boromir674/{project_slug}'
+changelog = f'{source_code_repo}/blob/dev/CHANGELOG.rst'
 
 README = os.path.join(my_dir, readme_filename)
-CHANGELOG = os.path.join(my_dir, changelog_filename)
 
 # Compute long description that will be rendered in the pypi server
 long_description = ''
@@ -32,33 +34,25 @@ def requirements():
         return fh.read().split('\n')
 
 
-# Automatically compute package vesion from the [semantic_release] section in setup.cfg
-with open(os.path.join(my_dir, setup_cfg_filename), 'r') as f:
-    regex = r"\[semantic_release\][\w\s=/\.:\d]+version_variable[\ \t]*=[\ \t]*([\w\.]+(?:/[\w\.]+)*):(\w+)"
-    m = re.search(regex, f.read(), re.MULTILINE)
-    if m:
-        target_file = os.path.join(my_dir, m.group(1))
-        target_string = m.group(2)
-    else:
-        raise RuntimeError(f"Expected to find the '[semantic_release]' section, in the '{setup_cfg_filename}' file, with key 'version_variable'."
-                           f"\nExample (it does not have to be a .py file) to indicate that the version is stored in the '__version__' string:\n[semantic_release]\nversion_variable = src/package_name/__init__.py:__version__")
+def run(cmd):
+    os.environ['PYTHONUNBUFFERED'] = "1"
+    proc = subprocess.Popen(cmd,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT,
+                            )
+    _stdout, _stderr = proc.communicate()
 
+    return proc.returncode, _stdout, _stderr
 
-if not os.path.isfile(target_file):
-    raise FileNotFoundError(
-        f"Path '{target_file} does not appear to be valid. Please go to the '{setup_cfg_filename}' file, [semantic_release] section, 'version_variable' key and indicate a valid path (to look for the version string)")
-
-reg_string = r'\s*=\s*[\'\"]([^\'\"]*)[\'\"]'
-
-with open(os.path.join(my_dir, target_file), 'r') as f:
-    content = f.read()
-    reg = f'^{target_string}' + reg_string
-    m = re.search(reg, content, re.MULTILINE)
-    if m:
-        _version = m.group(1)
-    else:
-        raise AttributeError(f"Could not find a match for regex {reg} when applied to:\n{content}")
-
+exit_code, stdout, stderr = run([sys.executable, os.path.join(my_dir, 'scripts', 'parse_package_version.py')])
+if exit_code == 0:
+    _version = stdout.decode('utf-8').replace('\n', '')
+    print(f'Parsed version: {_version}')
+else:
+    print(stdout)
+    print('Failed to automatically parse the package version. Either set it manually in setup.py (or stup.cfg) or'
+          'fix the automation.')
+    sys.exit(1)
 
 setup(
     version=_version,
@@ -69,9 +63,9 @@ setup(
     install_requires=['attrs', 'numpy', 'scikit-learn', 'pandas', 'somoclu'],
     project_urls=OrderedDict([
         ('1-Tracker', f'{source_code_repo}/issues'),
-        ('2-Changelog', CHANGELOG),
+        ('2-Changelog', changelog),
         ('3-Source', source_code_repo),
-        ('4-Documentation', 'https://so-magic.readthedocs.io/en/dev/'), # "https://blahblah.readthedocs.io/en/v{}/".format(_version)
+        ('4-Documentation', f'https://{project_slug}.readthedocs.io/en/dev/'), # "https://blahblah.readthedocs.io/en/v{}/".format(_version)
     ]),
 
     # download_url='https://github.com/boromir674/music-album-creator/archive/v{}.tar.gz'.format(_version),  # help easy_install do its tricks
