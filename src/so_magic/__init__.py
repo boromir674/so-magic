@@ -1,4 +1,4 @@
-__version__ = '0.3.8'
+__version__ = '0.3.9'
 
 from .so_master import SoMaster
 from .data import init_data_manager
