@@ -1,0 +1,23 @@
+*\.pyc
+\.eggs
+*\.egg-info
+*__pycache__
+snippets\.txt
+.idea
+\.fuse*
+*\.bak
+legacy
+\.cache*
+\.coverage
+
+# ignore modules installed by node
+node_modules*
+
+.DS_Store
+.tox/
+.vscode/
+build-artifacts/
+coverage.xml
+dist/
+docs/.DS_Store
+src/.DS_Store

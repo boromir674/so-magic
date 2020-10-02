@@ -1,0 +1,4 @@
+# tell bandit to accept assert in python
+# we do that because bandit reports as "error" assert statements found in unittests, which is a false positive
+# TODO write a custom bandit test that reports "error" on assert statements found only outside of (unit) testing code
+skips: ['B101']

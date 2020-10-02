@@ -1,0 +1,98 @@
+os: linux
+language: python
+cache: pip
+
+env:
+  global:
+    - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
+    - SEGFAULT_SIGNALS=all
+    - TOX_SKIP_MISSING_INTERPRETERS="False"
+    - secure: p4/GxB+E5BvcMDH0e0zztxDA/vHBFnyAfjvjMXo6hEqVZ4nsSMHulfk3D05d545aL8bVW8puv9h9eb/ULyart8tOK/cP5HrfTMV0zS5CYaSdRjfUNArnHqu/PuS7+dwC2jm0pJ6kYCEg6QZkT4NMxhOT984CVWKkYSnJeOePqPQGn3o/mWESwjpCTit1uyLIcMdyjfTVNWm0aYj5YlBbjwzLwyQebJQpovvU8rRpSAycHFufnDNWEoeuNpazTM017pLZ8Iy9mfB2p8IqONFJFgNdTxBq9DQDAQFcVFtNv7vsICVRswfpDNvGvWzHir7n4xolEfscH8pW3/4lAGmWeFZR+LGBnxVxNDJb52kbhri1Fe2b/5NXM+NSN5uR0bk9lD7sLJIdI4AV7nv4MTGtbZVuQw+oIiYMuaO7H9Ayq83VaOAVULynNKlhUWR7t52BqLZxU2MgK9Y4rLzr9ljkBK5lAGjUlZRnHXJU+N+fNAVS39i71KbI5pH6t1v05bz6A0Cl4VckystiH1eLYQN5bnJh4eNeQN3/cJRjPXDE3B55iIEjGmKLinpDVmXQdrf9UK239AYdLztUKty9k7wwTTEoMjxHWCv0AiVBvF+LhrtScgAAv9MpT4s1zNuFmuZU1VOVJ32XTf+4NGm1YJKzU5zf5wikDFtUAuAm8aIPwvI=
+
+before_install:
+  - python --version
+  - pip --version
+  - uname -a
+  - lsb_release -a
+  - sudo python -m pip install -U pip
+  - python -m pip install tox
+  - chmod +x scripts/install_anaconda.sh
+  - scripts/install_anaconda.sh
+  - export CONDA_EXE=/home/travis/miniconda/bin/conda
+  - echo $CONDA_EXE
+
+script:
+  - tox
+
+after_success:
+  - tox -e report,codecov
+  - sudo apt-get install jq
+  - curl -LSs "$(curl -LSs https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets | map({name, browser_download_url} | select(.name | endswith(".jar"))) | .[0].browser_download_url')" -o codacy-coverage-reporter-assembly.jar
+  - java -jar codacy-coverage-reporter-assembly.jar report -l Python -r coverage.xml
+
+
+jobs:
+  include:
+  - stage: Build_n_test
+    python: '3.6'
+    env: TOXENV=clean,py36-cov
+  - stage: Build_n_test
+    python: '3.7'
+    env: TOXENV=clean,py37-cov
+  - stage: Build_n_test
+    python: '3.8'
+    env: TOXENV=clean,py38-cov
+  - stage: Check_distro
+    env: TOXENV=check
+    name: "Check source distribution"
+  - stage: Build docs
+    install:
+      - sudo apt-get install python-enchant
+    env: TOXENV=spell,docs
+    name: "Build documentation"
+  - stage: release
+    if: tag IS present
+    deploy:
+      provider: pypi
+      user: praekelt.org
+      password:
+      secure: <encrypted password>
+      distributions: sdist bdist_wheel
+      on:
+        tags: true
+
+    install: skip
+    script: skip
+    after_success: skip
+
+
+after_failure:
+  - more .tox/log/* | cat
+  - more .tox/*/log/* | cat
+
+
+# In this stage ALL jobs have succeeded!
+# - echo "Potentially any of (Unittests, integrations tests, functional tests, regression tests, stress tests)."
+# - echo "You can use this 'point' to \"send stuff in production\""
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: assh -p22 $STAGING_SERVER_USER@$STAGING_SERVER "mkdir -p $STAGING_PATH_STABLE" && ssh -p22 $STAGING_SERVER_USER@$STAGING_SERVER "mkdir -p $STAGING_PATH_TRUNK" && rsync -rav -e ssh --exclude='.git/' --exclude=scripts/ --exclude='.travis.yml' --delete-excluded ./ $STAGING_SERVER_USER@$STAGING_SERVER:$STAGING_PATH_TRUNK && rsync -rav -e ssh --exclude='.git/' --exclude=scripts/ --exclude='.travis.yml' --delete-excluded ./ $STAGING_SERVER_USER@$STAGING_SERVER:$STAGING_PATH_STABLE
+    on:
+      branch: staging
+  - provider: script
+    skip_cleanup: true
+    script: ssh -p22 $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER "mkdir -p $PRODUCTION_SERVER_THEMES_PATH/_tmp-bornholm"&& ssh -p22 $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER "mkdir -p $PRODUCTION_SERVER_THEMES_PATH/bornholm" && rsync -rav -e ssh --exclude='.git/' --exclude=scripts/ --exclude='.travis.yml' --delete-excluded ./ $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER:$PRODUCTION_SERVER_THEMES_PATH/_tmp-bornholm && ssh -p22 $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER "mv $PRODUCTION_SERVER_THEMES_PATH/bornholm $PRODUCTION_SERVER_THEMES_PATH/_old-bornholm && mv $PRODUCTION_SERVER_THEMES_PATH/_tmp-bornholm $PRODUCTION_SERVER_THEMES_PATH/bornholm" && ssh -p22 $PRODUCTION_SERVER_USER@$PRODUCTION_SERVER "rm -rf $PRODUCTION_SERVER_THEMES_PATH/_old-bornholm"
+    on:
+      branch: master
+#deploy:
+#  provider: script
+#  script: .travis/deploy.sh
+#  on:
+#    all_branches: true
+
+
+#notifications:
+#  email:
+#    on_success: never
+#    on_failure: never

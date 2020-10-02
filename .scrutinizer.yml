@@ -4,14 +4,6 @@ checks:
         duplicate_code: true
 
 build:
-#    environment:
-#        variables:
-#            BIGARTM_PARENT_DIR:   $(echo $PWD)
-#            COLLECTIONS_DIR: "$(echo $PWD)/collections"
-#        apt_packages:
-#          - make
-#          - cmake
-
     nodes:
         analysis:
             project_setup:
