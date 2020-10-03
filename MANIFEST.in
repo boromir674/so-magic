@@ -36,3 +36,4 @@ include docs/spelling_wordlist.txt
 
 include scripts/install_anaconda.sh
 include scripts/parse_package_version.py
+include scripts/integration-test.sh
