@@ -61,7 +61,7 @@ jobs:
     script:
       - tox -e deploy-pypi -vv
       - chmod +x scripts/integration-test.sh
-      - scripts/integration-test.sh
+      - scripts/integration-test.sh $(python scripts/parse_package_version.py)
     after_success: skip
 ##  - stage: Build docs
 ##    install:

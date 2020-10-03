@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+VERSION_OF_INTEREST=$1
 
 MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ENV_NAME="integration-env"
@@ -61,7 +62,7 @@ python -m pip install -r requirements/dev.txt
 echo '------------ INSTALLING SO_MAGIC FROM TEST-PYPI -------------'
 # use the --no-deps flag, because test pypi absolutely not guarantees that it can satisfy dependencies by
 # looking for the packages in the index, simply because they might not exist
-python -m pip install --index-url https://test.pypi.org/simple/ --no-deps so_magic
+python -m pip install --index-url https://test.pypi.org/simple/ --no-deps so_magic==$VERSION_OF_INTEREST
 
 python -c 'import so_magic'
 
