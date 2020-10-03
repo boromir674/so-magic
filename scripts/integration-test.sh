@@ -69,6 +69,5 @@ python -c 'import so_magic'
 echo "Successfully installed the library emnulating the real 'pip install' scenario using the test-pypi server."
 
 python -m pytest $MY_DIR/../tests -vv --cov
-#python -m pip install tox
 
 echo "SUCCESS!!!"

@@ -45,29 +45,25 @@ jobs:
 #  - stage: Check_distro
 #    env: TOXENV=check
 #    name: "Check source distribution"
-#  - stage Integration-Test
-#    name: "Upload package to test-pypi"
-#    python: '3.8'
-#    script:
-#      - export PYPI_USERNAME=$TEST_PYPI_USERNAME
-#      - export PYPI_PASSWORD=$TEST_PYPI_PASSWORD
-#      - tox -e deploy-pypi
-#      - chmod +x scripts/integration-test.sh
-#      - scripts/integration-test.sh
-#    after_success: skip
-  - stage: Staging-Integration-test
-    name: "Do an emulated real-world-scenario test using the staging server: install lib from test-pypi and run tests"
+#  - stage: Build docs
+#    install:
+#      - sudo apt-get install python-enchant
+#    env: TOXENV=spell,docs
+#    name: "Build documentation"
+  - stage: Deploy-to-staging-environment
+    name: "Upload the package to the testpypi (index) server"
     python: '3.8'
     script:
       - tox -e deploy-pypi -vv
+    after_success: skip
+  - stage: Integration-test-using-staging
+    name: "Emulated a real-world-scenario by installing the package from the testpypi and running the unittests against the installation"
+    python: '3.8'
+    script:
       - chmod +x scripts/integration-test.sh
       - scripts/integration-test.sh $(python scripts/parse_package_version.py)
     after_success: skip
-##  - stage: Build docs
-##    install:
-##      - sudo apt-get install python-enchant
-##    env: TOXENV=spell,docs
-##    name: "Build documentation"
+
 #  - stage: deploy to staging (pypi test server)
 #    deploy:
 #    - provider: script
