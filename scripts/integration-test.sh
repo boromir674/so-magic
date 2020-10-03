@@ -59,12 +59,11 @@ conda install somoclu --channel conda-forge
 python -m pip install -r requirements/base.txt
 python -m pip install -r requirements/dev.txt
 echo '------------ INSTALLING SO_MAGIC FROM TEST-PYPI -------------'
-# use this command because test pypi absolutely not guarantees that it can satsify dependencies (--no-deps flag) by
+# use the --no-deps flag, because test pypi absolutely not guarantees that it can satisfy dependencies by
 # looking for the packages in the index, simply because they might not exist
 python -m pip install --index-url https://test.pypi.org/simple/ --no-deps so_magic
-#python -m pip install -U attrs
-python -c 'import so_magic'
 
+python -c 'import so_magic'
 
 echo "Successfully installed the library emnulating the real 'pip install' scenario using the test-pypi server."
 
