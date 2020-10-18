@@ -33,23 +33,23 @@ after_success:
 
 jobs:
   include:
-  - stage: Build_n_test
-    python: '3.6'
-    env: TOXENV=clean,py36-cov
-  - stage: Build_n_test
-    python: '3.7'
-    env: TOXENV=clean,py37-cov
-  - stage: Build_n_test
-    python: '3.8'
-    env: TOXENV=clean,py38-cov
-  - stage: Check_distro
-    env: TOXENV=check
-    name: "Check source distribution"
-  - stage: Build docs
-    install:
-      - sudo apt-get install python-enchant
-    env: TOXENV=spell,docs
-    name: "Build documentation"
+#  - stage: Build_n_test
+#    python: '3.6'
+#    env: TOXENV=clean,py36-cov
+#  - stage: Build_n_test
+#    python: '3.7'
+#    env: TOXENV=clean,py37-cov
+#  - stage: Build_n_test
+#    python: '3.8'
+#    env: TOXENV=clean,py38-cov
+#  - stage: Check_distro
+#    env: TOXENV=check
+#    name: "Check source distribution"
+#  - stage: Build docs
+#    install:
+#      - sudo apt-get install python-enchant
+#    env: TOXENV=spell,docs
+#    name: "Build documentation"
   - stage: Deploy-to-staging-environment
     name: "Upload the package to the testpypi (index) server"
     python: '3.8'
