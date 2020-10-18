@@ -9,7 +9,9 @@ SETUP_CFG = os.path.join(my_dir, '../', setup_cfg_filename)
 
 
 def main():
-    """Get the package version string provided that the developer has setup indication how to find it."""
+    """Get the package version string provided that the developer has setup indication how to find it. Reads the
+    [semantic_release] section found in setup.cfg and then determines where is the actual version string
+    """
     # Automatically compute package vesion from the [semantic_release] section in setup.cfg
     with open(SETUP_CFG, 'r') as f:
         regex = r"\[semantic_release\][\w\s=/\.:\d]+version_variable[\ \t]*=[\ \t]*([\w\.]+(?:/[\w\.]+)*):(\w+)"
