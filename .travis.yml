@@ -10,7 +10,8 @@ env:
     - secure: p4\/GxB\+E5BvcMDH0e0zztxDA\/vHBFnyAfjvjMXo6hEqVZ4nsSMHulfk3D05d545aL8bVW8puv9h9eb\/ULyart8tOK\/cP5HrfTMV0zS5CYaSdRjfUNArnHqu\/PuS7\+dwC2jm0pJ6kYCEg6QZkT4NMxhOT984CVWKkYSnJeOePqPQGn3o\/mWESwjpCTit1uyLIcMdyjfTVNWm0aYj5YlBbjwzLwyQebJQpovvU8rRpSAycHFufnDNWEoeuNpazTM017pLZ8Iy9mfB2p8IqONFJFgNdTxBq9DQDAQFcVFtNv7vsICVRswfpDNvGvWzHir7n4xolEfscH8pW3\/4lAGmWeFZR\+LGBnxVxNDJb52kbhri1Fe2b\/5NXM\+NSN5uR0bk9lD7sLJIdI4AV7nv4MTGtbZVuQw\+oIiYMuaO7H9Ayq83VaOAVULynNKlhUWR7t52BqLZxU2MgK9Y4rLzr9ljkBK5lAGjUlZRnHXJU\+N\+fNAVS39i71KbI5pH6t1v05bz6A0Cl4VckystiH1eLYQN5bnJh4eNeQN3\/cJRjPXDE3B55iIEjGmKLinpDVmXQdrf9UK239AYdLztUKty9k7wwTTEoMjxHWCv0AiVBvF\+LhrtScgAAv9MpT4s1zNuFmuZU1VOVJ32XTf\+4NGm1YJKzU5zf5wikDFtUAuAm8aIPwvI=
 
 before_install:
-  - sudo apt-get --yes install git make cmake build-essential libboost-all-dev libblas-dev liblapack-dev
+#  - sudo apt-get --yes install git make cmake build-essential libboost-all-dev libblas-dev liblapack-dev
+  - sudo apt-get --yes install make cmake build-essential gfortran
   - python --version
   - pip --version
   - uname -a
