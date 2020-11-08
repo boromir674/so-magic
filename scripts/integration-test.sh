@@ -34,7 +34,7 @@ set -e
 which conda
 
 echo '------------ CREATING ENV -------------'
-conda create -p $ENV_PATH -y
+conda create -p $ENV_PATH -y python=3.7
 
 printf "\n ---- SOURCING ----\n"
 source "$HOME/miniconda/etc/profile.d/conda.sh"
@@ -53,6 +53,9 @@ conda info -a
 echo '------------ ACTIVATING ENV -------------'
 conda activate $ENV_PATH
 
+echo '------------ INSTALLING DEPS -------------'
+sudo apt-get install --yes gcc gfortran python-dev liblapack-dev cython libblas-dev
+#sudo apt-get install --yes python3-scipy
 echo '------------ INSTALLING PYTHON DEPS -------------'
 python -m pip install -U pip
 python -m pip install -U wheel
