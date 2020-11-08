@@ -18,13 +18,20 @@ wget https://repo.continuum.io/miniconda/Miniconda$MINICONDA_VERSION-latest-Linu
 
 printf "\n ---- RUNNING mioniconda.sh ----\n"
 
+
+# determine $HOME according to running machine/server
+if [[ "$CIRCLECI" == "true" ]]; then
+  HOME=/home/circleci
+fi
+
 # shellcheck disable=SC2116
 if [[ $(echo "$HOME") ]]; then
-  echo "\$HOME variable is populated, so probably we are running on a 'local' machine";
+  echo "\$HOME variable is populated.";
 else
   HOME=/home/travis
   echo "Assuming we are running on travis CI; setting variable HOME=$HOME"
 fi
+
 
 bash miniconda.sh -b -p "$HOME/miniconda"
 

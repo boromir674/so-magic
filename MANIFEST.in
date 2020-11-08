@@ -10,6 +10,7 @@ include tests/dts/unittest-dataset-clean.pk
 recursive-include tests *.py
 
 include .travis.yml
+include .circleci/config.yml
 
 include appveyor.yml
 include bandit.yml
@@ -20,6 +21,7 @@ include .appveyor/appveyor-with-compiler.cmd
 
 include .coveragerc
 include tox.ini
+include tox-dev.ini
 
 recursive-include requirements *.txt
 recursive-include src *.py

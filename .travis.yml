@@ -56,7 +56,7 @@ jobs:
     name: "Upload the package to the testpypi (index) server"
     python: '3.8'
     script:
-      - tox -e deploy-pypi -vv
+      - tox -c tox-dev.ini -e deploy-pypi -vv
     after_success: skip
   - stage: Integration-test-using-staging
     name: "Emulated a real-world-scenario by installing the package from the testpypi and running the unittests against the installation"
