@@ -8,26 +8,30 @@ A python library providing with an elegant interface (API) to infer models of th
 
 .. start-badges
 
-|travis| |appveyor| |codacy_coverage| |docs| |better_code_hub| |codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
+|circleci| |travis| |appveyor| |codacy_coverage| |docs| |better_code_hub| |codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
 
 
-.. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=dev
+.. |circleci| image:: https://circleci.com/gh/boromir674/so-magic/tree/master.svg?style=shield
+    :alt: CircleCI Build Status
+    :target: https://circleci.com/gh/boromir674/so-magic/tree/master
+
+.. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=master
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/boromir674/so-magic
 
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/6u04abdkt9ou802l/branch/dev?svg=true
+.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/6u04abdkt9ou802l/branch/master?svg=true
     :alt: Appveyor Build Status
-    :target: https://ci.appveyor.com/project/boromir674/so-magic/branch/dev
+    :target: https://ci.appveyor.com/project/boromir674/so-magic/branch/master
     
 .. |codacy_coverage| image:: https://app.codacy.com/project/badge/Coverage/3c5b20d36ce94865b704e589b89204d4
     :alt: Codacy code coverage
     :target: https://www.codacy.com/manual/boromir674/so-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Coverage
 
-.. |docs| image:: https://readthedocs.org/projects/so-magic/badge/?version=dev
-    :target: https://so-magic.readthedocs.io/en/latest/?badge=dev
+.. |docs| image:: https://readthedocs.org/projects/so-magic/badge/?version=master
+    :target: https://so-magic.readthedocs.io/en/latest/?badge=master
     :alt: Documentation Status
 
-.. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=dev
+.. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=master
     :alt: Better Code Hub
     :target: https://bettercodehub.com/
 
@@ -35,14 +39,14 @@ A python library providing with an elegant interface (API) to infer models of th
     :alt: Codacy Code quality
     :target: https://www.codacy.com/manual/boromir674/so-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Grade
 
-.. |scrutinizer_code_quality| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/quality-score.png?b=dev
+.. |scrutinizer_code_quality| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/quality-score.png?b=master
     :alt: Code Quality
-    :target: https://scrutinizer-ci.com/g/boromir674/so-magic/?branch=dev
+    :target: https://scrutinizer-ci.com/g/boromir674/so-magic/?branch=master
 
-.. |code_intelligence_status| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/code-intelligence.svg?b=dev
+.. |code_intelligence_status| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/code-intelligence.svg?b=master
     :alt: Code Intelligence
     :target: https://scrutinizer-ci.com/code-intelligence
 
-.. |codecov| image:: https://codecov.io/gh/boromir674/so-magic/branch/dev/graph/badge.svg
+.. |codecov| image:: https://codecov.io/gh/boromir674/so-magic/branch/master/graph/badge.svg
     :alt: Codecov.io code coverage
     :target: https://codecov.io/gh/boromir674/so-magic
