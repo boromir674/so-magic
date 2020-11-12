@@ -1,3 +1,18 @@
+0.3.14 (2019-11-12)
+-------------------
+
+Changes
+^^^^^^^
+
+test
+""""
+- automated integration test involving the staging server
+
+ci
+""
+- Continuous Integration & Continuous Deployment on CircleCI server
+
+
 0.3.0 (2019-11-03)
 ------------------
 Changes
@@ -17,5 +32,5 @@ documentation
 
 ci
 ""
-- do not report assert statements "errors" to avoid fale positives found in unit-test code
+- do not report assert statements "errors" to avoid false positives found in unit-test code
 - autoprovision tox-conda to install somoclu dependency and wrap the train function
