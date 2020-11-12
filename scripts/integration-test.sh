@@ -37,7 +37,14 @@ echo '------------ CREATING ENV -------------'
 conda create -p $ENV_PATH -y python=3.7
 
 printf "\n ---- SOURCING ----\n"
-source "$HOME/miniconda/etc/profile.d/conda.sh"
+FILE_TO_SOURCE="$HOME/miniconda/etc/profile.d/conda.sh"
+if [[ ! -f $FILE_TO_SOURCE ]]; then
+  # file does not exist
+  # we try our luck with this simple workaround
+  source "$HOME/miniconda3/etc/profile.d/conda.sh"
+else
+  source "$HOME/miniconda/etc/profile.d/conda.sh"
+fi
 
 printf "\n ---- HASHING ----\n"
 hash -r
@@ -54,7 +61,11 @@ echo '------------ ACTIVATING ENV -------------'
 conda activate $ENV_PATH
 
 echo '------------ INSTALLING DEPS -------------'
-sudo apt-get install --yes gcc gfortran python-dev liblapack-dev cython libblas-dev
+if [[ $(uname -s) == Darwin ]]; then  # we are on macOS
+  echo "We are on macOS: skipping apt-get install command"
+else  # we assume we are on linux
+  sudo apt-get install --yes gcc gfortran python-dev liblapack-dev cython libblas-dev
+fi
 #sudo apt-get install --yes python3-scipy
 echo '------------ INSTALLING PYTHON DEPS -------------'
 python -m pip install -U pip
@@ -72,5 +83,6 @@ python -c 'import so_magic'
 echo "Successfully installed the library emnulating the real 'pip install' scenario using the test-pypi server."
 
 python -m pytest $MY_DIR/../tests -vv --cov
+echo "Successfully installed ran the test suite (unit-tests) that are bundled with the distribution (package) against the 'so-magic' library installed in the system"
 
 echo "SUCCESS!!!"
