@@ -2,15 +2,37 @@
 
 set -e
 
-if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-  wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+python_version=$(python -c 'import sys; print(".".join(str(_) for _ in sys.version_info[:2]))')
+
+if [[ $python_version == "2.7" ]]; then
+  echo "Using legacy Python 2.7";
+  MINICONDA_VERSION=2;
 else
-  wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  echo "Not Python 2.7, so should be Python 3";
+  MINICONDA_VERSION=3;
 fi
+
+echo "MINICONDA version: $MINICONDA_VERSION"
+
+wget https://repo.continuum.io/miniconda/Miniconda$MINICONDA_VERSION-latest-Linux-x86_64.sh -O miniconda.sh;
 
 printf "\n ---- RUNNING mioniconda.sh ----\n"
 
-HOME=/home/travis
+
+# determine $HOME according to running machine/server
+if [[ "$CIRCLECI" == "true" ]]; then
+  HOME=/home/circleci
+fi
+
+# shellcheck disable=SC2116
+if [[ $(echo "$HOME") ]]; then
+  echo "\$HOME variable is populated.";
+else
+  HOME=/home/travis
+  echo "Assuming we are running on travis CI; setting variable HOME=$HOME"
+fi
+
+
 bash miniconda.sh -b -p "$HOME/miniconda"
 
 printf "\n ---- SOURCING ----\n"
