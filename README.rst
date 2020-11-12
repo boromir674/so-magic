@@ -8,8 +8,12 @@ A python library providing with an elegant interface (API) to infer models of th
 
 .. start-badges
 
-|travis| |appveyor| |codacy_coverage| |docs| |better_code_hub| |codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
+|circleci| |travis| |appveyor| |codacy_coverage| |docs| |better_code_hub| |codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
 
+
+.. |circleci| image:: https://circleci.com/gh/boromir674/so-magic/tree/dev.svg?style=shield
+    :alt: CircleCI Build Status
+    :target: https://circleci.com/gh/boromir674/so-magic/tree/dev
 
 .. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=dev
     :alt: Travis-CI Build Status
