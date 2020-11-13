@@ -1,3 +1,14 @@
+0.3.16 (2019-11-13)
+-------------------
+
+Changes
+^^^^^^^
+
+ci
+""
+- travis-ci.org jobs: fix 'deploy-to-staging' & optimize 'documention-building' related jobs
+
+
 0.3.15 (2019-11-12)
 -------------------
 
