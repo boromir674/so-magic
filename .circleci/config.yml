@@ -67,6 +67,7 @@ jobs:
   send-coverage-to-codecov:
     executor: py37-docker-image
     steps:
+      - checkout
       - attach_workspace:
           at: .
       - run:
