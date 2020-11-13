@@ -18,6 +18,8 @@ before_install:
   - lsb_release -a
   - sudo python -m pip install -U pip
   - python -m pip install tox
+
+install:
   - chmod +x scripts/install_anaconda.sh
   - scripts/install_anaconda.sh
   - export CONDA_EXE=/home/travis/miniconda/bin/conda
@@ -27,7 +29,7 @@ script:
   - tox -vv
 
 after_success:
-  - tox -e report,codecov
+  - tox -c tox-dev.ini -e report,report-format,codecov
   - sudo apt-get install jq
   - curl -LSs "$(curl -LSs https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets | map({name, browser_download_url} | select(.name | endswith(".jar"))) | .[0].browser_download_url')" -o codacy-coverage-reporter-assembly.jar
   - java -jar codacy-coverage-reporter-assembly.jar report -l Python -r coverage.xml
@@ -55,8 +57,10 @@ jobs:
   - stage: Deploy-to-staging-environment
     name: "Upload the package to the testpypi (index) server"
     python: '3.8'
+    install:
+      - echo "No dependencies to install"
     script:
-      - tox -c tox-dev.ini -e deploy-pypi -vv
+      - tox -c tox-dev.ini -e deploy-final -vv
     after_success: skip
   - stage: Integration-test-using-staging
     name: "Emulated a real-world-scenario by installing the package from the testpypi and running the unittests against the installation"
