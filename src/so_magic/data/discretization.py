@@ -67,6 +67,7 @@ class BaseBinner(BinnerInterface):
 
 
 class BinnerFactory:
+    subclasses = {}
     @classmethod
     def register_as_subclass(cls, backend_type):
         def wrapper(subclass):
