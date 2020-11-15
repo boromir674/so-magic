@@ -1,6 +1,6 @@
 include README.rst
 include CHANGELOG.rst
-include LICENSE.txt
+include LICENSE
 
 include tests/dts/sample-strains.jl
 include tests/dts/sample-strains-colapsed.jl
