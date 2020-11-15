@@ -10,6 +10,5 @@ regex==2020.7.14
 scikit-learn==0.23.2
 scipy==1.5.1
 six==1.15.0
-somoclu==1.7.5
 threadpoolctl==2.1.0
 tqdm==4.47.0
