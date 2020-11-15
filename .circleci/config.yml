@@ -75,6 +75,8 @@ jobs:
             java -jar codacy-coverage-reporter-assembly.jar report -l Python -r coverage.xml
   build-documentation:
     executor: py37-docker-image
+    environment:
+      CONDA_EXE: /home/circleci/miniconda/bin/conda
     steps:
       - checkout
       - run:
