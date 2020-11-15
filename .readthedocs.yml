@@ -25,5 +25,5 @@ python:
   version: 3.7
   install:
     - requirements: requirements/base.txt
-#    - requirements: requirements/docs.txt
+    - requirements: requirements/docs.txt
 #    - requirements: requirements/somoclu.txt
