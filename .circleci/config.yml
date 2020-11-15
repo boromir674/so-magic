@@ -42,11 +42,8 @@ jobs:
       - store_artifacts:
           path: .coverage
       - run:
-          name: Transform test results data into xml
-          command: python -m tox -c tox-dev.ini -e report -- coverage xml
-      - run:
-          name: Transform test results-data into html-formatted reports
-          command: python -m tox -c tox-dev.ini -e report -- coverage html
+          name: Transform test results into 2 formats; html & xml
+          command: python -m tox -c tox-dev.ini -e format-report
       - store_artifacts:
           path: coverage.xml
       - store_artifacts:
@@ -78,8 +75,15 @@ jobs:
             java -jar codacy-coverage-reporter-assembly.jar report -l Python -r coverage.xml
   build-documentation:
     executor: py37-docker-image
+    environment:
+      CONDA_EXE: /home/circleci/miniconda/bin/conda
     steps:
       - checkout
+      - run:
+          name: Equip machine with anaconda (conda executable)
+          command: |
+            chmod +x scripts/install_anaconda.sh
+            scripts/install_anaconda.sh
       - run:
           name: Equip machine with tox automation tool
           command: python -m pip install --user tox
@@ -87,8 +91,8 @@ jobs:
           name: Install dependencies of documentation building tools
           command: sudo apt-get install python-enchant
       - run:
-          name: Install & run documentation building tools
-          command: python -m tox -c tox-dev.ini -e spell,docs
+          name: Run documentation building tools
+          command: python -m tox -e docs
 
   deploy-to-staging:
     executor: py37-docker-image
@@ -101,7 +105,7 @@ jobs:
           command: python -m pip install --user tox
       - run:
           name: Deploy package (source distro & wheel) to 'testpypi' (index) server
-          command: python -m tox -c tox-dev.ini -e deploy-final -vv
+          command: python -m tox -c tox-dev.ini -e deploy -vv
 
   integration-test:
     executor: py37-docker-image

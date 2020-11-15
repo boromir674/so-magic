@@ -5,6 +5,7 @@ from data.discretization import BaseBinner, BinnerFactory
 
 
 class BasePDBinner(BaseBinner, ABC):
+    subclasses = {}
 
     @classmethod
     def register_as_subclass(cls, binner_type):
@@ -20,13 +21,13 @@ class BasePDBinner(BaseBinner, ABC):
         return cls.subclasses[binner_type](*args, **kwargs)
 
 
-@BaseDFBinner.register_as_subclass('same-length')
+@BasePDBinner.register_as_subclass('same-length')
 class DFSameLengthBinning(BasePDBinner):
 
     def bin(self, values, nb_bins):
         return pd.cut(values, nb_bins)
 
-@BaseDFBinner.register_as_subclass('quantisized')
+@BasePDBinner.register_as_subclass('quantisized')
 class DFQBinning(BasePDBinner):
 
     def bin(self, values, nb_bins):

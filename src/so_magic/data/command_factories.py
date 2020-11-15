@@ -111,7 +111,9 @@ class CommandFactory:
 
     @classmethod
     def create(cls, *args, **kwargs) -> Command:
-        """Call to create a new Command object. The input arguments can be in two formats:
+        """Create a new instance of a Command object.
+
+        The input arguments can be in two formats:
 
         1. create(an_object, method, *arguments)
         In this case the command is of the form an_object.method(*arguments)

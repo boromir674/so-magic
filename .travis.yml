@@ -50,9 +50,9 @@ jobs:
     env: TOXENV=check
     name: "Check source distribution"
   - stage: Build docs
-    install:
+    script:
       - sudo apt-get install python-enchant
-    script: tox -c tox-dev.ini -e spell,docs
+      - tox -e docs
     name: "Build documentation"
   - stage: Deploy-to-staging-environment
     name: "Upload the package to the testpypi (index) server"
@@ -60,7 +60,7 @@ jobs:
     install:
       - echo "No dependencies to install"
     script:
-      - tox -c tox-dev.ini -e deploy-final -vv
+      - tox -c tox-dev.ini -e deploy -vv
     after_success: skip
   - stage: Integration-test-using-staging
     name: "Emulated a real-world-scenario by installing the package from the testpypi and running the unittests against the installation"
