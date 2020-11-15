@@ -10,7 +10,7 @@ class AbstractFeatureFactory(ABC):
 
 
 class FeatureFactory(AbstractFeatureFactory):
-
+    subclasses = {}
     @classmethod
     def register_as_subclass(cls, backend_type):
         def wrapper(subclass):
