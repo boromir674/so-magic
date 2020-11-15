@@ -1,3 +1,23 @@
+0.4.0 (2019-11-15)
+------------------
+
+Changes
+^^^^^^^
+
+feature
+"""""""
+- library documentation on https://so-magic.readthedocs.io/
+- write installation guide for Linux & macOS
+
+documentation
+"""""""""""""
+- add introduction, installation and API reference (with autodoc & sphinx-apidoc)
+
+ci
+""
+- add configuration for automatically building and hosting the documentation on readthedocs.org
+
+
 0.3.16 (2019-11-13)
 -------------------
 
