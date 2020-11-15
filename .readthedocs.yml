@@ -26,4 +26,4 @@ python:
   install:
     - requirements: requirements/base.txt
     - requirements: requirements/docs.txt
-#    - requirements: requirements/somoclu.txt
+    - requirements: requirements/somoclu.txt
