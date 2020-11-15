@@ -30,3 +30,7 @@ python:
     - requirements: requirements/rtd.txt
     - method: pip
       path: .
+
+# TODO remove requirements/rtd.txt
+# install above first requirements/base.txt then requirements/dev.txt
+# and then investigate the effect of doing pip install somoclu

@@ -13,7 +13,7 @@ my_dir = os.path.dirname(os.path.realpath(__file__))
 project_slug = 'so-magic'
 changelog_filename = 'CHANGELOG.rst'
 source_code_repo = f'https://github.com/boromir674/{project_slug}'
-changelog = f'{source_code_repo}/blob/dev/CHANGELOG.rst'
+changelog = f'{source_code_repo}/blob/master/CHANGELOG.rst'
 
 
 def run(cmd):
@@ -40,13 +40,29 @@ setup(
     name=project_slug,
     version=_version,
     long_description_content_type='text/x-rst',
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'Natural Language :: English',
+        'Operating System :: POSIX :: Linux',
+        'Operating System :: MacOS',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+        'Topic :: Scientific/Engineering :: Visualization',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+    ],
     test_suite='tests',
-    install_requires=['attrs', 'numpy', 'scikit-learn', 'pandas', 'somoclu'],
     project_urls=OrderedDict([
         ('Issue Tracker', f'{source_code_repo}/issues'),
         ('Changelog', changelog),
         ('Source', source_code_repo),
-        ('Documentation', f'https://{project_slug}.readthedocs.io/en/dev/'), # "https://blahblah.readthedocs.io/en/v{}/".format(_version)
+        ('Documentation', f'https://{project_slug}.readthedocs.io/'), # "https://blahblah.readthedocs.io/en/v{}/".format(_version)
     ]),
     download_url=f'https://github.com/boromir674/so-magic/archive/v{_version}.tar.gz',  # help easy_install do its tricks
     # extras_require={},
