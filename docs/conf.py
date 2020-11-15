@@ -68,4 +68,18 @@ if not on_rtd:  # only set the theme if we're building docs locally
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-sys.path.insert(0, os.path.abspath('../src/so_magic'))
+
+### External Links Configuration ###
+# provided by the sphinx.ext.extlinks extension
+
+# With the current settings (see the mapping below), you can for example use the directive :issue:`50`, which will
+# render a link with text 'issue 50' which upon clicking redirects to https://github.com/peterwittek/somoclu/issues/50
+
+# Mapping of link identifiers/keys to:
+# 2-length tuples with 1st item the url and 2nd the prefix (the "text string")
+extlinks = {
+    'issue': (
+        'https://github.com/peterwittek/somoclu/issues/%s',
+        'issue '
+    ),
+}
