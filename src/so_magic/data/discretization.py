@@ -16,7 +16,7 @@ class AbstractDiscretizer(DiscretizerInterface):
 @attr.s
 class BaseDiscretizer(AbstractDiscretizer):
     binner = attr.ib(init=True)
-    @bin.validator
+    @binner.validator
     def validate_bin_function(self, attribute, value):
         if not callable(value):
             raise ValueError(f'Expected a callable object, instead a {type(value).__name__} was given.')
@@ -67,6 +67,7 @@ class BaseBinner(BinnerInterface):
 
 
 class BinnerFactory:
+    subclasses = {}
     @classmethod
     def register_as_subclass(cls, backend_type):
         def wrapper(subclass):

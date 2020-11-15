@@ -3,8 +3,8 @@ import re
 
 # CONSTANSTS
 my_dir = os.path.dirname(os.path.realpath(__file__))
-repo_root = os.path.join(my_dir, '../')
-CONF_PY = os.path.join(my_dir, '../docs', 'conf.py')
+REPO_ROOT = os.path.join(my_dir, '..')
+CONF_PY = os.path.join(REPO_ROOT, 'docs', 'conf.py')
 
 ## CONFIG
 # 1. Automatic extensions registration
@@ -14,7 +14,7 @@ EXTENSIONS = [
     'sphinx.ext.napoleon',  # enable support for google and numpy format for autodoc
 ]
 # 2. Automatic parsing of software release version
-CONFIG_INI = os.path.join(repo_root, 'setup.cfg')
+CONFIG_INI = os.path.join(REPO_ROOT, 'setup.cfg')
 SECTION = 'semantic_release'
 FIELD = 'version_variable'
 # 3. Automatic updating $PATH to enable working with autodoc
@@ -41,7 +41,7 @@ def get_version_string(config_file, section, field):
         regex = r"\[semantic_release\][\w\s=/\.:\d]+version_variable[\ \t]*=[\ \t]*([\w\.]+(?:/[\w\.]+)*):(\w+)"
         m = re.search(regex, f.read(), re.MULTILINE)
         if m:
-            target_file = os.path.join(repo_root, m.group(1))
+            target_file = os.path.join(REPO_ROOT, m.group(1))
             target_string = m.group(2)
         else:
             raise RuntimeError(
