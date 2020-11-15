@@ -3,7 +3,8 @@
 VERSION_OF_INTEREST=$1
 
 MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-ENV_NAME="integration-env"
+# TODO dynamically decide on environment name
+ENV_NAME="integration-env-5"
 ENV_PATH=$MY_DIR/../$ENV_NAME
 
 if [[ $(echo "$HOME") ]]; then
@@ -34,6 +35,9 @@ set -e
 which conda
 
 echo '------------ CREATING ENV -------------'
+# TODO check if environment with path ENV_PATH exists in the list of conda environments
+# if yes than do not create an environment with the -p flag
+# if no use the beloow command
 conda create -p $ENV_PATH -y python=3.7
 
 printf "\n ---- SOURCING ----\n"
@@ -58,7 +62,11 @@ conda info -a
 
 
 echo '------------ ACTIVATING ENV -------------'
+# TODO check if environment with path ENV_PATH exists in the list of conda environments
+# if yes then do 'conda create'
+# if no then do 'conda activate $ENV_PATH'
 conda activate $ENV_PATH
+#conda activate
 
 echo '------------ INSTALLING DEPS -------------'
 if [[ $(uname -s) == Darwin ]]; then  # we are on macOS
@@ -71,17 +79,25 @@ echo '------------ INSTALLING PYTHON DEPS -------------'
 python -m pip install -U pip
 python -m pip install -U wheel
 conda install somoclu --channel conda-forge
+
+# TODO
+# If we install from testpypi then absolutely install the base and dev requirements
+# if we are installing from pypi experiment with both options both locally and on ci and then decide on code
 python -m pip install -r requirements/base.txt
 python -m pip install -r requirements/dev.txt
+
 echo '------------ INSTALLING SO_MAGIC FROM TEST-PYPI -------------'
 # use the --no-deps flag, because test pypi absolutely not guarantees that it can satisfy dependencies by
 # looking for the packages in the index, simply because they might not exist
+
+# TODO dynamically decide to use pypi or testpypi
 python -m pip install --index-url https://test.pypi.org/simple/ --no-deps so_magic==$VERSION_OF_INTEREST
+#python -m pip install so_magic==$VERSION_OF_INTEREST
 
 python -c 'import so_magic'
 
 echo "Successfully installed the library emnulating the real 'pip install' scenario using the test-pypi server."
-
+python -m pip install pytest pytest-cov
 python -m pytest $MY_DIR/../tests -vv --cov
 echo "Successfully installed ran the test suite (unit-tests) that are bundled with the distribution (package) against the 'so-magic' library installed in the system"
 
