@@ -27,3 +27,5 @@ python:
     - requirements: requirements/base.txt
     - requirements: requirements/docs.txt
     - requirements: requirements/somoclu.txt
+    - method: pip
+        path: .
