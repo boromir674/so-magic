@@ -20,14 +20,6 @@ so\_magic.data.backend.panda\_handling.df\_discretization module
    :undoc-members:
    :show-inheritance:
 
-so\_magic.data.backend.panda\_handling.df\_encoding module
-----------------------------------------------------------
-
-.. automodule:: so_magic.data.backend.panda_handling.df_encoding
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 so\_magic.data.backend.panda\_handling.df\_feature\_factory module
 ------------------------------------------------------------------
 
