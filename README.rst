@@ -63,9 +63,9 @@ A python library providing with an elegant interface (API) to infer models of th
     :alt: Supported Python versions
     :target: https://pypi.org/project/so-magic
 
-.. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.4.3.svg
+.. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.4.4.svg
     :alt: Commits since latest release
-    :target: https://github.com/boromir674/so-magic/compare/v0.4.3..master
+    :target: https://github.com/boromir674/so-magic/compare/v0.4.4..master
 
 To read more about the library (installation guide, features, how-to-use, etc)
 please read further in the So Magic documentation in https://so-magic.readthedocs.io/.
