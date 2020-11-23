@@ -21,8 +21,7 @@ class Mediator(ABC):
 
 
 class GenericMediator(Mediator, metaclass=ABCMeta):
-    """Abstract Mediator class that automatically configures components received as *args through the constructor.
-    """
+    """Abstract Mediator class that automatically configures components received as \*args through the constructor."""
     def __new__(cls, *components, **kwargs):
         x = super().__new__(cls)
         for i, component in enumerate(components):

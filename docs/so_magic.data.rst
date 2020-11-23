@@ -78,14 +78,6 @@ so\_magic.data.magic\_encoder module
    :undoc-members:
    :show-inheritance:
 
-so\_magic.data.receiver module
-------------------------------
-
-.. automodule:: so_magic.data.receiver
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 
 Module contents
 ---------------

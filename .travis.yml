@@ -52,7 +52,7 @@ jobs:
   - stage: Build docs
     script:
       - sudo apt-get install python-enchant
-      - tox -e docs
+      - tox -c tox-dev.ini -e docs-all
     name: "Build documentation"
   - stage: Deploy-to-staging-environment
     name: "Upload the package to the testpypi (index) server"

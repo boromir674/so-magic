@@ -2,8 +2,8 @@ include README.rst
 include CHANGELOG.rst
 include LICENSE
 
-include tests/dts/sample-strains.jl
-include tests/dts/sample-strains-colapsed.jl
+include tests/dts/sample-data.jsonlines
+include tests/dts/sample-data-collapsed.jsonlines
 include tests/dts/test-clean.pk
 include tests/dts/unittest-dataset-clean.pk
 
@@ -33,9 +33,11 @@ global-exclude *.py[cod] __pycache__ *.so *.dylib *.log
 recursive-include docs *.bat
 recursive-include docs *.py
 recursive-include docs *.rst
-recursive-include docs *.txt
+
+
 include docs/Makefile
 include docs/spelling_wordlist.txt
+
 
 include scripts/install_anaconda.sh
 include scripts/parse_package_version.py

@@ -1,3 +1,38 @@
+
+0.5.0 (2021-04-22)
+-------------------
+
+feature
+"""""""
+- add __name__ & __doc__ attributes to newly registered phis created out of class
+- automatically discover the commands definitions and build prototype commands
+
+test
+""""
+- assert that instantiation from Observer is not allowed, since it is an interface
+
+documentation
+"""""""""""""
+- fix warnings of phi module and test the example code by running it in a doctest session
+- document the purpose of the backend module (defines data_engine_wrapper)
+- fix word spelling, eliminate docs build command warnings
+- document the purpose of the phi.py module, being to officially register new phi functions
+- document purpose of magic_datapoints_factory and the Interfaces related to table-like data
+- document the purpose of the TabularDataInterface
+- document the purpose of the DatapointsManager class
+- add 'quickstart' section and restructure utils
+
+ci
+""
+- pass the .git directory to the send-test-to-codecov job
+- define job to send coverage to codecov.io and run it on every commit
+- add the --cov and --cov-report=term-missing cli arguments to the dev-cov command
+- document the 'graphs' env that creates visualization(s) of the Python dependencies
+- manually install the py package before trasforming the test results into html & xml
+- add 2 tox test envs that run tests against the code by using a development setup
+- inform where to find the built html-based documentation index.html
+
+
 0.4.4 (2019-11-16)
 ------------------
 - minor fix

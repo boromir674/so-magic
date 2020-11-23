@@ -33,7 +33,8 @@ jobs:
           name: Run unittests & measure code coverage
           command: |
             export CONDA_EXE=/home/circleci/miniconda/bin/conda
-            python -m tox -e clean,check,py37-cov
+            python -m tox -c tox-dev.ini -e clean
+            python -m tox -e check,py37-cov
       - store_test_results:  # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: test-results
       - store_artifacts:
@@ -42,8 +43,11 @@ jobs:
       - store_artifacts:
           path: .coverage
       - run:
+          name: Manually install the python py package
+          command: python -m pip install py
+      - run:
           name: Transform test results into 2 formats; html & xml
-          command: python -m tox -c tox-dev.ini -e format-report
+          command: python -m tox -c tox-dev.ini -e format-report -vv
       - store_artifacts:
           path: coverage.xml
       - store_artifacts:
@@ -59,6 +63,8 @@ jobs:
             - coverage.xml
             - .coverage
             - tox.ini
+            - tox-dev.ini
+            - .git
   
   send-coverage-to-codacy:
     executor: java15-docker-image
@@ -73,6 +79,22 @@ jobs:
             sudo apt-get install jq
             curl -LSs "$(curl -LSs https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets | map({name, browser_download_url} | select(.name | endswith(".jar"))) | .[0].browser_download_url')" -o codacy-coverage-reporter-assembly.jar
             java -jar codacy-coverage-reporter-assembly.jar report -l Python -r coverage.xml
+
+  send-coverage-to-codecov:
+    executor: ubuntu-1604-vm
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Download script that can upload to codecov.io
+          command: curl -s https://codecov.io/bash > .codecov
+      - run:
+          name: Grant execution permissions to the script
+          command: chmod +x .codecov
+      - run:
+          name: Upload the code coverage measurements to codecov.io, resulted from running the test suite (unit tests)
+          command: ./.codecov
+
   build-documentation:
     executor: py37-docker-image
     environment:
@@ -92,7 +114,7 @@ jobs:
           command: sudo apt-get install python-enchant
       - run:
           name: Run documentation building tools
-          command: python -m tox -e docs
+          command: python -m tox -e docs -vv
 
   deploy-to-staging:
     executor: py37-docker-image
@@ -105,7 +127,9 @@ jobs:
           command: python -m pip install --user tox
       - run:
           name: Deploy package (source distro & wheel) to 'testpypi' (index) server
-          command: python -m tox -c tox-dev.ini -e deploy -vv
+          command: |
+            export SO_MAGIC_RELEASE_VERSION=$(python scripts/parse_package_version.py)
+            python -m tox -c tox-dev.ini -e deploy -vv
 
   integration-test:
     executor: py37-docker-image
@@ -116,15 +140,6 @@ jobs:
           command: |
             chmod +x scripts/integration-test.sh
             scripts/integration-test.sh $(python scripts/parse_package_version.py)
-
-#  build_container:
-#    working_directory: ~/build
-#    executor: ubuntu-1604-vm
-#    steps:
-#      - checkout
-#      - run:
-#          name: Build container
-#          command: docker-compose up --build -d
 
   visualize_dependency_graphs:
     executor: py37-docker-image
@@ -156,7 +171,7 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - build-documentation:
+      - send-coverage-to-codecov:
           requires:
             - build_n_test
           filters:

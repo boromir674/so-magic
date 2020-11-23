@@ -1,36 +1,38 @@
-from so_magic.data.dataset import BroadcastingDatapointsFactory, DatapointsManager
-from so_magic.utils import Subject
+"""This module defines the Data Engine Wrapper as the Backend class which constructor can initialize Backend instances
+."""
+import attr
+from so_magic.data.magic_datapoints_factory import BroadcastingDatapointsFactory
+from so_magic.data.datapoints_manager import DatapointsManager
 
 
+@attr.s
 class Backend:
+    """Wrapper of a data engine, a datapoints manager and a datapoints factory.
+
+    Instances of this class act as data placeholders (aka data classes) and take at runtime a data engine (eg a set of
+    pandas-dependent implementations of the "Tabular Data interfaces" defined in so_magic.data.interfaces).
+
+    Args:
+        engine_instance (DataEngine): a data engine represented as a class object (eg class MyClass: pass)
     """
-        Args:
-            engine (DataEngine): a data engine represented as a class object (eg class MyClass: pass)
-    """
-    def __init__(self, engine):
-        self._engine = engine
-        self.datapoints_manager = DatapointsManager()
-        self.datapoints_factory = BroadcastingDatapointsFactory(Subject([]))
+    engine_instance = attr.ib(init=True)
+    datapoints_manager = attr.ib(init=False, default=attr.Factory(DatapointsManager))
+    datapoints_factory = attr.ib(init=True, default=attr.Factory(BroadcastingDatapointsFactory))
 
     @property
     def engine(self):
-        return self._engine
+        """The Data Engine instance, that this object wraps around.
+
+        Returns:
+            DataEngine: the Data Engine instance object
+        """
+        return self.engine_instance
 
     @engine.setter
     def engine(self, engine):
-        self._engine = engine
+        """Set the Data Engine instance to the input engine object.
 
-    subclasses = {}
-
-    @classmethod
-    def register_as_subclass(cls, backend_type):
-        def wrapper(subclass):
-            cls.subclasses[backend_type] = subclass
-            return subclass
-        return wrapper
-
-    @classmethod
-    def create(cls, backend_type, *args, **kwargs):
-        if backend_type not in cls.subclasses:
-            raise ValueError(f"Request Backend of type '{backend_type}'; supported are [{', '.join(sorted(cls.subclasses.keys()))}]")
-        return cls.subclasses[backend_type](*args, **kwargs)
+        Args:
+            engine (DataEngine): the Data Engine object to set with
+        """
+        self.engine_instance = engine
