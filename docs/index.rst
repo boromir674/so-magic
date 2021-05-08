@@ -9,7 +9,6 @@ Welcome to so-magic's documentation!
    why_this_library
    usage/installation
    usage/quickstart
-   features
    modules
 
 

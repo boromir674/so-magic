@@ -16,11 +16,11 @@ def tests_data_root(tests_root_dir):
 
 @pytest.fixture
 def sample_json(tests_data_root):
-    return os.path.join(tests_data_root, 'sample-strains.jl')
+    return os.path.join(tests_data_root, 'sample-data.jsonlines')
 
 @pytest.fixture
 def sample_collaped_json(tests_data_root):
-    return os.path.join(tests_data_root, 'sample-strains-colapsed.jl')
+    return os.path.join(tests_data_root, 'sample-data-collapsed.jsonlines')
 
 
 @pytest.fixture()
@@ -51,8 +51,8 @@ def data_manager():
         cmd_fact = data_manager.backend.engine.command_factory
 
         # test 1
-        from so_magic.data.dataset import DatapointsFactory
-        from so_magic.data.command_factories import MagicCommandFactory
+        from so_magic.data.datapoints.datapoints import DatapointsFactory
+        from so_magic.data.backend.engine import MagicCommandFactory
 
         assert isinstance(datapoints_fact, DatapointsFactory)
         assert isinstance(cmd_fact, MagicCommandFactory)

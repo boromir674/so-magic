@@ -1,31 +1,44 @@
+"""Typical subject/observers pattern implementation. You can see this pattern 
+mentioned also as event/notification or broadcast/listeners.
+
+* Provides the Observer class, serving as the interface that needs to be implemented by concrete classes; the update method needs to be overrode. Concrete Observers react to the notifications/updates issued by the Subject they had been attached to.
+* Provides the Subject class, serving with mechanisms to subscribe/unsubscribe (attach/detach) observers and also with a method to "notify" all subscribers about events.
+
+"""
+
 from abc import ABC, abstractmethod
 from typing import List
 
 __all__ = ['Subject', 'Observer']
 
 
-class ObserverInterface(ABC):
-    """The Observer interface declares the update method, used by subjects. Whenever an 'event' happens the update
-    callback executes."""
+class Observer(ABC):
+    """The Observer interface declares the update method, used by subjects. 
+    
+    Enables objects to act as "event" listeners; react to "notifications" 
+    by executing specific handling logic.
+    """
     @abstractmethod
     def update(self, *args, **kwargs) -> None:
-        """Receive update from subject."""
+        """Receive an update (from a subject); handle an event notification."""
         raise NotImplementedError
 
 
 class SubjectInterface(ABC):
     """The Subject interface declares a set of methods for managing subscribers.
-    Use it to model objects as "subjects of observations" (notify observers/listeners/subscribers).
+    
+    Enables objects to act as "subjects of observations"; notify the 
+    subscribed observers/listeners.
     """
 
     @abstractmethod
-    def attach(self, observer: ObserverInterface) -> None:
-        """Attach an observer to the subject."""
+    def attach(self, observer: Observer) -> None:
+        """Attach an observer to the subject; subscribe the observer."""
         raise NotImplementedError
 
     @abstractmethod
-    def detach(self, observer: ObserverInterface) -> None:
-        """Detach an observer from the subject."""
+    def detach(self, observer: Observer) -> None:
+        """Detach an observer from the subject; unsubscribe the observer."""
         raise NotImplementedError
 
     @abstractmethod
@@ -35,8 +48,10 @@ class SubjectInterface(ABC):
 
 
 class Subject(SubjectInterface):
-    """The Subject owns some important state and notifies observers when the state changes. Both the _state and _observers
-    attributes can be overriden to accomodate for more complex scenarios."""
+    """The Subject owns some important state and can notify observers.
+    
+    Both the _state and _observers attributes can be overrode to accomodate for 
+    more complex scenarios."""
     def __new__(cls, *args, **kwargs):
         self_object = super().__new__(cls)
         self_object._observers = []  # type=List[ObserverInterface]
@@ -44,10 +59,11 @@ class Subject(SubjectInterface):
         return self_object
 
     def add(self, *observers):
+        """Subscribe multiple observers at once."""
         self._observers.extend([_ for _ in observers])
     """
-    List of subscribers. In real life, the list of subscribers can be stored
-    more comprehensively (categorized by event type, etc.).
+    List of subscribers. In more complex scenarios, the list of subscribers can 
+    be stored more comprehensively (categorized by event type, etc.).
     """
     @property
     def state(self):
@@ -57,10 +73,10 @@ class Subject(SubjectInterface):
     def state(self, state):
         self._state = state
 
-    def attach(self, observer: ObserverInterface) -> None:
+    def attach(self, observer: Observer) -> None:
         self._observers.append(observer)
 
-    def detach(self, observer: ObserverInterface) -> None:
+    def detach(self, observer: Observer) -> None:
         self._observers.remove(observer)
 
     """
@@ -71,11 +87,3 @@ class Subject(SubjectInterface):
         """Trigger an update in each subscriber/observer."""
         for observer in self._observers:
             observer.update(self)
-
-"""
-Concrete Observers react to the updates issued by the Subject they had been
-attached to.
-"""
-class Observer(ObserverInterface):
-    def update(self, subject: Subject) -> None:
-        pass

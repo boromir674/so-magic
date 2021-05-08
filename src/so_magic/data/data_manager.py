@@ -21,6 +21,7 @@ class DataMediator(GenericMediator):
 class Phis(ObjectRegistry, Observer):
     def __getattr__(self, item):
         return self.objects[item]
+
     def update(self, subject):
         self.add(subject.name, subject.state)
 

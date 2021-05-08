@@ -65,7 +65,7 @@ class SelfOrganizingMap:
             id2members[attributed_cluster].add(dataset[i].id)
 
     def datapoint_coordinates(self, index):
-        """Call this method to get the best-matching unit (bmu) coordinates of the datapoint indexed byt the input pointer.\n
+        """Call this method to get the best-matching unit (bmu) coordinates of the datapoint indexed by the input pointer.\n
         Bmu is simply the neuron on the som grid that is closest to the datapoint after being projected to the 2D space."""
         return self.som.bmus[index][0], self.som.bmus[index][1]
 

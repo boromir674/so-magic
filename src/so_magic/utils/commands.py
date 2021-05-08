@@ -1,36 +1,50 @@
-from abc import ABC, abstractmethod
 import copy
-from typing import List
+from abc import ABC, abstractmethod
 
 __all__ = ['Command', 'Invoker', 'CommandHistory', 'CommandInterface']
 
 
 class CommandInterface(ABC):
-    """A class implementing this interface can act as a standalone command, encapsulating all logic and data needed."""
+    """Standalone command, encapsulating all logic and data needed, required for execution."""
     @abstractmethod
     def execute(self) -> None:
-        """Call this method to execute the command.
-        """
+        """Execute the command; run the commands logic."""
         raise NotImplementedError
 
 class AbstractCommand(CommandInterface, ABC):
-    """An abstract implementation of the Command Interface. The assumption is that the command involves a 'reveiver' object
-    (of arbitrary type) acting as an 'oracle' on the application.
+    """An abstract implementation of the CommandInterface.
+    
+    The assumption is that the command involves a main 'receiver' object.
+    Commands of this type follow the receiver.method(*args) pattern/model.
+    The receiver object usually is commonly acting as an 'oracle' on the 
+    application or on the situation/context.
 
     Args:
-        receiver (object): an object that is actually executing/receiving the command; usually holds the callback function/code
+        receiver (object): usually holds the callback function/code with the business logic
     """
     def __init__(self, receiver):
         self._receiver = receiver
 
 
 class BaseCommand(AbstractCommand):
-    """A basic implementation of the Abstract Command. The assumption is that the command involves calling a method of the reveiver
-    using the user-provided function arguments. Use the optional args to provide the receiver's method runtime arguments.
+    """A concrete implementation of the Abstract Command.
+    
+    This command simply invokes a 'method' on the 'receiver'. When constructing 
+    instances of BaseCommand make sure you respect the 'method' signature. For
+    that, you can use the *args to provide the receiver's method arguments.
 
+    Intuitively, what happens is
+
+    .. code-block:: python
+        
+        receiver.method(*args)
+
+    and that is another way to show how the *args are passed to method
+    
     Args:
         receiver (object): an object that is actually executing/receiving the command; usually holds the callback function/code
         method (str): the name of the receiver's method to call (it has to be callable and to exist on the receiver)
+        *args: 
     """
     def __init__(self, receiver, method: str, *args):
         super().__init__(receiver)

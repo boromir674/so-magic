@@ -1,7 +1,7 @@
 
 
 def test_command_registrator():
-    from so_magic.data.command_factories import CommandRegistrator
+    from so_magic.data.backend.engine import CommandRegistrator
 
     class A(metaclass=CommandRegistrator): pass
     class B(metaclass=CommandRegistrator): pass

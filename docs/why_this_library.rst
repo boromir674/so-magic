@@ -9,7 +9,7 @@ providing with pre-built commands and also supporting user-made commands for per
 on "raw" data.
 
 Apart from the ability to train SOM models (using the "learning" algorithm) So Magic provides with hyper-parameter
-tuning given intrinsic and user-made extrinsic evalaution criteria.
+tuning given intrinsic and user-made extrinsic evaluation criteria.
 
 Another feature is the easy way to persist models parameters and/or model evaluation statistics.
 The library provides serialization and deserialization supporting JSON format.
