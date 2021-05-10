@@ -1,9 +1,12 @@
-"""Typical subject/observers pattern implementation. You can see this pattern 
+"""Typical subject/observers pattern implementation. You can see this pattern
 mentioned also as event/notification or broadcast/listeners.
 
-* Provides the Observer class, serving as the interface that needs to be implemented by concrete classes; the update method needs to be overrode. Concrete Observers react to the notifications/updates issued by the Subject they had been attached to.
-* Provides the Subject class, serving with mechanisms to subscribe/unsubscribe (attach/detach) observers and also with a method to "notify" all subscribers about events.
+Provides the Observer class, serving as the interface that needs to be implemented by concrete classes; the update
+method needs to be overrode. Concrete Observers react to the notifications/updates issued by the Subject they had been
+attached to.
 
+Provides the Subject class, serving with mechanisms to subscribe/unsubscribe (attach/detach) observers and also with a
+method to "notify" all subscribers about events.
 """
 
 from abc import ABC, abstractmethod
@@ -13,9 +16,9 @@ __all__ = ['Subject', 'Observer']
 
 
 class Observer(ABC):
-    """The Observer interface declares the update method, used by subjects. 
-    
-    Enables objects to act as "event" listeners; react to "notifications" 
+    """The Observer interface declares the update method, used by subjects.
+
+    Enables objects to act as "event" listeners; react to "notifications"
     by executing specific handling logic.
     """
     @abstractmethod
@@ -26,8 +29,8 @@ class Observer(ABC):
 
 class SubjectInterface(ABC):
     """The Subject interface declares a set of methods for managing subscribers.
-    
-    Enables objects to act as "subjects of observations"; notify the 
+
+    Enables objects to act as "subjects of observations"; notify the
     subscribed observers/listeners.
     """
 
@@ -49,22 +52,28 @@ class SubjectInterface(ABC):
 
 class Subject(SubjectInterface):
     """The Subject owns some important state and can notify observers.
-    
-    Both the _state and _observers attributes can be overrode to accomodate for 
-    more complex scenarios."""
+
+    Both the _state and _observers attributes have a simple implementation,
+    but can be overrode to accommodate for more complex scenarios.
+
+    The observers/subscribers are implemented as a python list.
+    In more complex scenarios, the list of subscribers can
+    be stored more comprehensively (categorized by event type, etc.).
+
+
+    The subscription management methods provided are 'attach' and 'detach'
+    to add or remove a subscriber respectively
+    """
     def __new__(cls, *args, **kwargs):
-        self_object = super().__new__(cls)
-        self_object._observers = []  # type=List[ObserverInterface]
-        self_object._state = None
-        return self_object
+        subject_object = super().__new__(cls)
+        subject_object._observers: List[Observer] = []
+        subject_object._state = None
+        return subject_object
 
     def add(self, *observers):
         """Subscribe multiple observers at once."""
-        self._observers.extend([_ for _ in observers])
-    """
-    List of subscribers. In more complex scenarios, the list of subscribers can 
-    be stored more comprehensively (categorized by event type, etc.).
-    """
+        self._observers.extend(list(observers))
+
     @property
     def state(self):
         return self._state
@@ -78,10 +87,6 @@ class Subject(SubjectInterface):
 
     def detach(self, observer: Observer) -> None:
         self._observers.remove(observer)
-
-    """
-    The subscription management methods.
-    """
 
     def notify(self) -> None:
         """Trigger an update in each subscriber/observer."""

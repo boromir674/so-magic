@@ -41,7 +41,7 @@ def init_data_manager(a_backend):
     def one_hot_encoding(_data_manager, _datapoints, _attribute):
         dataframe = OneHotEncoder().encode(_datapoints, _attribute)
         _data_manager.datapoints.observations = pd.concat([_data_manager.datapoints.observations, dataframe], axis=1)
-    
+
     
     @mega_cmd_factory.build_command_prototype()
     def select_variables(_data_manager, variables):

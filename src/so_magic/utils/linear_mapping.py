@@ -1,15 +1,28 @@
+"""This module exposes the MapOnLinearSpace class and the 'universal_constructor' method to create instances of it.
+Instances of MapOnLinearSpace can be used to project a number from one linear space to another."""
 import attr
+
 
 @attr.s
 class LinearScale:
+    """A numerical linear scale (range between 2 numbers) where numbers fall in between.
+
+    Raises:
+        ValueError: in case the lower bound is not smaller than the upper
+
+    Args:
+        lower_bound (int): the minimum value a number can take on the scale
+        upper_bound (int): the maximum value a number can take on the scale
+    """
+
     lower_bound = attr.ib(init=True, type=int)
     upper_bound = attr.ib(init=True, type=int)
 
     @upper_bound.validator
-    def __validate_scale(self, attribute, upper_bound):
+    def __validate_scale(self, _attribute, upper_bound):
         if upper_bound <= self.lower_bound:
-            raise ValueError(
-                f'The linear scale, should have lower_bound < upper_bound. Instead lower_bound={self.lower_bound}, upper_bound={upper_bound}')
+            raise ValueError('The linear scale, should have lower_bound < upper_bound.'
+                             f' Instead lower_bound={self.lower_bound}, upper_bound={upper_bound}')
 
     def __len__(self):
         """Returns 2, since the lower and upper bound values are sufficient to define a linear scale."""
@@ -17,11 +30,20 @@ class LinearScale:
 
     @classmethod
     def create(cls, two_element_list_like):
-        return LinearScale(*[_ for _ in two_element_list_like])
+        return LinearScale(*list(two_element_list_like))
 
 
 @attr.s
 class MapOnLinearSpace:
+    """Projection of a number from one linear scale to another.
+
+    Instances of this class can transform an input number and map it from an initial scale to a target scale.
+
+    Args:
+         _from_scale (LinearScale): the scale where the number is initially mapped
+         _target_scale (LinearScale): the (target) scale where the number should be finally transformed/mapped to
+         _reverse (bool): whether the target scale is inverted or not
+    """
     _from_scale = attr.ib(init=True, type=LinearScale)
     _target_scale = attr.ib(init=True, type=LinearScale)
     _reverse = attr.ib(init=True, default=False, type=bool)
@@ -35,12 +57,16 @@ class MapOnLinearSpace:
                                 reverse)
 
     def __transform_inverted(self, number):
-        # F(x) = { ( to_scale_min - to_scale_max ) * x + to_scale_max * from_scale_max - to_scale_min * from_scale_min }  / ( from_scale_max - from_scale_min )
-        return ( (self._target_scale.lower_bound - self._target_scale.upper_bound) * number + self._target_scale.upper_bound * self._from_scale.upper_bound - self._target_scale.lower_bound * self._from_scale.lower_bound ) / (
+        return ( (self._target_scale.lower_bound - self._target_scale.upper_bound) * number
+                 + self._target_scale.upper_bound * self._from_scale.upper_bound
+                 - self._target_scale.lower_bound * self._from_scale.lower_bound ) / (
                self._from_scale.upper_bound - self._from_scale.lower_bound)
 
     def __transform(self, number):
-        return ((self._target_scale.upper_bound - self._target_scale.lower_bound) * number + self._target_scale.lower_bound * self._from_scale.upper_bound - self._target_scale.lower_bound * self._from_scale.lower_bound) / (self._from_scale.upper_bound - self._from_scale.lower_bound)
+        return ((self._target_scale.upper_bound - self._target_scale.lower_bound) * number
+                + self._target_scale.lower_bound * self._from_scale.upper_bound
+                - self._target_scale.lower_bound * self._from_scale.lower_bound) / (
+                self._from_scale.upper_bound - self._from_scale.lower_bound)
 
     def _get_transform_callback(self):
         if self._reverse:

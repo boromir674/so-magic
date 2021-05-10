@@ -1,5 +1,4 @@
-"""This module defines the Data Engine Wrapper as the Backend class which constructor can initialize Backend instances
-."""
+"""Define a wrapper around an Engine as the Backend class which constructor can initialize Backend instances."""
 import attr
 from so_magic.data.magic_datapoints_factory import BroadcastingDatapointsFactory
 from so_magic.data.datapoints_manager import DatapointsManager

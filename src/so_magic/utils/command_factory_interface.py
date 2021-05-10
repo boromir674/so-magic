@@ -1,6 +1,6 @@
 """This module is responsible to define an interface to construct Command objects (instances of the Command class)."""
 from abc import ABC, abstractmethod
-from so_magic.utils import Command
+from .command_interface import CommandInterface
 
 
 class CommandFactoryInterface(ABC):
@@ -9,7 +9,7 @@ class CommandFactoryInterface(ABC):
     Classes implementing this interface define a way to construct (initialize) new Command objects (class instances).
     """
     @abstractmethod
-    def construct(self, *args, **kwargs) -> Command:
+    def construct(self, *args, **kwargs) -> CommandInterface:
         """Construct a new Command object (new class instance) that can be executed.
 
         Returns:
@@ -20,9 +20,9 @@ class CommandFactoryInterface(ABC):
 
 class CommandFactoryType(type):
     def __new__(mcs, *args, **kwargs):
-        x = super().__new__(mcs, *args, **kwargs)
-        x.subclasses = {}
-        return x
+        command_factory_type = super().__new__(mcs, *args, **kwargs)
+        command_factory_type.subclasses = {}
+        return command_factory_type
 
     def register_as_subclass(cls, factory_type):
         def wrapper(subclass):
