@@ -4,7 +4,6 @@ from so_magic.utils import Observer
 
 @attr.s
 class CommandsAccumulator(Observer):
-    """"""
     commands = attr.ib(init=False, default={})
 
     def update(self, subject) -> None:
@@ -23,7 +22,8 @@ class CommandGetter:
 
     def __getattr__(self, item):
         if item not in self._commands_accumulator.commands:
-            raise KeyError(f"Item '{item}' not found in [{', '.join(str(_) for _ in self._commands_accumulator.commands.keys())}]")
+            raise KeyError(f"Item '{item}' not found in "
+                           f"[{', '.join(str(_) for _ in self._commands_accumulator.commands.keys())}]")
         return self._commands_accumulator.commands[item]
 
 

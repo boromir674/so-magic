@@ -1,16 +1,19 @@
 """Defines the DatapointsManager type (class); a centralized facility where all
 datapoints objects should arrived and be retrieved from."""
-import attr
 from typing import Iterable, Optional
+import logging
+import attr
 from so_magic.utils import Observer, Subject
+
+logger = logging.getLogger(__name__)
 
 
 @attr.s
 class DatapointsManager(Observer):
     """Manage operations revolved around datapoints collection objects.
 
-    Instances of this class are able to monitor (listener/observer pattern) the creation of 
-    datapoints collection objects and store them in a dictionary structure. 
+    Instances of this class are able to monitor (listener/observer pattern) the creation of
+    datapoints collection objects and store them in a dictionary structure.
     They also provide retrieval methods to the client to "pick up" a datapoints object.
 
     Args:
@@ -35,7 +38,8 @@ class DatapointsManager(Observer):
         datapoints_object = subject.state
         key = getattr(subject, 'name', '')
         if key == '':
-            raise RuntimeError(f"Subject {subject} with state {str(subject.state)} resulted in an empty string as key (to use in dict/hash).")
+            raise RuntimeError(f'Subject {subject} with state {str(subject.state)} resulted in an empty string as key.'
+                               f'We reject the key, since it is going to "query" a in dict/hash).')
         if key in self.datapoints_objects:
             raise RuntimeError(f"Attempted to register a new Datapoints object at the existing key '{key}'.")
         self.datapoints_objects[key] = datapoints_object
@@ -59,5 +63,6 @@ class DatapointsManager(Observer):
         """
         try:
             return self.datapoints_objects[self._last_key]
-        except KeyError as e:
-            print(f"{e}. Requested datapoints with id '{self._last_key}', but was not found in registered [{', '.join(_ for _ in self.datapoints_objects.keys())}]")
+        except KeyError as exception:
+            logger.error("%s . Requested datapoints with id '%s', but was not found in registered [%s]",
+                         exception, self._last_key, {', '.join(_ for _ in self.datapoints_objects.keys())})

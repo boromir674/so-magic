@@ -31,7 +31,8 @@ def init_data_manager(a_backend):
             datapoints = args[0]
             attribute = args[1]
             prefix_separator = '_'
-            dataframe = pd.get_dummies(datapoints.observations[attribute], prefix=attribute, prefix_sep='_', drop_first=False)
+            dataframe = pd.get_dummies(datapoints.observations[attribute], prefix=attribute, prefix_sep='_',
+                                       drop_first=False)
             self.values_set = [x.replace(f'{attribute}{prefix_separator}', '') for x in dataframe.columns]
             self.columns = [x for x in dataframe.columns]
             return dataframe
@@ -42,7 +43,7 @@ def init_data_manager(a_backend):
         dataframe = OneHotEncoder().encode(_datapoints, _attribute)
         _data_manager.datapoints.observations = pd.concat([_data_manager.datapoints.observations, dataframe], axis=1)
 
-    
+
     @mega_cmd_factory.build_command_prototype()
     def select_variables(_data_manager, variables):
         _data_manager.feature_manager.feature_configuration = variables
@@ -57,9 +58,11 @@ def init_data_manager(a_backend):
         def encode(self, *args, **kwargs):
             datapoints = args[0]
             attribute = args[1]
-            self.values_set = reduce(lambda i, j: set(i).union(set(j)), [_ for _ in datapoints.observations[attribute] if type(_) == list])
+            self.values_set = reduce(lambda i, j: set(i).union(set(j)),
+                                     [_ for _ in datapoints.observations[attribute] if type(_) == list])
             self.columns = [_ for _ in self.values_set]
-            return pd.DataFrame([self._yield_vector(datarow, attribute) for index, datarow in datapoints.iterrows()], columns=self.columns)
+            return pd.DataFrame([self._yield_vector(datarow, attribute) for index, datarow in datapoints.iterrows()],
+                                columns=self.columns)
 
         def _yield_vector(self, datarow, attribute):
             decision = {True: self._encode, False: self._encode_none}

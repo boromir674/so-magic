@@ -1,11 +1,11 @@
 """This module is responsible to provide a formal way of registering phi functions
 at runtime. See the 'PhiFunctionRegistrator' class and its 'register' decorator method
 """
-from typing import Callable
+import logging
 import inspect
+from typing import Callable
 from so_magic.utils import Singleton, ObjectRegistry, Subject
 
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -21,9 +21,9 @@ class PhiFunctionRegistry(Singleton, ObjectRegistry):
         Returns:
             PhiFunctionRegistry: the reference to the singleton object (instance)
         """
-        x = Singleton.__new__(cls, *args, **kwargs)
-        x = ObjectRegistry(getattr(x, 'objects', {}))
-        return x
+        phi_function_registry = Singleton.__new__(cls, *args, **kwargs)
+        phi_function_registry = ObjectRegistry(getattr(phi_function_registry, 'objects', {}))
+        return phi_function_registry
 
     @staticmethod
     def get_instance():
@@ -59,9 +59,9 @@ class PhiFunctionMetaclass(type):
         Returns:
             PhiFunctionMetaclass: the new class type object
         """
-        x = super().__new__(mcs, *args, **kwargs)
-        x.subject = Subject([])
-        return x
+        phi_function_class = super().__new__(mcs, *args, **kwargs)
+        phi_function_class.subject = Subject([])
+        return phi_function_class
 
 
 class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
@@ -139,7 +139,7 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
                 a_callable (Callable): the object (function or class) to register as phi function
             """
             if hasattr(a_callable, '__code__'):  # it is a function (def func_name ..)
-                logging.info(f"Registering input function {a_callable.__code__.co_name} as phi function.")
+                logging.info("Registering input function %s as phi function.", a_callable.__code__.co_name)
                 key = phi_name if phi_name else cls.get_name(a_callable)
                 print(f"Registering input function {a_callable.__code__.co_name} as phi function, at key {key}.")
                 cls._register(a_callable, key)
@@ -148,7 +148,7 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
                     raise RuntimeError("Expected an class definition with a '__call__' instance method defined 1."
                                        f" Got {type(a_callable)}")
                 members = inspect.getmembers(a_callable)
-                if not ('__call__', a_callable.__call__) in members:
+                if ('__call__', a_callable.__call__) not in members:
                     raise RuntimeError("Expected an class definition with a '__call__' instance method defined 2."
                                        f" Got {type(a_callable)}")
                 instance = a_callable()

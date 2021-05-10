@@ -1,6 +1,5 @@
 from abc import ABC
 import attr
-import copy
 
 
 class DiscretizerInterface(ABC):
@@ -17,7 +16,7 @@ class AbstractDiscretizer(DiscretizerInterface):
 class BaseDiscretizer(AbstractDiscretizer):
     binner = attr.ib(init=True)
     @binner.validator
-    def validate_bin_function(self, attribute, value):
+    def validate_bin_function(self, _attribute, value):
         if not callable(value):
             raise ValueError(f'Expected a callable object, instead a {type(value).__name__} was given.')
 
@@ -88,4 +87,3 @@ class BinnerFactory:
 
     def create_binner(self, *args, **kwargs) -> BaseBinner:
         raise NotImplementedError
-

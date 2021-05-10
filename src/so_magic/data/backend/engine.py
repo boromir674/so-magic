@@ -11,7 +11,7 @@ class MyDecorator(type):
     """
     @classmethod
     def magic_decorator(mcs, arg=None):
-        def decorator(func):
+        def decorator(_func):
             def wrapper(*a, **ka):
                 ffunc = a[0]
                 mcs._wrapper(ffunc, *a[1:], **ka)
@@ -21,9 +21,8 @@ class MyDecorator(type):
         if callable(arg):
             _ = decorator(arg)
             return _  # return 'wrapper'
-        else:
-            _ = decorator
-            return _  # ... or 'decorator'
+        _ = decorator
+        return _  # ... or 'decorator'
 
 
 class CommandRegistrator(MyDecorator):
@@ -35,11 +34,12 @@ class CommandRegistrator(MyDecorator):
         class_object.registry = {}
         return class_object
 
-    def __getitem__(self, item):
-        if item not in self.registry:
-            raise RuntimeError(f"Key '{item}' fot found in registry: [{', '.join(str(x) for x in self.registry.keys())}]")
-        return self.registry[item]
-    
+    def __getitem__(cls, item):
+        if item not in cls.registry:
+            raise RuntimeError(f"Key '{item}' fot found in registry: "
+                               f"[{', '.join(str(x) for x in cls.registry.keys())}]")
+        return cls.registry[item]
+
     # Legacy feature, not currently used in production
     def func_decorator(cls):
         def wrapper(a_callable):
@@ -54,22 +54,23 @@ class CommandRegistrator(MyDecorator):
 class EngineType(CommandRegistrator):
     """Tabular Data Backend type representation.
 
-    Classes using this class as metaclass gain certain class attributes such as 
+    Classes using this class as metaclass gain certain class attributes such as
     attributes related to tabular data operations (retriever, iterator, mutator) and attributes related to constructing
     command object prototypes (command_factory attribute).
     """
 
     def __new__(mcs, *args, **kwargs):
-        x = super().__new__(mcs, *args, **kwargs)
-        x._commands = {}
-        x.retriever = None
-        x.iterator = None
-        x.mutator = None
-        x.backend = None
-        x.command = mcs.magic_decorator
-        x.command_factory = MagicCommandFactory()
-        x._receivers = defaultdict(lambda: x._generic_cmd_receiver, observations=x._observations_from_file_cmd_receiver)
-        return x
+        engine_type = super().__new__(mcs, *args, **kwargs)
+        engine_type._commands = {}
+        engine_type.retriever = None
+        engine_type.iterator = None
+        engine_type.mutator = None
+        engine_type.backend = None
+        engine_type.command = mcs.magic_decorator
+        engine_type.command_factory = MagicCommandFactory()
+        engine_type._receivers = defaultdict(lambda: engine_type._generic_cmd_receiver,
+                                             observations=engine_type._observations_from_file_cmd_receiver)
+        return engine_type
 
     def _observations_from_file_cmd_receiver(cls, callable_function, **kwargs) -> Tuple[callable, dict]:
         """Create the Receiver of a command that creates datapoints from a file.
@@ -77,7 +78,7 @@ class EngineType(CommandRegistrator):
         It also creates the kwargs that a Command factory method would need along with the receiver object.
 
         It is assumed that the business logic is executed in the callable function supplied.
-        You can use the data_structure "keyword" argument (kwarg) to indicate how should we parse/read 
+        You can use the data_structure "keyword" argument (kwarg) to indicate how should we parse/read
         the raw data from the file. Supported values: 'tabular-data'
 
         Args:
@@ -92,7 +93,7 @@ class EngineType(CommandRegistrator):
         def observations(file_path, **runtime_kwargs):
             """Construct the observations attribute of a Datapoints instance.
 
-            The signature of this function determines the signature that is used at runtime 
+            The signature of this function determines the signature that is used at runtime
             when the command will be executed. Thus the command's arguments at runtime
             should follow the signature of this function.
 
@@ -103,7 +104,7 @@ class EngineType(CommandRegistrator):
             _observations = callable_function(file_path, **runtime_kwargs)
             # create the datapoints object and let the datapoints factory notify its listeners (eg a datapoints manager)
             _ = cls.backend.datapoints_factory.create(kwargs.get('data_structure', 'tabular-data'),
-                                                      _observations, [_ for _ in []],
+                                                      _observations, [],
                                                       cls.retriever(),
                                                       cls.iterator(),
                                                       cls.mutator(),
@@ -115,12 +116,12 @@ class EngineType(CommandRegistrator):
         """Create the Receiver of a generic command.
 
         It also creates the kwargs that a Command factory method would need along with the receiver object.
-        
+
         It is assumed that the business logic is executed in the callable function.
-        
+
         Args:
             callable_function (Callable): the business logic that shall run in the command
-        
+
         Returns:
             Union[callable, dict]: the receiver object that can be used to create a Command instance
                                     and parameters to pass in the kwargs of the command factory
@@ -130,7 +131,7 @@ class EngineType(CommandRegistrator):
         def a_function(*args, **runtime_kwargs):
             """Just execute the business logic that is provided at runtime.
 
-            The signature of this function determines the signature that is used at runtime 
+            The signature of this function determines the signature that is used at runtime
             when the command will be executed. Thus the command's arguments at runtime
             should follow the signature of this function. So, the runtime function
             can have any signature (since a_function uses flexible *args and **runtime_kwargs).

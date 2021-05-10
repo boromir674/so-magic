@@ -1,6 +1,5 @@
-from abc import ABC
-import attr
 from typing import Tuple
+import attr
 
 from so_magic.utils import Subject, Command, CommandFactoryInterface, CommandFactoryType
 
@@ -83,6 +82,6 @@ class MagicCommandFactory(Subject):
     command_factory = attr.ib(init=True, default=CommandFactory())
 
     def __call__(self, *args, **kwargs):
-        self._state, self.name = self.command_factory.create(*args, **kwargs)
+        self.state, self.name = self.command_factory.create(*args, **kwargs)
         self.notify()
-        return self._state
+        return self.state

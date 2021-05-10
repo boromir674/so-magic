@@ -1,19 +1,9 @@
-from abc import ABC
-import attr
 from typing import Callable
+import attr
 from so_magic.utils import Command, Subject, CommandFactoryInterface, CommandFactoryType
 
 
 class DataManagerCommandFactoryBuilder(metaclass=CommandFactoryType):
-    """[summary]
-
-    Args:
-        metaclass ([type], optional): [description]. Defaults to CommandFactoryType.
-
-    Returns:
-        [type]: [description]
-    """
-   
     @classmethod
     def create_factory(cls, name, callback):
         @DataManagerCommandFactoryBuilder.register_as_subclass(name)
@@ -27,21 +17,14 @@ class DataManagerCommandFactoryBuilder(metaclass=CommandFactoryType):
 
 @attr.s
 class DataManagerCommandFactory(Subject):
-    """[summary]
-
-    Args:
-        Subject ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
     _data_manager = attr.ib(init=True)
     command_factory = attr.ib(init=True, default=DataManagerCommandFactoryBuilder)
 
     def __call__(self, command_type, *args, **kwargs):
-        self._state, self.name = self.command_factory.create(command_type).construct(self._data_manager, *args, **kwargs), command_type
+        self.state = self.command_factory.create(command_type).construct(self._data_manager, *args, **kwargs)
+        self.name = command_type
         self.notify()
-        return self._state
+        return self.state
 
     def build_command_prototype(self):
         def wrapper(a_callable: Callable) -> Callable:

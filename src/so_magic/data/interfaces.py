@@ -11,7 +11,7 @@ class TabularRetriever(ABC):
 
     Classes implementing this interface gain the ability to perform various operations
     on data structures that resemble a table (have indexable columns, rows, etc):
-    
+
     most importantly they can slice through the data (retrieve specific row or column)
     """
     @abstractmethod
@@ -66,13 +66,19 @@ class TabularRetriever(ABC):
 
     @abstractmethod
     def get_numerical_attributes(self, data) -> Iterable:
-        """Get the data's attributes that represent numerical values.
+        r"""Get the data's attributes that represent numerical values.
 
         Returns the attributes that fall under the Numerical Variables: either
         Ratio or Interval type of variables.
 
-        Ratio variable: numerical variable where all operations are supported (+, -, \*, /) and true zero is defined; eg weight.
-        Interval variable: numerical variable where differences are interpretable; supported operations: [+, -]; no true zero; eg temperature in centigrade (ie Celsius).
+        Two type of numerical variables are supported:
+
+        Ratio variable:
+        numerical variable where all operations are supported (+, -, \*, /) and true zero is defined; eg weight.
+
+        Interval variable:
+        numerical variable where differences are interpretable; supported operations: [+, -]; no true zero;
+        eg temperature in centigrade (ie Celsius).
 
         Args:
             data (object): the data from which to retrieve the numerical attributes
@@ -98,7 +104,7 @@ class TabularIterator(ABC):
 
         Args:
             data (object): the (data) table to iterate over its rows
-        
+
         Returns:
             Iterable: the rows of the (data) table
         """
@@ -112,7 +118,7 @@ class TabularIterator(ABC):
 
         Args:
             data (object): the (data) table to iterate over its columns
-        
+
         Returns:
             Iterable: the columns of the (data) table
         """
@@ -134,7 +140,7 @@ class TabularIterator(ABC):
 class TabularMutator(ABC):
     """Mutate (alter) the contents of a table-like data structure.
 
-    Classes implementing this interface supply their instances the ability to alter the 
+    Classes implementing this interface supply their instances the ability to alter the
     contents of a table-like data structure.
     """
     @abstractmethod

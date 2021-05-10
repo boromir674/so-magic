@@ -90,13 +90,21 @@ class DatapointsFactory:
                 f"Request Engine of type '{name}'; supported are [{', '.join(sorted(cls.constructors.keys()))}]")
         try:
             return cls.constructors[name](*args, **kwargs)
-        except Exception as e:
-            print('Original exception:', e)
-            raise DatapointsCreationError(f"Exception {str(e)}. Datapoints creation failed for constructor {name}: {cls.constructors[name]}. Args: [{', '.join(f'{i}: {str(_)}' for i, _ in enumerate(args))}]\nKwargs: [{', '.join(f'{k}: {v}' for k, v in kwargs.items())}]")
+        except Exception as exception:
+            raise DatapointsCreationError({
+                'exception': exception,
+                'name': name,
+                'args': args,
+                'kwargs': kwargs,
+            }) from exception
 
 
-class DatapointsCreationError(Exception): pass
-
+class DatapointsCreationError(Exception):
+    def __init__(self, msg):
+        super().__init__(
+            f"Exception {str(msg['exception'])}. Datapoints creation failed for constructor {msg['name']}: "
+            f"{msg['constructor']}. Args: [{', '.join(f'{i}: {str(_)}' for i, _ in enumerate(msg['args']))}]\nKwargs: "
+            f"[{', '.join(f'{k}: {v}' for k, v in msg['kwargs'].items())}]")
 
 
 @attr.s
@@ -114,7 +122,7 @@ class StructuredData(DatapointsInterface, StructuredDataInterface):
         attributes (object): a reference to the attributes object
     """
     _observations = attr.ib(init=True)
-    _attributes = attr.ib(init=True, converter=lambda input_value: [x for x in input_value])
+    _attributes = attr.ib(init=True, converter=lambda input_value: list(input_value))
 
     # TODO remove property and "promote above attribute '_attributes' to 'attributes'
     @property
@@ -132,7 +140,7 @@ class StructuredData(DatapointsInterface, StructuredDataInterface):
 
 class AbstractTabularData(StructuredData, TabularDataInterface, ABC):
     """Tabular Data with known attributes of interest.
-    
+
     Classes inhereting from this abstract class, gain both capabilities of structured data
     in terms of their attributes and capabilities of a data table in terms of column, rows, etc.
     """
@@ -171,7 +179,7 @@ class TabularData(AbstractTabularData):
         return self.retriever.get_numerical_attributes(self)
 
     def get_categorical_attributes(self):
-        return iter(set(self.attributes) - set([_ for _ in self.retriever.get_numerical_attributes(self)]))
+        return iter(set(self.attributes) - set(self.retriever.get_numerical_attributes(self)))
 
     @property
     def nb_columns(self):

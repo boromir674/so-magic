@@ -10,9 +10,9 @@ class TabularDataInterface(ABC):
     """Data points that have tabular structure and are loaded in memory.
 
     Classes implementing this interface represent Data points that can be represented
-    as a table of rows an columns. One can imagine that each row (or column) represents a single observatin (single data point) 
-    and each column (or row) one single attribute out of possibly many attributes. 
-    
+    as a table of rows an columns. One can imagine that each row (or column) represents a single observation
+    (single data point) and each column (or row) one single attribute out of possibly many attributes.
+
     Classes implementing this interface have the ability to report on various
     elements and properties (eg rows, columns) of the underlying table-like data-structure.
     """
@@ -28,7 +28,7 @@ class TabularDataInterface(ABC):
     def rows(self) -> Iterable:
         """List of the row identifiers."""
         raise NotImplementedError
-    
+
     @abstractmethod
     def column(self, identifier: Union[str, int]) -> Iterable:
         """Get the data inside a column of the table.
@@ -40,7 +40,7 @@ class TabularDataInterface(ABC):
             Iterable: the data contained in the table's requested column
         """
         raise NotImplementedError
-    
+
     @abstractmethod
     def row(self, identifier: Union[str, int]) -> Iterable:
         """Get the data inside a row of the table.

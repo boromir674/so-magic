@@ -6,12 +6,12 @@ class Dataset:
     """High level representation of data, of some form.
 
     Instances of this class encapsulate observations in the form of datapoints
-    as well as their respective feature vectors. Feature vectors can then be 
+    as well as their respective feature vectors. Feature vectors can then be
     trivially "fed" into a Machine Learning algorithm (eg SOM).
 
     Args:
         datapoints ():
-        name (str, optional): 
+        name (str, optional):
     Returns:
         [type]: [description]
     """
