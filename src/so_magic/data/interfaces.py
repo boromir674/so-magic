@@ -1,5 +1,5 @@
 """Defines interfaces related to various operations on table-like data."""
-from abc import ABCMeta, abstractmethod, ABC
+from abc import abstractmethod, ABC
 from typing import Union, Iterable
 
 

@@ -34,7 +34,7 @@ def init_data_manager(a_backend):
             dataframe = pd.get_dummies(datapoints.observations[attribute], prefix=attribute, prefix_sep='_',
                                        drop_first=False)
             self.values_set = [x.replace(f'{attribute}{prefix_separator}', '') for x in dataframe.columns]
-            self.columns = [x for x in dataframe.columns]
+            self.columns = list(dataframe.columns)
             return dataframe
 
 
@@ -71,7 +71,7 @@ def init_data_manager(a_backend):
         def _encode(self, datarow, attribute):
             return [OneHotListEncoder.binary_transformer[column in datarow[attribute]] for column in self.columns]
 
-        def _encode_none(self, datarow, attribute):
+        def _encode_none(self, _datarow, _attribute):
             return [0.0] * len(self.values_set)
 
     @mega_cmd_factory.build_command_prototype()
