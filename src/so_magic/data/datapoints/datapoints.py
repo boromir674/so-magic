@@ -141,7 +141,7 @@ class StructuredData(DatapointsInterface, StructuredDataInterface):
 class AbstractTabularData(StructuredData, TabularDataInterface, ABC):
     """Tabular Data with known attributes of interest.
 
-    Classes inhereting from this abstract class, gain both capabilities of structured data
+    Classes inheriting from this abstract class, gain both capabilities of structured data
     in terms of their attributes and capabilities of a data table in terms of column, rows, etc.
     """
     def __iter__(self):

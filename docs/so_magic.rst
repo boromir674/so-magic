@@ -7,7 +7,6 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   so_magic.clustering
    so_magic.data
    so_magic.som
    so_magic.utils
