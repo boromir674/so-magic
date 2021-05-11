@@ -8,7 +8,7 @@ A python library providing with an elegant interface (API) to infer models of th
 
 .. start-badges
 
-|circleci| |travis| |release_version| |wheel| |supported_versions| |commits_since| |appveyor| |codacy_coverage| |docs| |better_code_hub| |codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
+|circleci| |travis| |release_version| |wheel| |supported_versions| |commits_since| |codacy_coverage| |docs| |better_code_hub| |codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
 
 
 .. |circleci| image:: https://circleci.com/gh/boromir674/so-magic/tree/master.svg?style=shield
@@ -18,10 +18,6 @@ A python library providing with an elegant interface (API) to infer models of th
 .. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=master
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/boromir674/so-magic
-
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/6u04abdkt9ou802l/branch/master?svg=true
-    :alt: Appveyor Build Status
-    :target: https://ci.appveyor.com/project/boromir674/so-magic/branch/master
     
 .. |codacy_coverage| image:: https://app.codacy.com/project/badge/Coverage/3c5b20d36ce94865b704e589b89204d4
     :alt: Codacy code coverage

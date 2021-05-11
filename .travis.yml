@@ -60,6 +60,7 @@ jobs:
     install:
       - echo "No dependencies to install"
     script:
+      - export SO_MAGIC_RELEASE_VERSION=$(python scripts/parse_package_version.py)
       - tox -c tox-dev.ini -e deploy -vv
     after_success: skip
   - stage: Integration-test-using-staging
