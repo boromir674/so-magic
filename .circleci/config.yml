@@ -129,11 +129,11 @@ jobs:
           name: Install the 'tox' automation tool
           command: python -m pip install --user tox
       - run:
-        name: Check code to comply with best practices of Python packaging ecosystem (pypi, pip, etc)
-        command: tox -c tox-dev.ini -e check -vv
+          name: Check code to comply with best practices of Python packaging ecosystem (pypi, pip, etc)
+          command: tox -c tox-dev.ini -e check -vv
       - run:
-        name: Build the code and create .tar.gz and .whl files
-        command: tox -c tox-dev.ini -e build -vv
+          name: Build the code and create .tar.gz and .whl files
+          command: tox -c tox-dev.ini -e build -vv
       - run:
           name: Deploy package (source distro & wheel) to 'testpypi' (index) server
           command: |
