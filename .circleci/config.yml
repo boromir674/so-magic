@@ -37,7 +37,7 @@ jobs:
           command: |
             export CONDA_EXE=/home/circleci/miniconda/bin/conda
             python -m tox -c tox-dev.ini -e clean
-            python -m tox -e check,py37-cov
+            python -m tox -e py37-cov
       - store_test_results:  # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: test-results
       - store_artifacts:
