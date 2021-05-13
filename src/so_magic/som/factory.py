@@ -1,6 +1,10 @@
+import logging
 import attr
 from so_magic.utils import Subject
 from .self_organising_map import SomTrainer, SelfOrganizingMap
+
+
+logger = logging.getLogger(__name__)
 
 
 @attr.s
@@ -10,13 +14,14 @@ class SelfOrganizingMapFactory:
 
     def create(self, dataset, nb_cols, nb_rows, **kwargs):
         try:
-            map_obj = self.trainer.infer_map(nb_cols, nb_rows, dataset, **kwargs)  # backend dependent (eg somoclu kind of object)
-            self.subject.state = map_obj
+            # run a backend algorithm and get a self-organising map representation object
+            somoclu_map = self.trainer.infer_map(nb_cols, nb_rows, dataset, **kwargs)
+            self.subject.state = somoclu_map
             self.subject.notify()
-            return SelfOrganizingMap(map_obj, dataset.name)
-        except NoFeatureVectorsError as e:
-            logger.info(f"{e}. Fire up an 'encode' command.")
-            raise e
+            return SelfOrganizingMap(somoclu_map, dataset.name)
+        except NoFeatureVectorsError as exception:
+            logger.info("%s Fire up an 'encode' command.", str(exception))
+            raise exception
 
 
 class NoFeatureVectorsError(Exception): pass

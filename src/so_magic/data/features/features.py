@@ -3,13 +3,13 @@ import attr
 from so_magic.data.variables.types import VariableTypeFactory
 
 
-class AttributeReporter(ABC):
+class AttributeReporterInterface(ABC):
     """A class implementing this interface has the ability to report information on an attribute/variable
     of some structured data (observations)
     """
     @abstractmethod
     def values(self, datapoints, attribute, **kwargs):
-        """Call to get the values ([N x 1] vector) of all datapoints (N x D) corresponding to the input variable/attribute.
+        """Get the values ([N x 1] vector) of all datapoints (N x D) corresponding to the input variable/attribute.
 
         Args:
             datapoints (Datapoints): [description]
@@ -38,7 +38,7 @@ class AttributeReporter(ABC):
         raise NotImplementedError
 
 
-class BaseAttributeReporter(AttributeReporter):
+class BaseAttributeReporter(AttributeReporterInterface):
 
     def values(self, datapoints, attribute, **kwargs):
         return datapoints[attribute]
@@ -47,16 +47,17 @@ class BaseAttributeReporter(AttributeReporter):
         return VariableTypeFactory.infer(datapoints, attribute, **kwargs)
 
     def value_set(self, datapoints, attribute, **kwargs):
-        return set([_ for _ in datapoints.column(attribute)])
+        return set(datapoints.column(attribute))
 
 
 #### HELPERS
-def _list_validator(self, attribute, value):
-    if not type(value) == list:
+def _list_validator(_self, _attribute, value):
+    if not isinstance(value, list):
         raise ValueError(f'Expected a list; instead a {type(value).__name__} was given.')
 
-def _string_validator(self, attribute, value):
-    if not type(value) == str:
+
+def _string_validator(_self, _attribute, value):
+    if not isinstance(value, str):
         raise ValueError(f'Expected a string; instead a {type(value).__name__} was given.')
 
 
@@ -95,15 +96,16 @@ class FeatureFunction:
     """
     function = attr.ib(init=True)
     @function.validator
-    def is_callable(self, attribute, value):
+    def is_callable(self, _attribute, value):
         if not callable(value):
             raise ValueError(f"Expected a callable object; instead {type(value)} was given.")
         if value.func_code.co_argcount < 1:
-            raise ValueError(f"Expected a callable that takes at least 1 argument; instead a callable that takes no arguments was given.")
+            raise ValueError("Expected a callable that takes at least 1 argument; "
+                             "instead a callable that takes no arguments was given.")
 
     label = attr.ib(init=True, default=None)
     @label.validator
-    def is_label(self, attribute, value):
+    def is_label(self, _attribute, value):
         if value is None:
             self.label = self.function.func_name
 
@@ -126,14 +128,15 @@ class StateMachine:
         return self._current
 
     def update(self, *args, **kwargs):
-        if 1 < len(args):
+        if len(args) > 1:
             self.states[args[0]] = args[1]
             self._current = args[0]
-        elif 0 < len(args):
+        elif len(args) > 0:
             if args[0] in self.states:
                 self._current = args[0]
             else:
-                raise RuntimeError(f"Requested to set the current state to '{args[0]}', it is not in existing [{', '.join(sorted(self.states))}]")
+                raise RuntimeError(f"Requested to set the current state to '{args[0]}', "
+                                   f"it is not in existing [{', '.join(sorted(self.states))}]")
 
     @property
     def state(self):
@@ -149,8 +152,10 @@ class TrackingFeature:
 
     @classmethod
     def from_callable(cls, a_callable, label=None, variable_type=None):
-        """Construct a feature that has one extract/report capability. Input id is correlated to the features position on the vector (see FeatureFunction above)"""
-        return TrackingFeature(FeatureFunction(a_callable, label), StateMachine({'raw': a_callable}, 'raw'), variable_type)
+        """Construct a feature that has one extract/report capability.
+        Input id is correlated to the features position on the vector (see FeatureFunction above)"""
+        return TrackingFeature(FeatureFunction(a_callable, label), StateMachine({'raw': a_callable}, 'raw'),
+                               variable_type)
 
     def values(self, dataset):
         return self.state_machine.state.reporter(dataset)

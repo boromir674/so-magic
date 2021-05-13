@@ -21,14 +21,13 @@ class Mediator(ABC):
 
 
 class GenericMediator(Mediator, metaclass=ABCMeta):
-    """Abstract Mediator class that automatically configures components received as *args through the constructor.
-    """
+    r"""Abstract Mediator class that automatically configures components received as \*args through the constructor."""
     def __new__(cls, *components, **kwargs):
-        x = super().__new__(cls)
+        generic_mediator = super().__new__(cls)
         for i, component in enumerate(components):
-            setattr(x, f'_component{i+1}', component)
-            getattr(x, f'_component{i+1}').mediator = x
-        return x
+            setattr(generic_mediator, f'_component{i+1}', component)
+            getattr(generic_mediator, f'_component{i+1}').mediator = generic_mediator
+        return generic_mediator
 
 
 class BaseComponent:

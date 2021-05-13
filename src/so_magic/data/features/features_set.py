@@ -48,20 +48,14 @@ class FeatureSet(BaseFeatureSet):
 
 @attr.s
 class FeatureConfiguration(Observer):
-    _variables = attr.ib(init=True)
-    _feature_vectors = attr.ib(init=True, default=attr.Factory(lambda self: OrderedDict([(variable_dict['variable'], []) for variable_dict in self._variables]), takes_self=True))
-
-    @property
-    def variables(self):
-        return self._variables
-
-    @variables.setter
-    def variables(self, variables):
-        self._variables = variables
+    variables = attr.ib(init=True)
+    _feature_vectors = attr.ib(default=attr.Factory(
+        lambda self: OrderedDict([(variable_dict['variable'], []) for variable_dict in self.variables]),
+        takes_self=True))
 
     @property
     def valid_variables(self):
-        return [self.valid_encoding(x) for x in self._variables]
+        return [self.valid_encoding(x) for x in self.variables]
 
     def valid_encoding(self, feature):
         return feature.valid_encoding(self.datapoints, self._feature_vectors[feature.variable])

@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    so_magic.data.backend
+   so_magic.data.datapoints
    so_magic.data.features
    so_magic.data.variables
 
@@ -34,6 +35,14 @@ so\_magic.data.data\_manager module
 -----------------------------------
 
 .. automodule:: so_magic.data.data_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+so\_magic.data.datapoints\_manager module
+-----------------------------------------
+
+.. automodule:: so_magic.data.datapoints_manager
    :members:
    :undoc-members:
    :show-inheritance:
@@ -70,18 +79,10 @@ so\_magic.data.interfaces module
    :undoc-members:
    :show-inheritance:
 
-so\_magic.data.magic\_encoder module
-------------------------------------
+so\_magic.data.magic\_datapoints\_factory module
+------------------------------------------------
 
-.. automodule:: so_magic.data.magic_encoder
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-so\_magic.data.receiver module
-------------------------------
-
-.. automodule:: so_magic.data.receiver
+.. automodule:: so_magic.data.magic_datapoints_factory
    :members:
    :undoc-members:
    :show-inheritance:

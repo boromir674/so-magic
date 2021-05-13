@@ -1,5 +1,5 @@
-import attr
 import logging
+import attr
 
 from so_magic.utils import ObjectsPool
 from .factory import SelfOrganizingMapFactory
@@ -15,7 +15,8 @@ class SomapObjectPool(ObjectsPool):
 @attr.s
 class MapManager:
     map_factory = attr.ib(init=True, default=SelfOrganizingMapFactory())
-    pool = attr.ib(init=False, default=attr.Factory(lambda self: SomapObjectPool(self.map_factory.create), takes_self=True))
+    pool = attr.ib(init=False, default=attr.Factory(lambda self: SomapObjectPool(self.map_factory.create),
+                                                    takes_self=True))
 
     def get_map(self, *args, **kwargs):
         """
@@ -24,7 +25,6 @@ class MapManager:
         return self.pool.get_object(*args, **kwargs)
 
     def train(self, dataset, nb_cols, nb_rows, **kwargs):
-        """"""
         return self.map_factory.create(dataset, nb_cols, nb_rows, **kwargs)
 
 
@@ -48,7 +48,8 @@ class MapId:
 
     @staticmethod
     def from_self_organizing_map(somap, **kwargs):
-        return MapId(kwargs.get('dataset_name', somap.dataset_name), *[getattr(somap, attribute.name) for attribute in MapId.__attrs_attrs__[1:]])
+        return MapId(kwargs.get('dataset_name', somap.dataset_name),
+                     *[getattr(somap, attribute.name) for attribute in MapId.__attrs_attrs__[1:]])
 
     def __dir__(self):
         return sorted([attribute.name for attribute in self.__attrs_attrs__])
@@ -63,4 +64,3 @@ class MapId:
 
 if __name__ == '__main__':
     map_manager = MapManager()
-

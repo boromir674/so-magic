@@ -1,12 +1,13 @@
+"""This module provides the Transformer class. Its constructor can be used to create data transformation methods."""
 import abc
 import inspect
 import types
-from functools import wraps
+
 
 __all__ = ['Transformer']
 
 class TransformerInterface(abc.ABC):
-    """The interface defining a method to transform structured data. Anyone, implementing this has the ability to receive
+    """The interface with a method to transform structured data. Anyone, implementing this has the ability to receive
     some kind of data and return some kind of transformed version of them.
     """
     @abc.abstractmethod
@@ -60,32 +61,33 @@ class RuntimeTransformer(TransformerInterface, abc.ABC):
         a_callable (callable): a callable object used to delegate the transformation operation
     """
     def __new__(cls, *args, **kwargs):
-        x = super().__new__(cls)
+        instance_object = super().__new__(cls)
         a_callable = args[0]
         if not callable(a_callable):
             raise ValueError(f"Expected a callable as argument; instead got '{type(a_callable)}'")
         nb_mandatory_arguments = a_callable.__code__.co_argcount  # this counts sums both *args and **kwargs
-        # use syntax like 'def a(b, *, c=1, d=2): .. to separate pos args from kwargs and to inform 'inspect' lib about it
+        # use syntax like 'def a(b, *, c=1, d=2): .. to separate pos args from kwargs & to inform 'inspect' lib about it
         if nb_mandatory_arguments < 1:
-            raise ValueError(f"Expected a callable that receives at least one positional argument; instead got a callable that "
-                             f"receives '{nb_mandatory_arguments}'")
+            raise ValueError("Expected a callable that receives at least one positional argument;"
+                             f"instead got a callable that receives '{nb_mandatory_arguments}' arguments.")
         signature = inspect.signature(a_callable)
-        parameters = [param for param in signature.parameters.values()]
+        parameters = list(signature.parameters.values())
 
-        if 1 < nb_mandatory_arguments:
-            def _transform(self, data, **keyword_args):
+        if nb_mandatory_arguments > 1:
+            def _transform(_self, data, **keyword_args):
                 return a_callable(data, **keyword_args)
-            x._transform = types.MethodType(_transform, x)
+            instance_object._transform = types.MethodType(_transform, instance_object)
         elif nb_mandatory_arguments == len(parameters):
-            def _transform(self, data, **keyword_args):
+            def _transform(_self, data, **_keyword_args_):
                 return a_callable(data)
-            x._transform = types.MethodType(_transform, x)
+            instance_object._transform = types.MethodType(_transform, instance_object)
         else:
-            raise Exception(f"Something went really bad. Check code above. Parameters: [{', '.join(str(_) for _ in parameters)}]")
-        x._callable = a_callable
-        return x
+            raise Exception(f"Something went really bad above! Parameters: [{', '.join(str(_) for _ in parameters)}]")
+        instance_object._callable = a_callable
+        return instance_object
 
     def transform(self, data, **kwargs):
         return self._transform(data, **kwargs)
+
 
 class Transformer(RuntimeTransformer): pass

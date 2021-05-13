@@ -1,26 +1,28 @@
-from enum import Enum
 import attr
-from so_magic.utils import GenericMediator, BaseComponent, ObjectRegistry, Observer
+from so_magic.utils import ObjectRegistry, Observer
 from .commands_manager import CommandsManager
 
 
-class MediatorEvent(Enum):
-    A = 'A'
-    B = 'B'
-    C = 'C'
-
-
-class DataMediator(GenericMediator):
-    def __init__(self, *args, **kwargs):
-        self.events = kwargs.get('events', {})
-
-    def notify(self, sender: object, event: str) -> None:
-        pass
+# from enum import Enum
+# from so_magic.utils import GenericMediator,
+# class MediatorEvent(Enum):
+#     A = 'A'
+#     B = 'B'
+#     C = 'C'
+#
+#
+# class DataMediator(GenericMediator):
+#     def __init__(self, *args, **kwargs):
+#         self.events = kwargs.get('events', {})
+#
+#     def notify(self, sender: object, event: str) -> None:
+#         pass
 
 
 class Phis(ObjectRegistry, Observer):
     def __getattr__(self, item):
         return self.objects[item]
+
     def update(self, subject):
         self.add(subject.name, subject.state)
 
@@ -32,7 +34,8 @@ class DataManager:
     feature_manager = attr.ib(init=True)
 
     commands_manager = attr.ib(init=True, default=CommandsManager())
-    mediator = attr.ib(init=False, default=attr.Factory(lambda self: DataMediator(self.commands_manager, self.backend), takes_self=True))
+    # mediator = attr.ib(init=False, default=attr.Factory(
+    #     lambda self: DataMediator(self.commands_manager, self.backend), takes_self=True))
     built_phis = attr.ib(init=False, default=Phis())
 
     def __attrs_post_init__(self):

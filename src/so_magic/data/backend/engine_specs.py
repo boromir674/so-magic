@@ -19,7 +19,8 @@ class EngineTabularRetriever(TabularRetriever, ABC):
     def create(cls, backend_type, *args, **kwargs) -> TabularRetriever:
         if backend_type not in cls.subclasses:
             raise ValueError(
-                f"Requested TabularRetriever of type '{backend_type}'; supported are [{', '.join(sorted(cls.subclasses.keys()))}]")
+                f"Requested TabularRetriever of type '{backend_type}'; "
+                f"supported are [{', '.join(sorted(cls.subclasses.keys()))}]")
         return cls.subclasses[backend_type](*args, **kwargs)
 
 
@@ -38,7 +39,8 @@ class EngineTabularIterator(TabularIterator, ABC):
     def create(cls, backend_type, *args, **kwargs) -> TabularRetriever:
         if backend_type not in cls.subclasses:
             raise ValueError(
-                f"Requested TabularIterator of type '{backend_type}'; supported are [{', '.join(sorted(cls.subclasses.keys()))}]")
+                f"Requested TabularIterator of type '{backend_type}'; "
+                f"supported are [{', '.join(sorted(cls.subclasses.keys()))}]")
         return cls.subclasses[backend_type](*args, **kwargs)
 
 
@@ -57,7 +59,8 @@ class EngineTabularMutator(TabularMutator, ABC):
     def create(cls, backend_type, *args, **kwargs) -> TabularRetriever:
         if backend_type not in cls.subclasses:
             raise ValueError(
-                f"Requested TabularMutator of type '{backend_type}'; supported are [{', '.join(sorted(cls.subclasses.keys()))}]")
+                f"Requested TabularMutator of type '{backend_type}'; "
+                f"supported are [{', '.join(sorted(cls.subclasses.keys()))}]")
         return cls.subclasses[backend_type](*args, **kwargs)
 
 

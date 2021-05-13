@@ -7,12 +7,12 @@ class ObjectRegistry(ABC):
     """Simple dict-like retrieval/inserting "store" facility."""
 
     def __new__(cls, *args, **kwargs):
-        x = super().__new__(cls)
+        object_registry = super().__new__(cls)
         if args:
-            x.objects = args[0]
+            object_registry.objects = args[0]
         else:
-            x.objects = {}
-        return x
+            object_registry.objects = {}
+        return object_registry
 
     def add(self, key, value):
         if self.objects.get(key, None):
@@ -37,5 +37,6 @@ class ObjectRegistry(ABC):
 
     def __contains__(self, item):
         return item in self.objects
+
 
 class ObjectRegistryError(Exception): pass

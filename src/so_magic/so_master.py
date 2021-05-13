@@ -7,12 +7,13 @@ class SoMaster:
     _dataset_constructor = attr.ib(init=True)
     _magic_map_manager_constructor = attr.ib(init=True)
 
-    _map_manager = attr.ib(init=False, default=attr.Factory(lambda self: self._magic_map_manager_constructor(self), takes_self=True))
+    _map_manager = attr.ib(init=False, default=attr.Factory(lambda self: self._magic_map_manager_constructor(self),
+                                                            takes_self=True))
     _last_path = attr.ib(init=False, default='')
 
     _datasets = attr.ib(init=False, default={})
 
-    def load_data(self, file_path, id=''):
+    def load_data(self, file_path):
         cmd = self._data_manager.command.observations
         cmd.args = [file_path]
         cmd.execute()
@@ -36,9 +37,3 @@ class SoMaster:
                 self._last_path,
             )
         return self._datasets[datapoints_id]
-
-    @classmethod
-    def create(cls, data_manager):
-        from .som import MagicMapManager
-        from .data.dataset import Dataset
-        return SoMaster(data_manager, Dataset, MagicMapManager)

@@ -6,7 +6,7 @@ import pytest
     # ([12, 12, 'toroid', 'rectangular'])
 ])
 def test_somagic_scenario(train_args, somagic, sample_collaped_json):
-    somagic.load_data(sample_collaped_json, id='test_data')
+    somagic.load_data(sample_collaped_json)
     ATTRS = ['hybrid', 'indica', 'sativa']
     ATTRS2 = ['type_hybrid', 'type_indica', 'type_sativa']
     from functools import reduce
