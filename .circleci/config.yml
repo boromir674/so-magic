@@ -129,6 +129,12 @@ jobs:
           name: Install the 'tox' automation tool
           command: python -m pip install --user tox
       - run:
+        name: Check code to comply with best practices of Python packaging ecosystem (pypi, pip, etc)
+        command: tox -c tox-dev.ini -e check -vv
+      - run:
+        name: Build the code and create .tar.gz and .whl files
+        command: tox -c tox-dev.ini -e build -vv
+      - run:
           name: Deploy package (source distro & wheel) to 'testpypi' (index) server
           command: |
             export SO_MAGIC_RELEASE_VERSION=$(python scripts/parse_package_version.py)
@@ -164,10 +170,16 @@ jobs:
           command: python -m pip install --user tox
       - run:
           name: Visualize dependency graphs as .svg files
-          command: python -m tox -e graphs -vv
+          command: python -m tox -c tox-dev.ini -e graphs -vv
       - store_artifacts:
           path: dependencies-graphs
           destination: dep-graphs
+      - run:
+          name: Visualize uml diagrams as .svg files
+          command: python -m tox -c tox-dev.ini -e uml -vv
+      - store_artifacts:
+          path: uml-diagrams
+          destination: uml-diagrams
 
 workflows:
   version: 2

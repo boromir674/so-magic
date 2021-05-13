@@ -53,8 +53,9 @@ jobs:
       - tox -c tox-dev.ini -e clean -vv
       - tox -e py38-cov -vv
   - stage: Check_distro
-    env: TOXENV=check
     name: "Check source distribution"
+    script:
+      - tox -c tox-dev.ini -e check -vv
     after_success: skip
   - stage: Build docs
     script:
@@ -68,6 +69,7 @@ jobs:
     install:
       - echo "No dependencies to install"
     script:
+      - tox -c tox-dev.ini -e build -vv
       - export SO_MAGIC_RELEASE_VERSION=$(python scripts/parse_package_version.py)
       - tox -c tox-dev.ini -e deploy -vv
     after_success: skip
