@@ -1,4 +1,3 @@
-
 0.5.1 (2021-04-22)
 -------------------
 
@@ -13,6 +12,7 @@ test
 
 documentation
 """""""""""""
+- re-design utils package api rtd documentation
 - fix warnings of phi module and test the example code by running it in a doctest session
 - document the purpose of the backend module (defines data_engine_wrapper)
 - fix word spelling, eliminate docs build command warnings
@@ -24,6 +24,10 @@ documentation
 
 ci
 ""
+- split check, build & deploy tox envs, add uml command to circleci, add pyroma check to all CIs
+- define an environment to generate uml (class & package) diagrams by inspecting the code
+- speed up jobs and revamp pipeline
+- remove the windows ci pipeline running on appveyor
 - pass the .git directory to the send-test-to-codecov job
 - define job to send coverage to codecov.io and run it on every commit
 - add the --cov and --cov-report=term-missing cli arguments to the dev-cov command
