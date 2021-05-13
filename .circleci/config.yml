@@ -159,12 +159,9 @@ jobs:
       - checkout
       - run: sudo apt-get update -y
       - run: python -m pip install -U pip
-      - run: sudo apt-get install graphviz
       - run:
-          name: Equip machine with anaconda (conda executable)
-          command: |
-            chmod +x scripts/install_anaconda.sh
-            scripts/install_anaconda.sh
+          name: Install the dot binary included in the graphviz package/distribution
+          command: sudo apt-get install graphviz
       - run:
           name: Install tox automation tool
           command: python -m pip install --user tox
@@ -176,7 +173,7 @@ jobs:
           destination: dep-graphs
       - run:
           name: Visualize uml diagrams as .svg files
-          command: python -m tox -c tox-dev.ini -e uml -vv
+          command: python -m tox -c tox-dev.ini -vv -e uml -- svg
       - store_artifacts:
           path: uml-diagrams
           destination: uml-diagrams
