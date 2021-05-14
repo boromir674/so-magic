@@ -1,5 +1,4 @@
 import os
-import re
 import sys
 from setuptools import setup
 import subprocess
@@ -40,6 +39,8 @@ setup(
     name=project_slug,
     version=_version,
     long_description_content_type='text/x-rst',
+    author='Konstantinos Lampridis',
+    author_email='k.lampridis@hotmail.com',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

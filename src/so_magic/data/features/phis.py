@@ -11,9 +11,11 @@ class DatapointsAttributePhi:
 
 
 def _values_set(list_to_nominal):
-    if str(list_to_nominal.attribute_reporter) not in list_to_nominal.datapoints_attribute_phi.datapoints.get_categorical_attributes():
-        raise RuntimeError(f"Requested to use the 'list_to_nominal' encoder, but the given variable '{str(list_to_nominal.attribute_reporter)}',"
-                           f"seems to not belong in the categorical variables of the structured data (so can't be nominal as well).")
+    if str(list_to_nominal.attribute_reporter) not in\
+            list_to_nominal.datapoints_attribute_phi.datapoints.get_categorical_attributes():
+        raise RuntimeError(f"Requested to use the 'list_to_nominal' encoder, but the given variable "
+                           f"'{str(list_to_nominal.attribute_reporter)}', seems to not belong in the categorical "
+                           "variables of the structured data (so can't be nominal as well).")
     return list_to_nominal.attribute_reporter.values_set(list_to_nominal.datapoints_attribute_phi.datapoints)
 
 
@@ -41,8 +43,9 @@ class ListOfCategoricalPhi:
             attribute (str): the attribute we wish to target for input to the phi function
         """
         self.attribute_reporter = args[0]
-        return iter([self._binary_transformer[x in datapoint] for x in self._ordering] for datapoint in self.datapoints_attribute_phi.datapoints.iterrows())
+        return iter([self._binary_transformer[x in datapoint] for x in self._ordering]
+                    for datapoint in self.datapoints_attribute_phi.datapoints.iterrows())
 
     @staticmethod
-    def _order(x):
-        return iter(_ for _ in sorted(x))
+    def _order(values_iterable):
+        return iter(_ for _ in sorted(values_iterable))

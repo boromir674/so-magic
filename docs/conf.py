@@ -22,7 +22,7 @@ copyright = '2020, Konstantinos Lampridis'
 author = 'Konstantinos Lampridis'
 
 # The full version, including alpha/beta/rc tags
-release = '0.4.4'
+release = '0.5.1'
 
 # -- General configuration ---------------------------------------------------
 
@@ -66,7 +66,7 @@ if not on_rtd:  # only set the theme if we're building docs locally
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 
 ### External Links Configuration ###

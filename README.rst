@@ -8,7 +8,7 @@ A python library providing with an elegant interface (API) to infer models of th
 
 .. start-badges
 
-|circleci| |travis| |release_version| |wheel| |supported_versions| |commits_since| |appveyor| |codacy_coverage| |docs| |better_code_hub| |codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
+|circleci| |travis| |release_version| |wheel| |supported_versions| |commits_since| |codacy_coverage| |docs| |better_code_hub| |codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
 
 
 .. |circleci| image:: https://circleci.com/gh/boromir674/so-magic/tree/dev.svg?style=shield
@@ -19,10 +19,6 @@ A python library providing with an elegant interface (API) to infer models of th
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/boromir674/so-magic
 
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/6u04abdkt9ou802l/branch/dev?svg=true
-    :alt: Appveyor Build Status
-    :target: https://ci.appveyor.com/project/boromir674/so-magic/branch/dev
-    
 .. |codacy_coverage| image:: https://app.codacy.com/project/badge/Coverage/3c5b20d36ce94865b704e589b89204d4
     :alt: Codacy code coverage
     :target: https://www.codacy.com/manual/boromir674/so-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Coverage
@@ -63,9 +59,9 @@ A python library providing with an elegant interface (API) to infer models of th
     :alt: Supported Python versions
     :target: https://pypi.org/project/so-magic
 
-.. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.4.4.svg
+.. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.5.1.svg
     :alt: Commits since latest release
-    :target: https://github.com/boromir674/so-magic/compare/v0.4.4..dev
+    :target: https://github.com/boromir674/so-magic/compare/v0.5.1..dev
 
 To read more about the library (installation guide, features, how-to-use, etc)
 please read further in the So Magic dev documentation in https://so-magic.readthedocs.io/en/dev/.

@@ -1,6 +1,4 @@
 from so_magic.data.backend.engine_specs import EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator
-from so_magic.data.backend.engine import DataEngine
-import pandas as pd
 
 __all__ = ['PDTabularRetriever', 'PDTabularIterator', 'PDTabularMutator']
 
@@ -29,7 +27,7 @@ class PDTabularIterator(EngineTabularIterator):
     """The observation object is the same as the one your return from 'from_json_lines'"""
 
     def columnnames(self, data):
-        return [_ for _ in data.observations.columns]
+        return list(data.observations.columns)
 
     def iterrows(self, data):
         return iter(data.observations.iterrows())

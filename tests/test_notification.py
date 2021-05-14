@@ -7,7 +7,7 @@ def subject():
 
 
 @pytest.fixture
-def observer_class():
+def observer():
     from so_magic.utils import Observer
     return Observer
 
@@ -47,18 +47,24 @@ def test_observers_sanity_test1(subject):
     assert id(subject1._observers) != id(subject2._observers)
 
 
-def test_scenario(subject, observer_class):
+def test_observer_as_constructor(observer):
+    with pytest.raises(TypeError) as instantiation_from_interface_error:
+        observer_instance = observer()
+    assert "Can't instantiate abstract class Observer with abstract methods update" in str(instantiation_from_interface_error.value)
+
+
+def test_scenario(subject, observer):
 # The client code.
 
     print("------ Scenario 1 ------\n")
-    class ObserverA(observer_class):
+    class ObserverA(observer):
         def update(self, a_subject) -> None:
             if a_subject.state == 0:
                 print("ObserverA: Reacted to the event")
 
     s1 = subject([])
-    o1 = observer_class()
-    s1.attach(o1)
+    # o1 = observer()
+    # s1.attach(o1)
 
     # business logic
     s1.state = 0
@@ -81,7 +87,7 @@ def test_scenario(subject, observer_class):
             print(f"Subject: My state has just changed to: {self._state}")
             self.notify()
 
-    class ObserverB(observer_class):
+    class ObserverB(observer):
         def update(self, a_subject) -> None:
             if a_subject.state == 0 or a_subject.state >= 2:
                 print("ObserverB: Reacted to the event")

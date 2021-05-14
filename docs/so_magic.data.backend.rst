@@ -28,6 +28,14 @@ so\_magic.data.backend.engine module
    :undoc-members:
    :show-inheritance:
 
+so\_magic.data.backend.engine\_command\_factory module
+------------------------------------------------------
+
+.. automodule:: so_magic.data.backend.engine_command_factory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 so\_magic.data.backend.engine\_specs module
 -------------------------------------------
 
