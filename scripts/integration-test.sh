@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# a version string possibly following semantic versioning
+# eg 0.5.1, 1.3.2
 VERSION_OF_INTEREST=$1
 
 MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -7,28 +9,27 @@ MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ENV_NAME="integration-env-5"
 ENV_PATH=$MY_DIR/../$ENV_NAME
 
-if [[ $(echo "$HOME") ]]; then
+if [[ "$HOME" ]]; then
   echo "\$HOME variable is already populated.";
 else
   HOME=/home/travis
 fi
 
-which conda
-if [[ $? != 0 ]]; then
+
+if [[ $(which conda) ]]; then
+  echo '------------ CONDA IS ALREADY INSTALLED -------------'
+else
   export PATH=$PATH:$HOME/miniconda/bin/
-  which conda
-  if [[ $? != 0 ]]; then
+  if [[ $(which conda) ]]; then
+    echo '------------ CONDA IS ALREADY INSTALLED -------------'
+  else
     echo "CONDA NOT FOUND"
     echo '------------ INSTALLING CONDA -------------'
     chmod +x scripts/install_anaconda.sh
     scripts/install_anaconda.sh
     export CONDA_EXE=$HOME/miniconda/bin/conda
     export PATH=$PATH:$HOME/miniconda/bin/
-  else
-    echo '------------ CONDA IS ALREADY INSTALLED -------------'
   fi
-else
-  echo '------------ CONDA IS ALREADY INSTALLED -------------'
 fi
 
 set -e
@@ -38,7 +39,7 @@ echo '------------ CREATING ENV -------------'
 # TODO check if environment with path ENV_PATH exists in the list of conda environments
 # if yes than do not create an environment with the -p flag
 # if no use the beloow command
-conda create -p $ENV_PATH -y python=3.7
+conda create -p "$ENV_PATH" -y python=3.8
 
 printf "\n ---- SOURCING ----\n"
 FILE_TO_SOURCE="$HOME/miniconda/etc/profile.d/conda.sh"
@@ -65,40 +66,40 @@ echo '------------ ACTIVATING ENV -------------'
 # TODO check if environment with path ENV_PATH exists in the list of conda environments
 # if yes then do 'conda create'
 # if no then do 'conda activate $ENV_PATH'
-conda activate $ENV_PATH
+conda activate "$ENV_PATH"
 #conda activate
 
 echo '------------ INSTALLING DEPS -------------'
 if [[ $(uname -s) == Darwin ]]; then  # we are on macOS
   echo "We are on macOS: skipping apt-get install command"
 else  # we assume we are on linux
-  sudo apt-get install --yes gcc gfortran python-dev liblapack-dev cython libblas-dev
+  sudo apt-get install --yes gcc gfortran python3-dev liblapack-dev cython libblas-dev
 fi
 #sudo apt-get install --yes python3-scipy
 echo '------------ INSTALLING PYTHON DEPS -------------'
-python -m pip install -U pip
-python -m pip install -U wheel
+python3 -m pip install -U pip
+python3 -m pip install -U wheel
 conda install somoclu --channel conda-forge
 
 # TODO
 # If we install from testpypi then absolutely install the base and dev requirements
 # if we are installing from pypi experiment with both options both locally and on ci and then decide on code
-python -m pip install -r requirements/base.txt
-python -m pip install -r requirements/dev.txt
+python3 -m pip install -r requirements/base.txt
+python3 -m pip install -r requirements/dev.txt
 
 echo '------------ INSTALLING SO_MAGIC FROM TEST-PYPI -------------'
 # use the --no-deps flag, because test pypi absolutely not guarantees that it can satisfy dependencies by
 # looking for the packages in the index, simply because they might not exist
 
 # TODO dynamically decide to use pypi or testpypi
-python -m pip install --index-url https://test.pypi.org/simple/ --no-deps so_magic==$VERSION_OF_INTEREST
+python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps so_magic=="$VERSION_OF_INTEREST"
 #python -m pip install so_magic==$VERSION_OF_INTEREST
 
-python -c 'import so_magic'
+python3 -c 'import so_magic'
 
 echo "Successfully installed the library emnulating the real 'pip install' scenario using the test-pypi server."
-python -m pip install pytest pytest-cov
-python -m pytest $MY_DIR/../tests -vv --cov
+python3 -m pip install pytest pytest-cov
+python3 -m pytest "$MY_DIR"/../tests -vv --cov
 echo "Successfully installed ran the test suite (unit-tests) that are bundled with the distribution (package) against the 'so-magic' library installed in the system"
 
 echo "SUCCESS!!!"
