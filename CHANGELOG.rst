@@ -1,3 +1,15 @@
+0.5.2 (2021-05-22)
+------------------
+
+documentation
+"""""""""""""
+- report correct code coverage and other values of code badges
+
+ci
+""
+- add the .prospector.yml configuration file and avoid crash (due to .pylintrc)
+
+
 0.5.1 (2021-04-22)
 -------------------
 
