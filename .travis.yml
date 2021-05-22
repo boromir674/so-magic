@@ -64,6 +64,7 @@ jobs:
     name: "Build documentation"
     after_success: skip
   - stage: Deploy-to-staging-environment
+    if: branch =~ /^(master|dev|release-staging)$/
     name: "Upload the package to the testpypi (index) server"
     python: '3.8'
     install:
@@ -74,6 +75,7 @@ jobs:
       - tox -c tox-dev.ini -e deploy -vv
     after_success: skip
   - stage: Integration-test-using-staging
+    if: branch =~ /^(master|dev|release-staging)$/
     name: "Emulated a real-world-scenario by installing the package from the testpypi and running the unittests against the installation"
     python: '3.8'
     script:
