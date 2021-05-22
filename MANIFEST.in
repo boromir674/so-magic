@@ -39,6 +39,7 @@ recursive-include docs *.rst
 
 include docs/Makefile
 include docs/spelling_wordlist.txt
+include docs/static/magic-logo-prototype-1.png
 
 
 include scripts/install_anaconda.sh
