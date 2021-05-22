@@ -24,11 +24,11 @@ A python library providing with an elegant interface (API) to infer models of th
     :alt: Supported Python versions
     :target: https://pypi.org/project/so-magic
 
-.. |circleci| image:: https://circleci.com/gh/boromir674/so-magic/tree/dev.svg?style=shield
+.. |circleci| image:: https://circleci.com/gh/boromir674/so-magic/tree/master.svg?style=shield
     :alt: CircleCI Build Status
-    :target: https://circleci.com/gh/boromir674/so-magic/tree/dev
+    :target: https://circleci.com/gh/boromir674/so-magic/tree/master
 
-.. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=dev
+.. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=master
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/boromir674/so-magic
 
@@ -36,11 +36,11 @@ A python library providing with an elegant interface (API) to infer models of th
     :target: https://so-magic.readthedocs.io/en/latest/?badge=stable
     :alt: Documentation Status
 
-.. |codecov_new| image:: https://codecov.io/gh/boromir674/so-magic/branch/dev/graph/badge.svg?token=JcAbqe8scC
+.. |codecov_new| image:: https://codecov.io/gh/boromir674/so-magic/branch/master/graph/badge.svg?token=JcAbqe8scC
     :alt: Test Coverage
     :target: https://codecov.io/gh/boromir674/so-magic
 
-.. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=dev
+.. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=master
     :alt: Better Code Hub
     :target: https://bettercodehub.com/
 
@@ -48,17 +48,17 @@ A python library providing with an elegant interface (API) to infer models of th
     :alt: Codacy Code quality
     :target: https://www.codacy.com/gh/boromir674/so-magic/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Grade
 
-.. |scrutinizer_code_quality| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/quality-score.png?b=dev
+.. |scrutinizer_code_quality| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/quality-score.png?b=master
     :alt: Code Quality
-    :target: https://scrutinizer-ci.com/g/boromir674/so-magic/?branch=dev
+    :target: https://scrutinizer-ci.com/g/boromir674/so-magic/?branch=master
 
-.. |code_intelligence_status| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/code-intelligence.svg?b=dev
+.. |code_intelligence_status| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/code-intelligence.svg?b=master
     :alt: Code Intelligence
     :target: https://scrutinizer-ci.com/code-intelligence
 
 .. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.5.2.svg
     :alt: Commits since latest release
-    :target: https://github.com/boromir674/so-magic/compare/v0.5.2..dev
+    :target: https://github.com/boromir674/so-magic/compare/v0.5.2..master
 
 .. |code_climate| image:: https://api.codeclimate.com/v1/badges/00053b21a36ac61066e5/maintainability
    :target: https://codeclimate.com/github/boromir674/so-magic/maintainability
@@ -66,4 +66,4 @@ A python library providing with an elegant interface (API) to infer models of th
 
 
 To read more about the library (installation guide, features, how-to-use, etc)
-please read further in the So Magic dev documentation in https://so-magic.readthedocs.io/en/dev/.
+please read further in the So Magic documentation in https://so-magic.readthedocs.io/.
