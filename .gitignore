@@ -21,3 +21,13 @@ coverage.xml
 dist/
 docs/.DS_Store
 src/.DS_Store
+
+docs/_build/
+htmlcov/
+
+package-lock.json
+package.json
+
+so-magic-dependency-graphs/
+test-results/
+uml-diagrams/
