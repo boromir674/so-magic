@@ -8,48 +8,13 @@ A python library providing with an elegant interface (API) to infer models of th
 
 .. start-badges
 
-|circleci| |travis| |release_version| |wheel| |supported_versions| |commits_since| |codacy_coverage| |docs| |better_code_hub| |codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
+|circleci| |travis| |release_version| |wheel| |supported_versions| |commits_since|
+|codecov_new| |docs| |code_climate| |better_code_hub| |codacy_quality| |scrutinizer_code_quality| |code_intelligence_status|
 
-
-.. |circleci| image:: https://circleci.com/gh/boromir674/so-magic/tree/dev.svg?style=shield
-    :alt: CircleCI Build Status
-    :target: https://circleci.com/gh/boromir674/so-magic/tree/dev
-
-.. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=dev
-    :alt: Travis-CI Build Status
-    :target: https://travis-ci.org/boromir674/so-magic
-
-.. |codacy_coverage| image:: https://app.codacy.com/project/badge/Coverage/3c5b20d36ce94865b704e589b89204d4
-    :alt: Codacy code coverage
-    :target: https://www.codacy.com/manual/boromir674/so-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Coverage
-
-.. |docs| image:: https://readthedocs.org/projects/so-magic/badge/?version=stable
-    :target: https://so-magic.readthedocs.io/en/latest/?badge=stable
-    :alt: Documentation Status
 
 .. |release_version| image:: https://img.shields.io/pypi/v/so-magic
     :target: https://pypi.org/project/so-magic/
     :alt: Production Version
-
-.. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=dev
-    :alt: Better Code Hub
-    :target: https://bettercodehub.com/
-
-.. |codacy_quality| image:: https://app.codacy.com/project/badge/Grade/3c5b20d36ce94865b704e589b89204d4
-    :alt: Codacy Code quality
-    :target: https://www.codacy.com/manual/boromir674/so-magic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Grade
-
-.. |scrutinizer_code_quality| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/quality-score.png?b=dev
-    :alt: Code Quality
-    :target: https://scrutinizer-ci.com/g/boromir674/so-magic/?branch=dev
-
-.. |code_intelligence_status| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/code-intelligence.svg?b=dev
-    :alt: Code Intelligence
-    :target: https://scrutinizer-ci.com/code-intelligence
-
-.. |codecov| image:: https://codecov.io/gh/boromir674/so-magic/branch/dev/graph/badge.svg
-    :alt: Codecov.io code coverage
-    :target: https://codecov.io/gh/boromir674/so-magic
 
 .. |wheel| image:: https://img.shields.io/pypi/wheel/so-magic.svg
     :alt: Python Wheel
@@ -59,9 +24,46 @@ A python library providing with an elegant interface (API) to infer models of th
     :alt: Supported Python versions
     :target: https://pypi.org/project/so-magic
 
+.. |circleci| image:: https://circleci.com/gh/boromir674/so-magic/tree/dev.svg?style=shield
+    :alt: CircleCI Build Status
+    :target: https://circleci.com/gh/boromir674/so-magic/tree/dev
+
+.. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=dev
+    :alt: Travis-CI Build Status
+    :target: https://travis-ci.org/boromir674/so-magic
+
+.. |docs| image:: https://readthedocs.org/projects/so-magic/badge/?version=stable
+    :target: https://so-magic.readthedocs.io/en/latest/?badge=stable
+    :alt: Documentation Status
+
+.. |codecov_new| image:: https://codecov.io/gh/boromir674/so-magic/branch/dev/graph/badge.svg?token=JcAbqe8scC
+    :alt: Test Coverage
+    :target: https://codecov.io/gh/boromir674/so-magic
+
+.. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=dev
+    :alt: Better Code Hub
+    :target: https://bettercodehub.com/
+
+.. |codacy_quality| image:: https://app.codacy.com/project/badge/Grade/319e57e2ec484dce9b953c608f88455d
+    :alt: Codacy Code quality
+    :target: https://www.codacy.com/gh/boromir674/so-magic/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Grade
+
+.. |scrutinizer_code_quality| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/quality-score.png?b=dev
+    :alt: Code Quality
+    :target: https://scrutinizer-ci.com/g/boromir674/so-magic/?branch=dev
+
+.. |code_intelligence_status| image:: https://scrutinizer-ci.com/g/boromir674/so-magic/badges/code-intelligence.svg?b=dev
+    :alt: Code Intelligence
+    :target: https://scrutinizer-ci.com/code-intelligence
+
 .. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.5.1.svg
     :alt: Commits since latest release
     :target: https://github.com/boromir674/so-magic/compare/v0.5.1..dev
+
+.. |code_climate| image:: https://api.codeclimate.com/v1/badges/00053b21a36ac61066e5/maintainability
+   :target: https://codeclimate.com/github/boromir674/so-magic/maintainability
+   :alt: Maintainability
+
 
 To read more about the library (installation guide, features, how-to-use, etc)
 please read further in the So Magic dev documentation in https://so-magic.readthedocs.io/en/dev/.

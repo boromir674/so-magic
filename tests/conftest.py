@@ -71,10 +71,3 @@ def data_manager():
         return data_manager
 
     return getter
-
-
-# Helpers
-@pytest.fixture
-def factories():
-    def factories_dict(data_manager_instance):
-        return {'cmd': DataEngine.test_pd.command_factory}

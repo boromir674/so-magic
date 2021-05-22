@@ -40,7 +40,7 @@ def test_somagic_scenario(train_args, somagic, sample_collaped_json):
 
         # set([]) pd.unique(somagic._data_manager.datapoints.observations['flavors'])
         MAX_FLAVORS_PER_DAATPOINT = max([len(x) for x in [_ for _ in somagic._data_manager.datapoints.observations['flavors'] if type(_) is list]])
-        MIN = 0
+
         assert len(UNIQUE_FLAVORS) > 5
         nb_columns_before = len(somagic._data_manager.datapoints.observations.columns)
 

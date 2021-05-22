@@ -16,6 +16,7 @@ include .readthedocs.yml
 include appveyor.yml
 include bandit.yml
 include .pylintrc
+include .prospector.yml
 
 recursive-include .appveyor *.py
 include .appveyor/appveyor-with-compiler.cmd
