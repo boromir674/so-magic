@@ -56,9 +56,9 @@ A python library providing with an elegant interface (API) to infer models of th
     :alt: Code Intelligence
     :target: https://scrutinizer-ci.com/code-intelligence
 
-.. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.5.1.svg
+.. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.5.2.svg
     :alt: Commits since latest release
-    :target: https://github.com/boromir674/so-magic/compare/v0.5.1..dev
+    :target: https://github.com/boromir674/so-magic/compare/v0.5.2..dev
 
 .. |code_climate| image:: https://api.codeclimate.com/v1/badges/00053b21a36ac61066e5/maintainability
    :target: https://codeclimate.com/github/boromir674/so-magic/maintainability
