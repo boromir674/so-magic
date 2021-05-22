@@ -1,5 +1,3 @@
-import pytest
-
 def test_encoding_list_nominal(data_manager, test_json_data):
     dt_manager = data_manager()
     cmd = dt_manager.command.observations

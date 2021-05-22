@@ -141,7 +141,7 @@ jobs:
             python -m tox -c tox-dev.ini -e deploy -vv
 
   integration-test:
-    executor: py37-docker-image
+    executor: py38-docker-image
     steps:
       - checkout
       - run:
