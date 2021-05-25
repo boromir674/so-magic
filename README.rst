@@ -13,7 +13,7 @@
 | |better_code_hub| |codacy| |codeclimate_tech_debt| |scrutinizer_code_quality|
 
 |
-| **Documentation:** https://so-magic.readthedocs.io/en/dev
+| **Documentation:** https://so-magic.readthedocs.io/en/master
 | **Source Code:** https://github.com/boromir674/so-magic
 |
 
@@ -25,16 +25,16 @@ So Magic is a Python package (`import so_magic`) that can infer *Self-Organing M
     :alt: CircleCI
     :target: https://circleci.com/gh/boromir674/so-magic/tree/master
 
-.. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=dev
+.. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=master
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/boromir674/so-magic
 
-.. |codecov| image:: https://img.shields.io/codecov/c/github/boromir674/so-magic/dev?logo=codecov
+.. |codecov| image:: https://img.shields.io/codecov/c/github/boromir674/so-magic/master?logo=codecov
     :alt: Codecov
     :target: https://codecov.io/gh/boromir674/so-magic
 
-.. |docs| image:: https://readthedocs.org/projects/so-magic/badge/?version=dev
-    :target: https://so-magic.readthedocs.io/en/latest/?badge=dev
+.. |docs| image:: https://readthedocs.org/projects/so-magic/badge/?version=master
+    :target: https://so-magic.readthedocs.io/en/latest/?badge=master
     :alt: Documentation Status
 
 
@@ -52,10 +52,10 @@ So Magic is a Python package (`import so_magic`) that can infer *Self-Organing M
 
 .. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.5.3.svg
     :alt: Commits since latest release
-    :target: https://github.com/boromir674/so-magic/compare/v0.5.3..dev
+    :target: https://github.com/boromir674/so-magic/compare/v0.5.3..master
 
 
-.. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=dev
+.. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=master
     :alt: Better Code Hub
     :target: https://bettercodehub.com/
 
@@ -66,11 +66,11 @@ So Magic is a Python package (`import so_magic`) that can infer *Self-Organing M
 .. |codeclimate_tech_debt| image:: https://img.shields.io/codeclimate/tech-debt/boromir674/so-magic?logo=code%20climate
     :alt: Code Climate technical debt
 
-.. |scrutinizer_code_quality| image:: https://img.shields.io/scrutinizer/quality/g/boromir674/so-magic/dev?logo=scrutinizer-ci
+.. |scrutinizer_code_quality| image:: https://img.shields.io/scrutinizer/quality/g/boromir674/so-magic/master?logo=scrutinizer-ci
     :alt: Scrutinizer code quality
-    :target: https://scrutinizer-ci.com/g/boromir674/so-magic/?branch=dev
+    :target: https://scrutinizer-ci.com/g/boromir674/so-magic/?branch=master
 
 
 
 To read more about the library (installation guide, features, how-to-use, etc)
-please read further in the So Magic `dev documentation <https://so-magic.readthedocs.io/en/dev/>`_.
+please read further in the So Magic `documentation <https://so-magic.readthedocs.io/en/master/>`_.
