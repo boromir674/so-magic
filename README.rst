@@ -10,7 +10,7 @@
 
 | |circleci| |travis| |codecov| |docs|
 | |release_version| |wheel| |supported_versions| |commits_since|
-| |better_code_hub| |codacy| |codeclimate_tech_debt| |scrutinizer_code_quality|
+| |better_code_hub| |scrutinizer_code_quality|
 
 |
 | **Documentation:** https://so-magic.readthedocs.io/en/dev
@@ -21,9 +21,9 @@ So Magic is a Python package (`import so_magic`) that can infer *Self-Organing M
 
 
 
-.. |circleci|  image:: https://img.shields.io/circleci/build/github/boromir674/so-magic/master?logo=circleci
+.. |circleci|  image:: https://img.shields.io/circleci/build/github/boromir674/so-magic/dev?logo=circleci
     :alt: CircleCI
-    :target: https://circleci.com/gh/boromir674/so-magic/tree/master
+    :target: https://circleci.com/gh/boromir674/so-magic/tree/dev
 
 .. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=dev
     :alt: Travis-CI Build Status
@@ -34,8 +34,8 @@ So Magic is a Python package (`import so_magic`) that can infer *Self-Organing M
     :target: https://codecov.io/gh/boromir674/so-magic
 
 .. |docs| image:: https://readthedocs.org/projects/so-magic/badge/?version=dev
-    :target: https://so-magic.readthedocs.io/en/latest/?badge=dev
     :alt: Documentation Status
+    :target: https://so-magic.readthedocs.io/en/latest/?badge=dev
 
 
 .. |release_version| image:: https://img.shields.io/pypi/v/so-magic
@@ -50,21 +50,14 @@ So Magic is a Python package (`import so_magic`) that can infer *Self-Organing M
     :alt: Supported Python versions
     :target: https://pypi.org/project/so-magic
 
-.. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.5.3.svg
-    :alt: Commits since latest release
+.. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.5.3/mpeta?logo=github
+    :alt: GitHub commits on branch, since tagged version
     :target: https://github.com/boromir674/so-magic/compare/v0.5.3..dev
 
 
 .. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=dev
     :alt: Better Code Hub
     :target: https://bettercodehub.com/
-
-.. |codacy| image:: https://app.codacy.com/project/badge/Grade/319e57e2ec484dce9b953c608f88455d
-    :alt: Codacy
-    :target: https://www.codacy.com/gh/boromir674/so-magic/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Grade
-
-.. |codeclimate_tech_debt| image:: https://img.shields.io/codeclimate/tech-debt/boromir674/so-magic?logo=code%20climate
-    :alt: Code Climate technical debt
 
 .. |scrutinizer_code_quality| image:: https://img.shields.io/scrutinizer/quality/g/boromir674/so-magic/dev?logo=scrutinizer-ci
     :alt: Scrutinizer code quality
