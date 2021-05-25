@@ -21,15 +21,15 @@ So Magic is a Python package (`import so_magic`) that can infer *Self-Organing M
 
 
 
-.. |circleci|  image:: https://img.shields.io/circleci/build/github/boromir674/so-magic/dev?logo=circleci
+.. |circleci|  image:: https://img.shields.io/circleci/build/github/boromir674/so-magic/master?logo=circleci
     :alt: CircleCI
-    :target: https://circleci.com/gh/boromir674/so-magic/tree/dev
+    :target: https://circleci.com/gh/boromir674/so-magic/tree/master
 
 .. |travis| image:: https://travis-ci.org/boromir674/so-magic.svg?branch=dev
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/boromir674/so-magic
 
-.. |codecov| image:: https://img.shields.io/codecov/c/github/boromir674/so-magic/mpeta?logo=codecov
+.. |codecov| image:: https://img.shields.io/codecov/c/github/boromir674/so-magic/dev?logo=codecov
     :alt: Codecov
     :target: https://codecov.io/gh/boromir674/so-magic
 
@@ -63,16 +63,12 @@ So Magic is a Python package (`import so_magic`) that can infer *Self-Organing M
     :alt: Codacy
     :target: https://www.codacy.com/gh/boromir674/so-magic/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Grade
 
-.. |codacy_branch_quality| image:: https://img.shields.io/codacy/grade/319e57e2ec484dce9b953c608f88455d/mpeta?logo=codacy
-    :alt: Codacy branch grade
-    :target: https://app.codacy.com/gh/boromir674/so-magic/dashboard?branch=mpeta
-
 .. |codeclimate_tech_debt| image:: https://img.shields.io/codeclimate/tech-debt/boromir674/so-magic?logo=code%20climate
     :alt: Code Climate technical debt
 
-.. |scrutinizer_code_quality| image:: https://img.shields.io/scrutinizer/quality/g/boromir674/so-magic/mpeta?logo=scrutinizer-ci
+.. |scrutinizer_code_quality| image:: https://img.shields.io/scrutinizer/quality/g/boromir674/so-magic/dev?logo=scrutinizer-ci
     :alt: Scrutinizer code quality
-    :target: https://scrutinizer-ci.com/g/boromir674/so-magic/?branch=mpeta
+    :target: https://scrutinizer-ci.com/g/boromir674/so-magic/?branch=dev
 
 
 
