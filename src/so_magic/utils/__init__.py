@@ -7,8 +7,9 @@ from .singleton import Singleton
 from .transformations import Transformer
 from .linear_mapping import MapOnLinearSpace
 from .command_factory_interface import CommandFactoryInterface, CommandFactoryType
+from .subclass_registry import SubclassRegistry
 
 
 __all__ = ['Command', 'Invoker', 'CommandHistory', 'GenericMediator', 'BaseComponent', 'Observer', 'Subject',
            'ObjectRegistry', 'ObjectRegistryError', 'ObjectsPool', 'Singleton', 'Transformer', 'MapOnLinearSpace',
-           'CommandFactoryInterface', 'CommandFactoryType']
+           'CommandFactoryInterface', 'CommandFactoryType', 'SubclassRegistry']
