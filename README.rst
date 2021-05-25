@@ -50,9 +50,9 @@ So Magic is a Python package (`import so_magic`) that can infer *Self-Organing M
     :alt: Supported Python versions
     :target: https://pypi.org/project/so-magic
 
-.. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.5.2.svg
+.. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.5.3.svg
     :alt: Commits since latest release
-    :target: https://github.com/boromir674/so-magic/compare/v0.5.2..dev
+    :target: https://github.com/boromir674/so-magic/compare/v0.5.3..dev
 
 
 .. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=dev
