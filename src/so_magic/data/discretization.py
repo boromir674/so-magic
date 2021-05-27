@@ -1,5 +1,6 @@
 from abc import ABC
 import attr
+from so_magic.utils import SubclassRegistry
 
 
 class DiscretizerInterface(ABC):
@@ -65,23 +66,15 @@ class BaseBinner(BinnerInterface):
         raise NotImplementedError
 
 
-class BinnerFactory:
-    subclasses = {}
-    @classmethod
-    def register_as_subclass(cls, backend_type):
-        def wrapper(subclass):
-            cls.subclasses[backend_type] = subclass
-            return subclass
-        return wrapper
+class BinnerClass(metaclass=SubclassRegistry): pass
 
-    @classmethod
-    def create(cls, backend_type, *args, **kwargs):
-        if backend_type not in cls.subclasses:
-            raise ValueError('Bad "BinnerFactory Backend type" type \'{}\''.format(backend_type))
-        return cls.subclasses[backend_type](*args, **kwargs)
+
+class BinnerFactory:
+    parent_class = BinnerClass
 
     def equal_length_binner(self, *args, **kwargs) -> BaseBinner:
         raise NotImplementedError
+
     def quantisized_binner(self, *args, **kwargs) -> BaseBinner:
         raise NotImplementedError
 
