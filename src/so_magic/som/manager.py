@@ -7,16 +7,15 @@ from .factory import SelfOrganizingMapFactory
 logger = logging.getLogger(__name__)
 
 
-class SomapObjectPool(ObjectsPool):
-    def _build_hash(self, *args, **kwargs):
-        return str(MapId(*args, kwargs.get('initialization'), kwargs.get('map_type'), kwargs.get('grid_type')))
+def _build_hash(_self, *args, **kwargs):
+    return str(MapId(*args, kwargs.get('initialization'), kwargs.get('map_type'), kwargs.get('grid_type')))
 
 
 @attr.s
 class MapManager:
     map_factory = attr.ib(init=True, default=SelfOrganizingMapFactory())
-    pool = attr.ib(init=False, default=attr.Factory(lambda self: SomapObjectPool(self.map_factory.create),
-                                                    takes_self=True))
+    pool = attr.ib(init=False, default=attr.Factory(
+        lambda self: ObjectsPool(self.map_factory.create, {}, _build_hash), takes_self=True))
 
     def get_map(self, *args, **kwargs):
         """

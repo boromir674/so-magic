@@ -13,13 +13,13 @@ class AbstractDiscretizer(DiscretizerInterface):
         raise NotImplementedError
 
 
+def validate_bin_function(_self, _attribute, value):
+    if not callable(value):
+        raise ValueError(f'Expected a callable object, instead a {type(value).__name__} was given.')
+
 @attr.s
 class BaseDiscretizer(AbstractDiscretizer):
-    binner = attr.ib(init=True)
-    @binner.validator
-    def validate_bin_function(self, _attribute, value):
-        if not callable(value):
-            raise ValueError(f'Expected a callable object, instead a {type(value).__name__} was given.')
+    binner = attr.ib(init=True, validator=validate_bin_function)
 
     def discretize(self, *args, **kwargs):
         """Expects args: dataset, feature and kwargs; 'nb_bins'."""

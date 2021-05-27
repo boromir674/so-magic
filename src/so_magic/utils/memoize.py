@@ -1,9 +1,19 @@
-"""
-Implementation of the object pool
-"""
+"""Implementation of the object pool"""
+import types
 import attr
 
 __all__ = ['ObjectsPool']
+
+
+def build_hash(*args, **kwargs):
+    r"""Construct a unique string out of the input \*args and \*\*kwargs."""
+    return hash('-'.join([str(_) for _ in args] + ['{key}={value}'.format(key=k, value=str(v)) for k, v in kwargs]))
+
+
+def _convert_to_method(function):
+    def _function(_self, *args, **kwargs):
+        return function(*args, **kwargs)
+    return _function
 
 
 @attr.s
@@ -20,6 +30,8 @@ class ObjectsPool:
     """
     constructor = attr.ib(init=True)
     _objects = attr.ib(init=True, default={})
+    _build_hash = attr.ib(default=attr.Factory(lambda self: types.MethodType(_convert_to_method(build_hash), self),
+                                               takes_self=True))
 
     def get_object(self, *args, **kwargs):
         r"""Request an object from the pool.
@@ -36,7 +48,3 @@ class ObjectsPool:
         if key not in self._objects:
             self._objects[key] = self.constructor(*args, **kwargs)
         return self._objects[key]
-
-    def _build_hash(self, *args, **kwargs):
-        r"""Construct a unique string out of the input \*args and \*\*kwargs."""
-        return hash('-'.join([str(_) for _ in args] + ['{key}={value}'.format(key=k, value=str(v)) for k, v in kwargs]))

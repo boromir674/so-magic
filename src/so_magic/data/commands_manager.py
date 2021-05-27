@@ -7,6 +7,7 @@ class CommandsAccumulator(Observer):
     commands = attr.ib(init=False, default={})
 
     def update(self, subject) -> None:
+        # add logging here
         self.commands[getattr(subject, 'name', str(subject.state))] = subject.state
 
     def __contains__(self, item):

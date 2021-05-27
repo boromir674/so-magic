@@ -19,12 +19,10 @@ def test_singleton():
 
     assert id(reg1) == id(reg2) == id(reg3)
     for i in rs:
-        print(i.objects)
         assert i.objects == {'a': 1, 'b': 2}
     assert all(x.objects == {'a': 1,
                              'b': 2} for x in rs)
     del reg3.objects['a']
     assert all(x.objects == {'b': 2} for x in rs)
     for i in rs:
-        print(i.objects)
         assert i.objects == {'b': 2}
