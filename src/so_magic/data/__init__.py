@@ -1,3 +1,4 @@
+from functools import reduce
 from .data_manager import DataManager
 from .features.phi import PhiFunctionRegistrator
 from .features import FeatureManager
