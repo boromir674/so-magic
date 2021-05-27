@@ -80,6 +80,7 @@ class MagicCommandFactory(Subject):
         command_factory (CommandFactory, optional): an instance of a CommandFActory
     """
     command_factory = attr.ib(init=True, default=CommandFactory())
+    name: str = attr.ib(init=False, default='')
 
     def __call__(self, *args, **kwargs):
         self.state, self.name = self.command_factory.create(*args, **kwargs)

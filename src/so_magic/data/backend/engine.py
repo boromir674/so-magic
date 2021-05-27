@@ -69,7 +69,7 @@ class EngineType(CommandRegistrator):
         engine_type.command = mcs.magic_decorator
         engine_type.command_factory = MagicCommandFactory()
         engine_type._receivers = defaultdict(lambda: engine_type._generic_cmd_receiver,
-                                             observations=engine_type._observations_from_file_cmd_receiver)
+                                             observations_command=engine_type._observations_from_file_cmd_receiver)
         return engine_type
 
     def _observations_from_file_cmd_receiver(cls, callable_function, **kwargs) -> Tuple[callable, dict]:
@@ -90,7 +90,7 @@ class EngineType(CommandRegistrator):
                                     cls.command_factory(a_function, **kwargs_dict))
         """
 
-        def observations(file_path, **runtime_kwargs):
+        def observations_command(file_path, **runtime_kwargs):
             """Construct the observations attribute of a Datapoints instance.
 
             The signature of this function determines the signature that is used at runtime
@@ -109,8 +109,7 @@ class EngineType(CommandRegistrator):
                                                       cls.iterator(),
                                                       cls.mutator(),
                                                       file_path=file_path)
-
-        return observations, {}
+        return observations_command, {}
 
     def _generic_cmd_receiver(cls, callable_function, **kwargs) -> Tuple[callable, dict]:
         """Create the Receiver of a generic command.

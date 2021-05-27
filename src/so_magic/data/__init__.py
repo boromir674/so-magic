@@ -11,7 +11,7 @@ def init_data_manager(a_backend):
     mega_cmd_factory.attach(data_manager.commands_manager.command.accumulator)
 
     @data_manager.backend.engine.dec()
-    def encode_nominal_subsets(datapoints, attribute, new_attribute):
+    def encode_nominal_subsets_command(datapoints, attribute, new_attribute):
         from so_magic.data.features.phis import ListOfCategoricalPhi, DatapointsAttributePhi
         phi = ListOfCategoricalPhi(DatapointsAttributePhi(datapoints))
         new_values = phi(attribute)
@@ -20,7 +20,7 @@ def init_data_manager(a_backend):
     import pandas as pd
 
     @data_manager.backend.engine.dec()
-    def observations(file_path):
+    def observations_command(file_path):
         return pd.read_json(file_path, lines=True)
 
     from so_magic.data.encoding import NominalAttributeEncoder
@@ -40,18 +40,17 @@ def init_data_manager(a_backend):
 
 
     @mega_cmd_factory.build_command_prototype()
-    def one_hot_encoding(_data_manager, _datapoints, _attribute):
+    def one_hot_encoding_command(_data_manager, _datapoints, _attribute):
         dataframe = OneHotEncoder().encode(_datapoints, _attribute)
         _data_manager.datapoints.observations = pd.concat([_data_manager.datapoints.observations, dataframe], axis=1)
 
 
     @mega_cmd_factory.build_command_prototype()
-    def select_variables(_data_manager, variables):
+    def select_variables_command(_data_manager, variables):
         _data_manager.feature_manager.feature_configuration = variables
 
 
     import numpy as np
-    from functools import reduce
 
     class OneHotListEncoder(NominalAttributeEncoder):
         binary_transformer = {True: 1.0, False: 0.0}
@@ -60,14 +59,14 @@ def init_data_manager(a_backend):
             datapoints = args[0]
             attribute = args[1]
             self.values_set = reduce(lambda i, j: set(i).union(set(j)),
-                                     [_ for _ in datapoints.observations[attribute] if type(_) == list])
-            self.columns = [_ for _ in self.values_set]
+                                     [_ for _ in datapoints.observations[attribute] if isinstance(_, list)])
+            self.columns = list(self.values_set)
             return pd.DataFrame([self._yield_vector(datarow, attribute) for index, datarow in datapoints.iterrows()],
                                 columns=self.columns)
 
         def _yield_vector(self, datarow, attribute):
             decision = {True: self._encode, False: self._encode_none}
-            return decision[type(datarow[attribute]) == list](datarow, attribute)
+            return decision[isinstance(datarow[attribute], list)](datarow, attribute)
 
         def _encode(self, datarow, attribute):
             return [OneHotListEncoder.binary_transformer[column in datarow[attribute]] for column in self.columns]
@@ -76,7 +75,7 @@ def init_data_manager(a_backend):
             return [0.0] * len(self.values_set)
 
     @mega_cmd_factory.build_command_prototype()
-    def one_hot_encoding_list(_data_manager, _datapoints, _attribute):
+    def one_hot_encoding_list_command(_data_manager, _datapoints, _attribute):
         _data_manager.datapoints.observations[_attribute].fillna(value=np.nan, inplace=True)
         dataframe = OneHotListEncoder().encode(_datapoints, _attribute)
         _data_manager.datapoints.observations = pd.concat([_data_manager.datapoints.observations, dataframe],

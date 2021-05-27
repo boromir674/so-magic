@@ -14,7 +14,7 @@ class SoMaster:
     _datasets = attr.ib(init=False, default={})
 
     def load_data(self, file_path):
-        cmd = self._data_manager.command.observations
+        cmd = self._data_manager.command.observations_command
         cmd.args = [file_path]
         cmd.execute()
         self._last_path = file_path

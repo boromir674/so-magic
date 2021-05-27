@@ -1,4 +1,3 @@
-
 def test_singleton():
     from so_magic.utils import Singleton
 
