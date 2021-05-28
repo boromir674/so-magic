@@ -11,15 +11,15 @@ def tabular_operators():
         'mutator': PDTabularMutator,
     }
 
-
 @pytest.fixture
-def tabular_interfaces():
-    from so_magic.data.backend.engine_specs import EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator
+def tabular_operators_reverse():
+    from so_magic.data.backend.panda_handling.df_backend import PDTabularRetriever, PDTabularIterator, PDTabularMutator
     return {
-        'retriever': EngineTabularRetriever,
-        'iterator': EngineTabularIterator,
-        'mutator': EngineTabularMutator,
+        PDTabularRetriever: 'retriever',
+        PDTabularIterator: 'iterator',
+        PDTabularMutator: 'mutator',
     }
+
 
 @pytest.fixture
 def tabular_interfaces_contracts():
@@ -41,83 +41,51 @@ def tabular_interfaces_contracts():
         },
     }
 
-def test_tabular_interfaces(tabular_interfaces, tabular_operators, tabular_interfaces_contracts):
-    
-    # RETRIEVER
 
-    pd_tabular_retriever1 = tabular_operators['retriever']()
-    pd_tabular_retriever2 = tabular_operators['retriever']()
-
-    expected_implemented_methods_names = list(x[0] for x in inspect.getmembers(
-                tabular_interfaces['retriever'], predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
-
-    member1 = list(x[0] for x in inspect.getmembers(pd_tabular_retriever1, predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
-    member2 = list(x[0] for x in inspect.getmembers(pd_tabular_retriever2, predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
-
-    for retr_expec_member in expected_implemented_methods_names:
-        assert retr_expec_member in member1
-        assert retr_expec_member in member1
-        sig = inspect.signature(getattr(pd_tabular_retriever1, retr_expec_member))
-        assert str(sig) == tabular_interfaces_contracts['retriever']
+@pytest.fixture
+def member_names():
+    def get_member_names(_object):
+        return list(x[0] for x in inspect.getmembers(_object, predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))    
+    return get_member_names
 
 
-    assert id(pd_tabular_retriever1._delegate) != id(pd_tabular_retriever2._delegate) 
-
-    for function in tabular_interfaces_contracts['retriever']:
-        assert function in dir(pd_tabular_retriever1)
-        assert id(getattr(pd_tabular_retriever1, function)) != id(getattr(pd_tabular_retriever2, function))
-        assert id(getattr(pd_tabular_retriever1._delegate, function)) != id(getattr(pd_tabular_retriever2._delegate, function))
-    
+@pytest.fixture
+def create_instances(tabular_operators):
+    def _create_operators(*interface_ids):
+        return tuple(tabular_operators[interface_id]() for interface_id in interface_ids)
+    return _create_operators
 
 
-    # ITERATOR
-
-    pd_tabular_iterator1 = tabular_operators['iterator']()
-    pd_tabular_iterator2 = tabular_operators['iterator']()
-
-    expected_implemented_methods_names = list(x[0] for x in inspect.getmembers(
-                tabular_interfaces['iterator'], predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
-
-
-    member1 = list(x[0] for x in inspect.getmembers(pd_tabular_iterator1, predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
-    member2 = list(x[0] for x in inspect.getmembers(pd_tabular_iterator2, predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
-
-    for retr_expec_member in expected_implemented_methods_names:
-        assert retr_expec_member in member1
-        assert retr_expec_member in member1
-        sig = inspect.signature(getattr(pd_tabular_retriever1, retr_expec_member))
-        assert str(sig) == tabular_interfaces_contracts['iterator']
+@pytest.fixture
+def assert_correct_signatures(tabular_interfaces_contracts, member_names, tabular_operators_reverse):
+    def _assert_correct_signatures(instance):
+        interface_id = tabular_operators_reverse[type(instance)]
+        expected_implemented_methods_names = tabular_interfaces_contracts[interface_id].keys()
+        runtime_members = member_names(instance)
+        assert all(member in runtime_members and str(inspect.signature(getattr(instance, member))) == tabular_interfaces_contracts[interface_id][member] for member in expected_implemented_methods_names)
+    return _assert_correct_signatures
 
 
-    assert id(pd_tabular_iterator1._delegate) != id(pd_tabular_iterator2._delegate) 
+@pytest.fixture
+def assert_correct_delegate_behaviour(tabular_interfaces_contracts, tabular_operators_reverse):
+    def _assert_correct_delegate_behaviour(instance1, instance2):
+        instance1_type = type(instance1)
+        assert instance1_type == type(instance2)
+        assert id(instance1._delegate) != id(instance2._delegate) 
 
-    for function in tabular_interfaces_contracts['iterator']:
-        assert function in dir(pd_tabular_iterator1)
-        assert id(getattr(pd_tabular_iterator1, function)) != id(getattr(pd_tabular_iterator2, function))
-        assert id(getattr(pd_tabular_iterator1._delegate, function)) != id(getattr(pd_tabular_iterator2._delegate, function))
+        for function in tabular_interfaces_contracts[tabular_operators_reverse[instance1_type]]:
+            assert id(getattr(instance1, function)) != id(getattr(instance2, function))
+            assert id(getattr(instance1._delegate, function)) != id(getattr(instance2._delegate, function))
+    return _assert_correct_delegate_behaviour
 
 
-    # MUTATOR
+@pytest.mark.parametrize('interface_id', [
+    ('retriever'),
+    ('iterator'),
+    ('mutator'),
+])
+def test_tabular_interfaces2(interface_id, create_instances, assert_correct_signatures, assert_correct_delegate_behaviour):
+    operator_instance1, operator_instance2 = create_instances(*list([interface_id] * 2))
 
-    pd_tabular_mutator1 = tabular_operators['mutator']()
-    pd_tabular_mutator2 = tabular_operators['mutator']()
-
-    expected_implemented_methods_names = list(x[0] for x in inspect.getmembers(
-                tabular_interfaces['mutator'], predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
-
-    member1 = list(x[0] for x in inspect.getmembers(pd_tabular_mutator1, predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
-    member2 = list(x[0] for x in inspect.getmembers(pd_tabular_mutator2, predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
-
-    for retr_expec_member in expected_implemented_methods_names:
-        assert retr_expec_member in member1
-        assert retr_expec_member in member1
-        sig = inspect.signature(getattr(pd_tabular_retriever1, retr_expec_member))
-        assert str(sig) == tabular_interfaces_contracts['mutator']
-
-    
-    assert id(pd_tabular_mutator1._delegate) != id(pd_tabular_mutator2._delegate) 
-
-    for function in tabular_interfaces_contracts['mutator']:
-        assert function in dir(pd_tabular_mutator1)
-        assert id(getattr(pd_tabular_mutator1, function)) != id(getattr(pd_tabular_mutator2, function))
-        assert id(getattr(pd_tabular_mutator1._delegate, function)) != id(getattr(pd_tabular_mutator2._delegate, function))
+    assert_correct_signatures(operator_instance1)
+    assert_correct_delegate_behaviour(operator_instance1, operator_instance2)
