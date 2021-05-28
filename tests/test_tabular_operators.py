@@ -43,25 +43,11 @@ def tabular_interfaces_contracts():
 
 
 @pytest.fixture
-def member_names():
-    def get_member_names(_object):
-        return list(x[0] for x in inspect.getmembers(_object, predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))    
-    return get_member_names
-
-
-@pytest.fixture
-def create_instances(tabular_operators):
-    def _create_operators(*interface_ids):
-        return tuple(tabular_operators[interface_id]() for interface_id in interface_ids)
-    return _create_operators
-
-
-@pytest.fixture
-def assert_correct_signatures(tabular_interfaces_contracts, member_names, tabular_operators_reverse):
+def assert_correct_signatures(tabular_interfaces_contracts, tabular_operators_reverse):
     def _assert_correct_signatures(instance):
         interface_id = tabular_operators_reverse[type(instance)]
         expected_implemented_methods_names = tabular_interfaces_contracts[interface_id].keys()
-        runtime_members = member_names(instance)
+        runtime_members = list(x[0] for x in inspect.getmembers(instance, predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
         assert all(member in runtime_members and str(inspect.signature(getattr(instance, member))) == tabular_interfaces_contracts[interface_id][member] for member in expected_implemented_methods_names)
     return _assert_correct_signatures
 
@@ -84,8 +70,8 @@ def assert_correct_delegate_behaviour(tabular_interfaces_contracts, tabular_oper
     ('iterator'),
     ('mutator'),
 ])
-def test_tabular_interfaces2(interface_id, create_instances, assert_correct_signatures, assert_correct_delegate_behaviour):
-    operator_instance1, operator_instance2 = create_instances(*list([interface_id] * 2))
+def test_tabular_interfaces2(interface_id, tabular_operators, assert_correct_signatures, assert_correct_delegate_behaviour):
+    operator_instance1, operator_instance2 = tuple(tabular_operators[_interface_id]() for _interface_id in [interface_id] * 2)
 
     assert_correct_signatures(operator_instance1)
     assert_correct_delegate_behaviour(operator_instance1, operator_instance2)
