@@ -5,11 +5,6 @@ import attr
 __all__ = ['ObjectsPool']
 
 
-def _build_hash(*args, **kwargs):
-    r"""Construct a unique string out of the input \*args and \*\*kwargs."""
-    return hash('-'.join([str(_) for _ in args] + ['{key}={value}'.format(key=k, value=str(v)) for k, v in kwargs]))
-
-
 def _convert_to_method(function):
     def _function(_self, *args, **kwargs):
         return function(*args, **kwargs)
@@ -28,10 +23,15 @@ class ObjectsPool:
         constructor (callable): able to construct the object given arguments
         objects (dict): the data structure representing the object pool
     """
+    @staticmethod
+    def __build_hash(*args, **kwargs):
+        r"""Construct a unique string out of the input \*args and \*\*kwargs."""
+        return hash('-'.join([str(_) for _ in args] + ['{key}={value}'.format(key=k, value=str(v)) for k, v in kwargs]))
+
     constructor = attr.ib(init=True)
     _objects = attr.ib(init=True, default={})
-    _build_hash = attr.ib(default=attr.Factory(lambda self: types.MethodType(_convert_to_method(_build_hash), self),
-                                               takes_self=True))
+    _build_hash = attr.ib(default=attr.Factory(lambda self: types.MethodType(
+        _convert_to_method(ObjectsPool.__build_hash), self), takes_self=True))
 
     def get_object(self, *args, **kwargs):
         r"""Request an object from the pool.
@@ -52,5 +52,5 @@ class ObjectsPool:
     @classmethod
     def new_empty(cls, constructor, build_hash=None):
         if build_hash is None:
-            build_hash = _build_hash
+            build_hash = ObjectsPool.__build_hash
         return ObjectsPool(constructor, {}, build_hash)
