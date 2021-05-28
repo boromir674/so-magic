@@ -43,7 +43,7 @@ def plain_usage(subclass_registry_metaclass, assert_correct_metaclass_behaviour)
         class ParentClass2(metaclass=subclass_registry_metaclass):
             pass
 
-        @ParentClass2.register_as_subclass()
+        @ParentClass2.register_as_subclass(subclass_id)
         class Child2:
             pass
 
