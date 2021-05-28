@@ -78,26 +78,32 @@ class Delegate:
                 setattr(delegate_ins, member.__name__, types.MethodType(member, delegate_ins))
             if isinstance(member, types.MethodType):  # if @classmethod is used
                 setattr(delegate_ins, member.__name__, types.MethodType(with_self(member), delegate_ins))
-            print()
         return delegate_ins
 
 
-def validate_retriever_delegate(_self, _attribute, value):
-    members_list = list(inspect.getmembers(value,
+def _validate_signature(tabular_operator, function_name, signature):
+    sig = str(inspect.signature(getattr(tabular_operator, function_name)))
+    if sig != signature:
+        raise ValueError(f"Expected signature {signature} for {function_name} member of object {tabular_operator} with "
+                         f"type {type(tabular_operator)}. Instead got {sig}.")
+
+
+def validate_delegate(tabular_operator, required_members):
+    members_list = list(inspect.getmembers(tabular_operator,
                                            predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
-    assert all(x in (_[0] for _ in members_list) for x in ('row', 'column', 'nb_rows', 'nb_columns',
-                                                            'get_numerical_attributes'))
-    for member_name, _member in members_list:
-        if member_name in ['row', 'column']:
-            sig = str(inspect.signature(getattr(value, member_name)))
-            if sig != '(identifier, data)':
-                raise ValueError(f"Expected signature (identifier, data) for {member_name} of retriever {value}. "
-                                 f"Instead got {sig}.")
-        if member_name in ['nb_rows', 'nb_columns', 'get_numerical_attributes']:
-            sig = str(inspect.signature(getattr(value, member_name)))
-            if sig != '(data)':
-                raise ValueError(f"Expected signature (data) for {member_name} of retriever {value}. "
-                                 f"Instead got {sig}.")
+    assert all(x in (_[0] for _ in members_list) for x in required_members)
+    for member_name, required_signature in required_members:
+        _validate_signature(tabular_operator, member_name, required_signature)
+
+
+def validate_retriever_delegate(_self, _attribute, value):
+    validate_delegate(value, {
+        'column': '(identifier, data)',
+        'row': '(identifier, data)',
+        'nb_columns': '(data)',
+        'nb_rows': '(data)',
+        'get_numerical_attributes': '(data)',
+    })
 
 
 # CONCRETE IMPLEMENTATIONS
