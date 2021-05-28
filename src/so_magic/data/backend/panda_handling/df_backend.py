@@ -81,19 +81,15 @@ class Delegate:
         return delegate_ins
 
 
-def _validate_signature(tabular_operator, function_name, signature):
-    sig = str(inspect.signature(getattr(tabular_operator, function_name)))
-    if sig != signature:
-        raise ValueError(f"Expected signature {signature} for {function_name} member of object {tabular_operator} with "
-                         f"type {type(tabular_operator)}. Instead got {sig}.")
-
-
 def validate_delegate(tabular_operator, required_members):
     members_list = list(inspect.getmembers(tabular_operator,
                                            predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
     assert all(x in (_[0] for _ in members_list) for x in required_members)
     for member_name, required_signature in required_members:
-        _validate_signature(tabular_operator, member_name, required_signature)
+        sig = str(inspect.signature(getattr(tabular_operator, member_name)))
+        if sig != required_signature:
+            raise ValueError(f"Expected signature {required_signature} for {member_name} member of object "
+                             f"{tabular_operator} with type {type(tabular_operator)}. Instead got {sig}.")
 
 
 def validate_retriever_delegate(_self, _attribute, value):
