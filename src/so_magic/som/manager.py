@@ -15,7 +15,7 @@ def _build_hash(_self, *args, **kwargs):
 class MapManager:
     map_factory = attr.ib(init=True, default=SelfOrganizingMapFactory())
     pool = attr.ib(init=False, default=attr.Factory(
-        lambda self: ObjectsPool(self.map_factory.create, {}, _build_hash), takes_self=True))
+        lambda self: ObjectsPool.new_empty(self.map_factory.create, build_hash=_build_hash), takes_self=True))
 
     def get_map(self, *args, **kwargs):
         """
