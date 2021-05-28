@@ -35,6 +35,12 @@ def usage_with_subclass(subclass_registry_metaclass):
             pass
 
         child1_instance1 = ParentClass.create('child1')
+
+        assert ParentClass.subclasses['child1'] == Child1
+        assert type(child1_instance1) == Child1
+        assert isinstance(child1_instance1, Child1)
+        assert isinstance(child1_instance1, ParentClass)
+
         return child1_instance1, Child1, ParentClass
     return parent_n_child_classes
 
@@ -50,18 +56,17 @@ def plain_usage(subclass_registry_metaclass):
             pass
 
         child1_instance2 = ParentClass2.create('child2')
+
+        assert ParentClass2.subclasses['child2'] == Child2
+        assert type(child1_instance2) == Child2
+        assert isinstance(child1_instance2, Child2)
+        assert not isinstance(child1_instance2, ParentClass2)
         return child1_instance2, Child2, ParentClass2
     return parent_n_child_classes
 
 
 def test_subclass_registry(usage_with_subclass, plain_usage):
     child1_instance1, Child1, ParentClass = usage_with_subclass()
-
-    assert ParentClass.subclasses['child1'] == Child1
-
-    assert type(child1_instance1) == Child1
-    assert isinstance(child1_instance1, Child1)
-    assert isinstance(child1_instance1, ParentClass)
 
     non_existent_identifier = 'child2'
 
@@ -73,12 +78,5 @@ def test_subclass_registry(usage_with_subclass, plain_usage):
     with pytest.raises(ValueError, match=exception_message_regex):
         ParentClass.create(non_existent_identifier)
 
-
     child1_instance2, Child2, ParentClass2 = plain_usage()
-
     assert ParentClass.subclasses['child1'] == Child1
-    assert ParentClass2.subclasses['child2'] == Child2
-
-    assert type(child1_instance2) == Child2
-    assert isinstance(child1_instance2, Child2)
-    assert not isinstance(child1_instance2, ParentClass2)
