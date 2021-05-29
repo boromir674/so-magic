@@ -34,9 +34,6 @@ class Delegate:
 
 
 def validate_delegate(tabular_operator, required_members):
-    members_list = list(inspect.getmembers(tabular_operator,
-                                           predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
-    assert all(x in (_[0] for _ in members_list) for x in required_members)
     for member_name, required_signature in required_members:
         sig = str(inspect.signature(getattr(tabular_operator, member_name)))
         if sig != required_signature:
@@ -44,14 +41,13 @@ def validate_delegate(tabular_operator, required_members):
                              f"{tabular_operator} with type {type(tabular_operator)}. Instead got {sig}.")
 
 
-def validate_retriever_delegate(_self, _attribute, value):
-    validate_delegate(value, {
+RETRIEVER_REQUIRED_SIGNATURES = {
         'column': '(identifier, data)',
         'row': '(identifier, data)',
         'nb_columns': '(data)',
         'nb_rows': '(data)',
         'get_numerical_attributes': '(data)',
-    })
+    }
 
 
 # CONCRETE IMPLEMENTATIONS
@@ -61,8 +57,8 @@ def validate_retriever_delegate(_self, _attribute, value):
 class PDTabularRetriever(EngineTabularRetriever):
     """The observation object is the same as the one your return from 'from_json_lines'"""
     _delegate = attr.ib(default=attr.Factory(lambda: Delegate(PDTabularRetrieverDelegate)),
-    # validator=validate_retriever_delegate
-    )
+                        # validator=lambda x, y, z: validate_delegate(z, RETRIEVER_REQUIRED_SIGNATURES)
+                        )
 
     def column(self, identifier, data):
         return self._delegate.column(identifier, data)
