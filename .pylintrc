@@ -148,7 +148,8 @@ disable=print-statement,
         missing-module-docstring,
         missing-class-docstring,
         unnecessary-lambda,
-        inconsistent-return-statements
+        inconsistent-return-statements,
+        redundant-keyword-arg
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -209,8 +210,7 @@ check-str-concat-over-line-jumps=no
 
 # List of note tags to take in consideration, separated by a comma.
 notes=FIXME,
-      XXX,
-      TODO
+      XXX
 
 # Regular expression of note tags to take in consideration.
 #notes-rgx=
@@ -247,7 +247,17 @@ ignore-on-opaque-inference=yes
 # List of class names for which member attributes should not be checked (useful
 # for classes with dynamically set attributes). This supports the use of
 # qualified names.
-ignored-classes=optparse.Values,thread._local,_thread._local
+ignored-classes=optparse.Values,
+                thread._local,
+                _thread._local,
+                EngineTabularRetriever,
+                EngineTabularIterator,
+                EngineTabularMutator,
+                PhiFunctionRegistrator,
+                CommandsManager,
+                BaseCommandFactory,
+                FeatureConfiguration,
+                BaseDiscretizer
 
 # List of module names for which member attributes should not be checked
 # (useful for modules/projects where namespaces are manipulated during runtime
@@ -490,7 +500,7 @@ callbacks=cb_,
 
 # A regular expression matching the name of dummy variables (i.e. expected to
 # not be used).
-dummy-variables-rgx=_+$|(_[a-zA-Z0-9_]*[a-zA-Z0-9]+?$)|dummy|^ignored_|^unused_
+dummy-variables-rgx=_+$|(_[a-zA-Z0-9_]*[a-zA-Z0-9]+?$)|dummy|^ignored_|^unused_|[a-zA-Z0-9_]+_command$|DataManagerRuntimeCommandFactory
 
 # Argument names that match this expression will be ignored. Default to name
 # with leading underscore.

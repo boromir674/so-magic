@@ -1,67 +1,16 @@
-from abc import ABC
 import attr
 
-from so_magic.data.interfaces import TabularRetriever, TabularIterator, TabularMutator
+# from so_magic.data.interfaces import TabularRetriever, TabularIterator, TabularMutator
+from so_magic.utils import SubclassRegistry
 
 
-class EngineTabularRetriever(TabularRetriever, ABC):
-
-    subclasses = {}
-
-    @classmethod
-    def register_as_subclass(cls, backend_type):
-        def wrapper(subclass):
-            cls.subclasses[backend_type] = subclass
-            return subclass
-        return wrapper
-
-    @classmethod
-    def create(cls, backend_type, *args, **kwargs) -> TabularRetriever:
-        if backend_type not in cls.subclasses:
-            raise ValueError(
-                f"Requested TabularRetriever of type '{backend_type}'; "
-                f"supported are [{', '.join(sorted(cls.subclasses.keys()))}]")
-        return cls.subclasses[backend_type](*args, **kwargs)
+class EngineTabularRetriever(metaclass=SubclassRegistry): pass
 
 
-class EngineTabularIterator(TabularIterator, ABC):
-    subclasses = {}
-
-    @classmethod
-    def register_as_subclass(cls, backend_type):
-        def wrapper(subclass):
-            cls.subclasses[backend_type] = subclass
-            return subclass
-
-        return wrapper
-
-    @classmethod
-    def create(cls, backend_type, *args, **kwargs) -> TabularRetriever:
-        if backend_type not in cls.subclasses:
-            raise ValueError(
-                f"Requested TabularIterator of type '{backend_type}'; "
-                f"supported are [{', '.join(sorted(cls.subclasses.keys()))}]")
-        return cls.subclasses[backend_type](*args, **kwargs)
+class EngineTabularIterator(metaclass=SubclassRegistry): pass
 
 
-class EngineTabularMutator(TabularMutator, ABC):
-    subclasses = {}
-
-    @classmethod
-    def register_as_subclass(cls, backend_type):
-        def wrapper(subclass):
-            cls.subclasses[backend_type] = subclass
-            return subclass
-
-        return wrapper
-
-    @classmethod
-    def create(cls, backend_type, *args, **kwargs) -> TabularRetriever:
-        if backend_type not in cls.subclasses:
-            raise ValueError(
-                f"Requested TabularMutator of type '{backend_type}'; "
-                f"supported are [{', '.join(sorted(cls.subclasses.keys()))}]")
-        return cls.subclasses[backend_type](*args, **kwargs)
+class EngineTabularMutator(metaclass=SubclassRegistry): pass
 
 
 @attr.s

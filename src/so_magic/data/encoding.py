@@ -1,35 +1,25 @@
-import abc
-from abc import ABC
+from abc import ABC, abstractmethod
+import attr
 
 
-class EncoderInterface(abc.ABC):
-    @abc.abstractmethod
-    def encode(self, *args, **kwargs):
-        raise NotImplementedError
-
-class AbstractEncoder(EncoderInterface):
-    @abc.abstractmethod
+class EncoderInterface(ABC):
+    @abstractmethod
     def encode(self, *args, **kwargs):
         raise NotImplementedError
 
 
-class Encoder(AbstractEncoder, ABC):
-    subclasses = {}
+@attr.s(slots=True)
+class NominalAttributeEncoder(EncoderInterface, ABC):
+    """Encode the observations of a categorical nominal variable.
 
-    @classmethod
-    def register_as_subclass(cls, backend_type):
-        def wrapper(subclass):
-            cls.subclasses[backend_type] = subclass
-            return subclass
-        return wrapper
+    The client code can supply the possible values for the nominal variable, if known a-priori.
+    The possible values are stored in the 'values_set' attribute/property. If they are not supplied
+    they should be computed at runtime (when running the encode method).
 
-    @classmethod
-    def create(cls, backend_type, *args, **kwargs):
-        if backend_type not in cls.subclasses:
-            raise ValueError('Bad "BinnerFactory Backend type" type \'{}\''.format(backend_type))
-        return cls.subclasses[backend_type](*args, **kwargs)
+    It also defines and stores the string identifiers for each column produced in the 'columns attribute/property.
 
-
-class NominalAttributeEncoder(Encoder, ABC):
-    def __init__(self, attribute_variable_values=None):
-        self.values_set = attribute_variable_values if attribute_variable_values else []
+    Args:
+        values_set (list): the possible values of the nominal variable observations, if known a-priori
+    """
+    values_set: list = attr.ib(default=attr.Factory(list))
+    columns: list = attr.ib(init=False, default=[])

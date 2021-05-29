@@ -1,5 +1,6 @@
 from abc import ABC
 import attr
+from so_magic.utils import SubclassRegistry
 
 
 class DiscretizerInterface(ABC):
@@ -12,13 +13,13 @@ class AbstractDiscretizer(DiscretizerInterface):
         raise NotImplementedError
 
 
+def validate_bin_function(_self, _attribute, value):
+    if not callable(value):
+        raise ValueError(f'Expected a callable object, instead a {type(value).__name__} was given.')
+
 @attr.s
 class BaseDiscretizer(AbstractDiscretizer):
-    binner = attr.ib(init=True)
-    @binner.validator
-    def validate_bin_function(self, _attribute, value):
-        if not callable(value):
-            raise ValueError(f'Expected a callable object, instead a {type(value).__name__} was given.')
+    binner = attr.ib(init=True, validator=validate_bin_function)
 
     def discretize(self, *args, **kwargs):
         """Expects args: dataset, feature and kwargs; 'nb_bins'."""
@@ -65,23 +66,15 @@ class BaseBinner(BinnerInterface):
         raise NotImplementedError
 
 
-class BinnerFactory:
-    subclasses = {}
-    @classmethod
-    def register_as_subclass(cls, backend_type):
-        def wrapper(subclass):
-            cls.subclasses[backend_type] = subclass
-            return subclass
-        return wrapper
+class BinnerClass(metaclass=SubclassRegistry): pass
 
-    @classmethod
-    def create(cls, backend_type, *args, **kwargs):
-        if backend_type not in cls.subclasses:
-            raise ValueError('Bad "BinnerFactory Backend type" type \'{}\''.format(backend_type))
-        return cls.subclasses[backend_type](*args, **kwargs)
+
+class BinnerFactory:
+    parent_class = BinnerClass
 
     def equal_length_binner(self, *args, **kwargs) -> BaseBinner:
         raise NotImplementedError
+
     def quantisized_binner(self, *args, **kwargs) -> BaseBinner:
         raise NotImplementedError
 

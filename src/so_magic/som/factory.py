@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 @attr.s
 class SelfOrganizingMapFactory:
-    trainer = attr.ib(init=True, default=SomTrainer())
+    trainer = attr.ib(init=True, default=attr.Factory(SomTrainer.from_callable))
     subject = attr.ib(init=True, default=Subject([]))
 
     def create(self, dataset, nb_cols, nb_rows, **kwargs):

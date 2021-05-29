@@ -89,19 +89,19 @@ class FeatureState:
         return self.key
 
 
+def is_callable(_self, _attribute, value):
+    if not callable(value):
+        raise ValueError(f"Expected a callable object; instead {type(value)} was given.")
+    if value.func_code.co_argcount < 1:
+        raise ValueError("Expected a callable that takes at least 1 argument; "
+                            "instead a callable that takes no arguments was given.")
+
 @attr.s
 class FeatureFunction:
     """Example: Assume we have a datapoint v = [v_1, v_2, .., v_n, and 2 feature functions f_1, f_2\n
     Then we can produce an encoded vector (eg to feed for training a ML model) like: encoded_vector = [f_1(v), f_2(v)]
     """
-    function = attr.ib(init=True)
-    @function.validator
-    def is_callable(self, _attribute, value):
-        if not callable(value):
-            raise ValueError(f"Expected a callable object; instead {type(value)} was given.")
-        if value.func_code.co_argcount < 1:
-            raise ValueError("Expected a callable that takes at least 1 argument; "
-                             "instead a callable that takes no arguments was given.")
+    function = attr.ib(init=True, validator=is_callable)
 
     label = attr.ib(init=True, default=None)
     @label.validator
