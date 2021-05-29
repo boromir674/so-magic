@@ -19,49 +19,56 @@ def assert_correct_class_creation(subclass_registry_metaclass):
 
 
 @pytest.fixture
-def usage_with_subclass(subclass_registry_metaclass, assert_correct_metaclass_behaviour):
-    def parent_n_child_classes(subclass_id: str):
+def register_class(subclass_registry_metaclass):
+    def _register_class(subclass_id: str, inherit=False):
         class ParentClass(metaclass=subclass_registry_metaclass):
             pass
 
-        @ParentClass.register_as_subclass(subclass_id)
-        class Child1(ParentClass):
-            pass
+        if inherit:
+            @ParentClass.register_as_subclass(subclass_id)
+            class Child(ParentClass):
+                pass
+        else:
+            @ParentClass.register_as_subclass(subclass_id)
+            class Child:
+                pass
 
-        child1_instance1 = ParentClass.create(subclass_id)
+        child_instance = ParentClass.create(subclass_id)
 
-        assert_correct_metaclass_behaviour(ParentClass, subclass_id, Child1, child1_instance1)
-        assert isinstance(child1_instance1, ParentClass)
+        return {'class_registry': ParentClass, 'child': Child, 'child_instance': child_instance}
+    return _register_class
 
-        return child1_instance1, Child1, ParentClass
+
+@pytest.fixture
+def usage_with_subclass(register_class, assert_correct_metaclass_behaviour):
+    def parent_n_child_classes(subclass_id: str):
+        classes = register_class(subclass_id, inherit=True)
+
+        assert_correct_metaclass_behaviour(classes, subclass_id)
+        assert isinstance(classes['child_instance'], classes['class_registry'])
+
+        return classes['child_instance'], classes['child'], classes['class_registry']
     return parent_n_child_classes
 
 
 @pytest.fixture
-def plain_usage(subclass_registry_metaclass, assert_correct_metaclass_behaviour):
+def plain_usage(register_class, assert_correct_metaclass_behaviour):
     def parent_n_child_classes(subclass_id: str):
-        class ParentClass2(metaclass=subclass_registry_metaclass):
-            pass
+        classes = register_class(subclass_id, inherit=False)
 
-        @ParentClass2.register_as_subclass(subclass_id)
-        class Child2:
-            pass
+        assert_correct_metaclass_behaviour(classes, subclass_id)
+        assert not isinstance(classes['child_instance'], classes['class_registry'])
 
-        child1_instance2 = ParentClass2.create(subclass_id)
-
-        assert_correct_metaclass_behaviour(ParentClass2, subclass_id, Child2, child1_instance2)
-        assert not isinstance(child1_instance2, ParentClass2)
-
-        return child1_instance2, Child2, ParentClass2
+        return classes['child_instance'], classes['child'], classes['class_registry']
     return parent_n_child_classes
 
 
 @pytest.fixture
 def assert_correct_metaclass_behaviour():
-    def assert_metaclass_behaviour(metaclass_user, subclass_id, subclass, subclass_instance):
-        assert metaclass_user.subclasses[subclass_id] == subclass
-        assert type(subclass_instance) == subclass
-        assert isinstance(subclass_instance, subclass)
+    def assert_metaclass_behaviour(classes, subclass_id):
+        assert classes['class_registry'].subclasses[subclass_id] == classes['child']
+        assert type(classes['child_instance']) == classes['child']
+        assert isinstance(classes['child_instance'], classes['child'])
     return assert_metaclass_behaviour
 
 
