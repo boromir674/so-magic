@@ -59,8 +59,7 @@ def test_scenario(subject, observer):
     print("------ Scenario 1 ------\n")
     class ObserverA(observer):
         def update(self, a_subject) -> None:
-            if a_subject.state == 0:
-                print("ObserverA: Reacted to the event")
+            print("ObserverA: Reacted to the event")
 
     s1 = subject([])
     # o1 = observer()
