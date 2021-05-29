@@ -10,12 +10,12 @@ def init_data_manager(a_backend):
     mega_cmd_factory = DataManagerCommandFactory(data_manager)
     mega_cmd_factory.attach(data_manager.commands_manager.command.accumulator)
 
-    @data_manager.backend.engine.dec()
-    def encode_nominal_subsets_command(datapoints, attribute, new_attribute):
-        from so_magic.data.features.phis import ListOfCategoricalPhi, DatapointsAttributePhi
-        phi = ListOfCategoricalPhi(DatapointsAttributePhi(datapoints))
-        new_values = phi(attribute)
-        datapoints.mutator.add_column(datapoints, new_values, new_attribute)
+    # Build built-in engine commands
+    from .built_in_commands import encode_nominal_subsets_command
+    data_manager.backend.engine.dec()(encode_nominal_subsets_command)
+    
+    from .built_in_data_manager_commands import select_variables_command
+    mega_cmd_factory.build_command_prototype()(select_variables_command)
 
     import pandas as pd
 
@@ -42,13 +42,9 @@ def init_data_manager(a_backend):
     @mega_cmd_factory.build_command_prototype()
     def one_hot_encoding_command(_data_manager, _datapoints, _attribute):
         dataframe = OneHotEncoder().encode(_datapoints, _attribute)
+        # TODO add a add_columns method to the mutator interface
+        # replace below with datapoints.mutator.add_columns(...) (similar to the encode_nominal_subsets_command above)
         _data_manager.datapoints.observations = pd.concat([_data_manager.datapoints.observations, dataframe], axis=1)
-
-
-    @mega_cmd_factory.build_command_prototype()
-    def select_variables_command(_data_manager, variables):
-        _data_manager.feature_manager.feature_configuration = variables
-
 
     import numpy as np
 
