@@ -8,17 +8,6 @@ def subclass_registry_metaclass():
 
 
 @pytest.fixture
-def assert_correct_class_creation(subclass_registry_metaclass):
-    def assert_class_creation(user_class):
-        assert type(user_class) == subclass_registry_metaclass
-        assert hasattr(user_class, 'subclasses')
-        assert hasattr(user_class, 'create')
-        assert hasattr(user_class, 'register_as_subclass')
-        assert user_class.subclasses == {}
-    return assert_class_creation
-
-
-@pytest.fixture
 def register_class(subclass_registry_metaclass):
     def _register_class(subclass_id: str, inherit=False):
         class ParentClass(metaclass=subclass_registry_metaclass):
@@ -60,11 +49,15 @@ def assert_correct_metaclass_behaviour():
     return assert_metaclass_behaviour
 
 
-def test_metaclass_usage(subclass_registry_metaclass, assert_correct_class_creation):
+def test_metaclass_usage(subclass_registry_metaclass):
     class ParentClass(metaclass=subclass_registry_metaclass):
         pass
 
-    assert_correct_class_creation(ParentClass)
+    assert type(ParentClass) == subclass_registry_metaclass
+    assert hasattr(ParentClass, 'subclasses')
+    assert hasattr(ParentClass, 'create')
+    assert hasattr(ParentClass, 'register_as_subclass')
+    assert ParentClass.subclasses == {}
 
 
 def test_subclass_registry(use_metaclass):
