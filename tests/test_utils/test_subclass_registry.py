@@ -40,27 +40,15 @@ def register_class(subclass_registry_metaclass):
 
 
 @pytest.fixture
-def usage_with_subclass(register_class, assert_correct_metaclass_behaviour):
-    def parent_n_child_classes(subclass_id: str):
-        classes = register_class(subclass_id, inherit=True)
-
+def use_metaclass(register_class, assert_correct_metaclass_behaviour):
+    is_instance = {True: lambda classes: isinstance(classes['child_instance'], classes['class_registry']),
+                False: lambda classes: not isinstance(classes['child_instance'], classes['class_registry'])}
+    def _use_metaclass_in_scenario(subclass_id: str, inherit=False):
+        classes = register_class(subclass_id, inherit=inherit)
         assert_correct_metaclass_behaviour(classes, subclass_id)
-        assert isinstance(classes['child_instance'], classes['class_registry'])
-
+        assert is_instance[inherit]
         return classes['child_instance'], classes['child'], classes['class_registry']
-    return parent_n_child_classes
-
-
-@pytest.fixture
-def plain_usage(register_class, assert_correct_metaclass_behaviour):
-    def parent_n_child_classes(subclass_id: str):
-        classes = register_class(subclass_id, inherit=False)
-
-        assert_correct_metaclass_behaviour(classes, subclass_id)
-        assert not isinstance(classes['child_instance'], classes['class_registry'])
-
-        return classes['child_instance'], classes['child'], classes['class_registry']
-    return parent_n_child_classes
+    return _use_metaclass_in_scenario
 
 
 @pytest.fixture
@@ -79,8 +67,8 @@ def test_metaclass_usage(subclass_registry_metaclass, assert_correct_class_creat
     assert_correct_class_creation(ParentClass)
 
 
-def test_subclass_registry(usage_with_subclass, plain_usage):
-    child1_instance1, Child1, ParentClass = usage_with_subclass('child1')
+def test_subclass_registry(use_metaclass):
+    child1_instance1, Child1, ParentClass = use_metaclass('child1', inherit=True)
 
     non_existent_identifier = 'child2'
 
@@ -92,5 +80,5 @@ def test_subclass_registry(usage_with_subclass, plain_usage):
     with pytest.raises(ValueError, match=exception_message_regex):
         ParentClass.create(non_existent_identifier)
 
-    child1_instance2, Child2, ParentClass2 = plain_usage('child2')
+    child1_instance2, Child2, ParentClass2 = use_metaclass('child2', inherit=False)
     assert ParentClass.subclasses['child1'] == Child1
