@@ -1,3 +1,17 @@
+0.6.0 (2021-05-30)
+------------------
+
+feature
+"""""""
+- allow both method & classmethod as client implementation of TabularData operations
+
+test
+""""
+- make unit-tests code coverage 100% when running the test suite
+- automate tabular operators tests
+- assert all tabular data operations implementations follow interfaces
+
+
 0.5.3 (2021-05-25)
 ------------------
 
