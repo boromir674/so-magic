@@ -10,14 +10,14 @@
 
 | |circleci| |travis| |codecov| |docs|
 | |release_version| |wheel| |supported_versions| |commits_since|
-| |better_code_hub| |codacy| |codeclimate_tech_debt| |scrutinizer_code_quality|
+| |better_code_hub| |codacy| |maintainability| |codeclimate_tech_debt| |scrutinizer_code_quality|
 
 |
 | **Documentation:** https://so-magic.readthedocs.io/en/master
 | **Source Code:** https://github.com/boromir674/so-magic
 |
 
-So Magic is a Python package (`import so_magic`) that can infer *Self-Organing Map* models, out of structured data.
+So Magic is a Python package (`import so_magic`) that can infer *Self-Organising Map* models, out of structured data.
 
 
 
@@ -50,9 +50,9 @@ So Magic is a Python package (`import so_magic`) that can infer *Self-Organing M
     :alt: Supported Python versions
     :target: https://pypi.org/project/so-magic
 
-.. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.6.0/master?logo=github
+.. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.6.1/master?logo=github
     :alt: GitHub commits on branch, since tagged version
-    :target: https://github.com/boromir674/so-magic/compare/v0.6.0..master
+    :target: https://github.com/boromir674/so-magic/compare/v0.6.1..master
 
 
 .. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=master
@@ -63,8 +63,13 @@ So Magic is a Python package (`import so_magic`) that can infer *Self-Organing M
     :alt: Codacy
     :target: https://www.codacy.com/gh/boromir674/so-magic/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=boromir674/so-magic&amp;utm_campaign=Badge_Grade
 
+.. |maintainability| image:: https://img.shields.io/codeclimate/maintainability-percentage/boromir674/so-magic?logo=code-climate
+    :alt: Maintainability
+    :target: https://codeclimate.com/github/boromir674/so-magic/maintainability
+
 .. |codeclimate_tech_debt| image:: https://img.shields.io/codeclimate/tech-debt/boromir674/so-magic?logo=code%20climate
     :alt: Code Climate technical debt
+    :target: https://codeclimate.com/github/boromir674/so-magic/trends/technical_debt
 
 .. |scrutinizer_code_quality| image:: https://img.shields.io/scrutinizer/quality/g/boromir674/so-magic/master?logo=scrutinizer-ci
     :alt: Scrutinizer code quality
