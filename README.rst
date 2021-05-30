@@ -52,7 +52,7 @@ So Magic is a Python package (`import so_magic`) that can infer *Self-Organing M
 
 .. |commits_since| image:: https://img.shields.io/github/commits-since/boromir674/so-magic/v0.5.3/mpeta?logo=github
     :alt: GitHub commits on branch, since tagged version
-    :target: https://github.com/boromir674/so-magic/compare/v0.5.3..dev
+    :target: https://github.com/boromir674/so-magic/compare/v0.6.0..dev
 
 
 .. |better_code_hub| image:: https://bettercodehub.com/edge/badge/boromir674/so-magic?branch=dev
