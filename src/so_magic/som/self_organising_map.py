@@ -7,19 +7,26 @@ from sklearn.cluster import KMeans
 logger = logging.getLogger(__name__)
 
 
-class SomTrainer:
+def infer_map(nb_cols, nb_rows, dataset, **kwargs):
+    """Infer a self-organizing map from dataset.\n
+    initialcodebook = None, kerneltype = 0, maptype = 'planar', gridtype = 'rectangular',
+    compactsupport = False, neighborhood = 'gaussian', std_coeff = 0.5, initialization = None
+    """
+    if not hasattr(dataset, 'feature_vectors'):
+        raise NoFeatureVectorsError("Attempted to train a Som model, "
+                                    "but did not find feature vectors in the dataset.")
+    som = somoclu.Somoclu(nb_cols, nb_rows, **kwargs)
+    som.train(data=np.array(dataset.feature_vectors, dtype=np.float32))
+    return som
 
-    def infer_map(self, nb_cols, nb_rows, dataset, **kwargs):
-        """Infer a self-organizing map from dataset.\n
-        initialcodebook = None, kerneltype = 0, maptype = 'planar', gridtype = 'rectangular',
-        compactsupport = False, neighborhood = 'gaussian', std_coeff = 0.5, initialization = None
-        """
-        if not hasattr(dataset, 'feature_vectors'):
-            raise NoFeatureVectorsError("Attempted to train a Som model, "
-                                        "but did not find feature vectors in the dataset.")
-        som = somoclu.Somoclu(nb_cols, nb_rows, **kwargs)
-        som.train(data=np.array(dataset.feature_vectors, dtype=np.float32))
-        return som
+
+@attr.s(slots=True)
+class SomTrainer:
+    infer_map: callable = attr.ib()
+
+    @staticmethod
+    def from_callable():
+        return SomTrainer(infer_map)
 
 
 @attr.s

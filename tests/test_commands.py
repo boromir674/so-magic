@@ -21,9 +21,8 @@ def invoker():
 
 def test_wrong_interface_usage(command_interface):
     class WrongChildClass(command_interface): pass
-    with pytest.raises(TypeError) as e:
+    with pytest.raises(TypeError, match="Can't instantiate abstract class WrongChildClass with abstract methods execute"):
         a = WrongChildClass()
-        assert "Can't instantiate abstract class WrongChildClass with abstract methods execute" == str(e)
 
 
 def test_correct_command(command_class):
@@ -45,9 +44,8 @@ def test_wrong_command(command_class):
 
     input_list = [1]
     cmd = command_class(add, '__call__', input_list, 22)
-    with pytest.raises(AttributeError) as e:
+    with pytest.raises(AttributeError, match="'list' object has no attribute 'gg'"):
         cmd.execute()
-        assert "'list' object has no attribute 'gg'" == str(e)
 
 
 def test_invoker(invoker, command_class):

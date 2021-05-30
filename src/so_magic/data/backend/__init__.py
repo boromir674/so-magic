@@ -1,6 +1,7 @@
 from .backend import Backend
 from .engine import DataEngine
 from .engine_specs import EngineSpecifications
+from .panda_handling.df_backend import *
 
 ENGINES = {
     'pd': {
@@ -10,7 +11,7 @@ ENGINES = {
 }
 
 def init_backend(engine_type='pd'):
-    from so_magic.data.backend.panda_handling.df_backend import PDTabularRetriever, PDTabularIterator, PDTabularMutator
+
     # create/register new empty/canvas engine
     pd_engine = DataEngine.new(ENGINES[engine_type]['abbr'])
 

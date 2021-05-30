@@ -68,7 +68,7 @@ class RuntimeTransformer(TransformerInterface, abc.ABC):
         nb_mandatory_arguments = a_callable.__code__.co_argcount  # this counts sums both *args and **kwargs
         # use syntax like 'def a(b, *, c=1, d=2): .. to separate pos args from kwargs & to inform 'inspect' lib about it
         if nb_mandatory_arguments < 1:
-            raise ValueError("Expected a callable that receives at least one positional argument;"
+            raise ValueError("Expected a callable that receives at least one positional argument; "
                              f"instead got a callable that receives '{nb_mandatory_arguments}' arguments.")
         signature = inspect.signature(a_callable)
         parameters = list(signature.parameters.values())

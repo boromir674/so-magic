@@ -19,6 +19,7 @@ class DataManagerCommandFactoryBuilder(metaclass=CommandFactoryType):
 class DataManagerCommandFactory(Subject):
     _data_manager = attr.ib(init=True)
     command_factory = attr.ib(init=True, default=DataManagerCommandFactoryBuilder)
+    name: str = attr.ib(init=False, default='')
 
     def __call__(self, command_type, *args, **kwargs):
         self.state = self.command_factory.create(command_type).construct(self._data_manager, *args, **kwargs)

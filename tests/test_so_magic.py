@@ -14,7 +14,7 @@ def test_somagic_scenario(train_args, somagic, sample_collaped_json):
                             [_ for _ in somagic._data_manager.datapoints.observations['flavors'] if _ is not None])
 
     if not getattr(somagic.dataset, 'feature_vectors', None):
-        cmd = somagic._data_manager.command.select_variables
+        cmd = somagic._data_manager.command.select_variables_command
         cmd.args = [[{'variable': 'type', 'columns': ATTRS2}, {'variable': 'flavors', 'columns': list(UNIQUE_FLAVORS)}]]
         cmd.execute()
 
@@ -26,7 +26,7 @@ def test_somagic_scenario(train_args, somagic, sample_collaped_json):
         import pandas as pd
         assert set(ATTRS) == set(pd.unique(somagic._data_manager.datapoints.observations['type']))
 
-        cmd = somagic._data_manager.command.one_hot_encoding
+        cmd = somagic._data_manager.command.one_hot_encoding_command
         cmd.args = [somagic._data_manager.datapoints, 'type']
         cmd.execute()
 
@@ -44,7 +44,7 @@ def test_somagic_scenario(train_args, somagic, sample_collaped_json):
         assert len(UNIQUE_FLAVORS) > 5
         nb_columns_before = len(somagic._data_manager.datapoints.observations.columns)
 
-        cmd = somagic._data_manager.command.one_hot_encoding_list
+        cmd = somagic._data_manager.command.one_hot_encoding_list_command
         cmd.args = [somagic._data_manager.datapoints, 'flavors']
         cmd.execute()
 
@@ -76,6 +76,8 @@ def test_somagic_objects(nb_objects, nb_observers):
     from so_magic import init_so_magic
     so_magic_instances = [init_so_magic() for _ in range(nb_objects)]
 
+    assert id(so_magic_instances[0]) != id(so_magic_instances[1])
+    assert id(so_magic_instances[0]._data_manager) != id(so_magic_instances[1]._data_manager)
     assert id(so_magic_instances[0]._data_manager.backend) != id(so_magic_instances[1]._data_manager.backend)
     assert id(so_magic_instances[0]._data_manager.backend.engine) != id(so_magic_instances[1]._data_manager.backend.engine)
     assert id(so_magic_instances[0]._data_manager.backend.datapoints_manager) != id(so_magic_instances[1]._data_manager.backend.datapoints_manager)
