@@ -12,9 +12,6 @@ __all__ = ['PDTabularRetriever', 'PDTabularIterator', 'PDTabularMutator']
 # INFRASTRUCTURE
 
 def with_self(function):
-    # foo_code = compile(f'def {f_name}({arg_string}): return f({params_str})', "<string>", "exec")
-    # foo_func1 = types.FunctionType(foo_code.co_consts[0], globals(), f_name)
-
     def _function(_self, *args, **kwargs):
         return function(*args, **kwargs)
     return _function

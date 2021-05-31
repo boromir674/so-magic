@@ -197,24 +197,3 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
         # TODO replace below line with a raise Exception
         # we want to cause an error when we fail to get a sensible string name
         return ''
-
-
-if __name__ == '__main__':
-    reg1 = PhiFunctionRegistry()
-    reg2 = PhiFunctionRegistry()
-    reg3 = PhiFunctionRegistry.get_instance()
-
-    assert id(reg1) == id(reg2) == id(reg3)
-
-    @PhiFunctionRegistrator.register
-    def example():
-        """Inherited Docstring"""
-        print('Called example function')
-
-    example()
-
-    print(example.__name__)
-    print('--')
-    print(example.__doc__)
-
-    reg1.get('example')()
