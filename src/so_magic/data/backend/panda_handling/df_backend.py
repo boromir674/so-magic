@@ -33,69 +33,45 @@ class Delegate:
         return delegate_ins
 
 
-def validate_delegate(tabular_operator, required_members):
-    for member_name, required_signature in required_members:
-        sig = str(inspect.signature(getattr(tabular_operator, member_name)))
-        if sig != required_signature:
-            raise ValueError(f"Expected signature {required_signature} for {member_name} member of object "
-                             f"{tabular_operator} with type {type(tabular_operator)}. Instead got {sig}.")
-
-
-RETRIEVER_REQUIRED_SIGNATURES = {
-        'column': '(identifier, data)',
-        'row': '(identifier, data)',
-        'nb_columns': '(data)',
-        'nb_rows': '(data)',
-        'get_numerical_attributes': '(data)',
+tabular_operators = {
+    'retriever': {
+        'implementations': {
+            'pd': PDTabularRetrieverDelegate,
+        },
+        'class_registry': EngineTabularRetriever,
+    },
+    'iterator': {
+        'implementations': {
+            'pd': PDTabularIteratorDelegate,
+        },
+        'class_registry': EngineTabularIterator,
+    },
+    'mutator': {
+        'implementations': {
+            'pd': PDTabularMutatorDelegate,
+        },
+        'class_registry': EngineTabularMutator,
     }
+}
+
+
+def get_operator(backend_id: str, operator_type: str):
+    class_registry = tabular_operators[operator_type]['class_registry']
+    
+    @attr.s
+    @class_registry.register_as_subclass(backend_id)
+    class OperatorClass(class_registry):
+        _delegate = attr.ib(
+            default=attr.Factory(lambda: Delegate(tabular_operators[operator_type]['implementations'][backend_id])))
+
+        def __getattr__(self, name: str):
+            return getattr(self._delegate, name)
+
+    return OperatorClass
 
 
 # CONCRETE IMPLEMENTATIONS
 
-@attr.s
-@EngineTabularRetriever.register_as_subclass('pd')
-class PDTabularRetriever(EngineTabularRetriever):
-    """The observation object is the same as the one your return from 'from_json_lines'"""
-    _delegate = attr.ib(default=attr.Factory(lambda: Delegate(PDTabularRetrieverDelegate)),
-                        # validator=lambda x, y, z: validate_delegate(z, RETRIEVER_REQUIRED_SIGNATURES)
-                        )
-
-    def column(self, identifier, data):
-        return self._delegate.column(identifier, data)
-
-    def row(self, identifier, data):
-        return self._delegate.row(identifier, data)
-
-    def nb_columns(self, data):
-        return self._delegate.nb_columns(data)
-
-    def nb_rows(self, data):
-        return self._delegate.nb_rows(data)
-
-    def get_numerical_attributes(self, data):
-        return self._delegate.get_numerical_attributes(data)
-
-
-@attr.s
-@EngineTabularIterator.register_as_subclass('pd')
-class PDTabularIterator(EngineTabularIterator):
-    """The observation object is the same as the one your return from 'from_json_lines'"""
-    _delegate = attr.ib(default=attr.Factory(lambda: Delegate(PDTabularIteratorDelegate)))
-
-    def columnnames(self, data):
-        return self._delegate.columnnames(data)
-
-    def iterrows(self, data):
-        return self._delegate.iterrows(data)
-
-    def itercolumns(self, data):
-        return self._delegate.itercolumns(data)
-
-
-@attr.s
-@EngineTabularMutator.register_as_subclass('pd')
-class PDTabularMutator(EngineTabularMutator):
-    _delegate = attr.ib(default=attr.Factory(lambda: Delegate(PDTabularMutatorDelegate)))
-
-    def add_column(self, datapoints, values, new_attribute, **kwargs):
-        self._delegate.add_column(datapoints, values, new_attribute, **kwargs)
+PDTabularRetriever = get_operator('pd', 'retriever')
+PDTabularIterator = get_operator('pd', 'iterator')
+PDTabularMutator = get_operator('pd', 'mutator')
