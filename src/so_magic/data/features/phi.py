@@ -74,7 +74,7 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
     # NICE TO HAVE: make the decorator work without parenthesis
     @classmethod
     def register(cls, phi_name=''):
-        """Add a new phi function to phi function registry and notify listeners/observers.
+        r"""Add a new phi function to phi function registry and notify listeners/observers.
 
         Use this decorator around either a callable function (defined with the 'def' python special word) or a class
         with a takes-no-arguments (or all-optional-arguments) constructor and a __call__ magic method.
@@ -95,8 +95,12 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
 
             >>> @PhiFunctionRegistrator.register()
             ... def f1(x):
+            ...  '''Multiply by 2.'''
             ...  return x * 2
             Registering input function f1 as phi function, at key f1.
+
+            >>> registered_phis.get('f1').__doc__
+            'Multiply by 2.'
 
             >>> input_value = 5
             >>> print(f"{input_value} * 2 = {registered_phis.get('f1')(input_value)}")

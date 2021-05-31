@@ -18,16 +18,13 @@ def with_self(function):
 
 
 class Delegate:
-    def __new__(cls, *args, **kwargs):
-        delegate_ins = super().__new__(cls)
-        tabular_operator = args[0]
+    def __init__(self, tabular_operator):
         for _member_name, member in inspect.getmembers(
                 tabular_operator, predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])):
             if isinstance(member, types.FunctionType):  # if no decorator is used
-                setattr(delegate_ins, member.__name__, types.MethodType(member, delegate_ins))
+                setattr(self, member.__name__, types.MethodType(member, self))
             if isinstance(member, types.MethodType):  # if @classmethod is used
-                setattr(delegate_ins, member.__name__, types.MethodType(with_self(member), delegate_ins))
-        return delegate_ins
+                setattr(self, member.__name__, types.MethodType(with_self(member), self))
 
 
 tabular_operators = {
@@ -54,7 +51,7 @@ tabular_operators = {
 
 def get_operator(backend_id: str, operator_type: str):
     class_registry = tabular_operators[operator_type]['class_registry']
-    
+
     @attr.s
     @class_registry.register_as_subclass(backend_id)
     class OperatorClass(class_registry):
