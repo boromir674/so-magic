@@ -63,6 +63,7 @@ runtime
 maptype
 gridtype
 compactsupport
+priori
 
 # 2nd, 3rd
 nd
