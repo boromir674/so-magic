@@ -22,7 +22,7 @@ def init_data_manager(engine):
         'data_manager_command': mega_cmd_factory.build_command_prototype,
         'arbitrary_command': my_data_manager.engine.backend.dec,
     })()
-    
+
     # Build backend-agnostic, built-in engine commands
     my_data_manager.engine.backend.dec()(encode_nominal_subsets_command)
     mega_cmd_factory.build_command_prototype()(select_variables_command)

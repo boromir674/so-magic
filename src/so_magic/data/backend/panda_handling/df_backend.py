@@ -5,7 +5,7 @@ import attr
 from so_magic.data.magic_datapoints_factory import BroadcastingDatapointsFactory
 from so_magic.data.interfaces import TabularRetriever, TabularIterator, TabularMutator
 from so_magic.data.backend.backend import EngineBackend
-from so_magic.data.backend.backend_specs import BackendSpecifications, EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator
+from ..backend_specs import EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator, BackendSpecifications
 from .client_code import BACKEND
 
 
@@ -50,7 +50,9 @@ BUILT_IN_BACKENDS_DATA = [
 @attr.s
 class EngineBackends:
     backend_interfaces = attr.ib()
-    _interface_2_name = attr.ib(init=False, default=attr.Factory(lambda self: {v['interface']: interface_id for interface_id, v in self.backend_interfaces.items()}, takes_self=True))
+    _interface_2_name = attr.ib(init=False, default=attr.Factory(
+        lambda self: {v['interface']: interface_id for interface_id, v in self.backend_interfaces.items()},
+        takes_self=True))
     implementations = attr.ib(init=False, default=attr.Factory(dict))
     backends = attr.ib(init=False, default=attr.Factory(dict))
     # id of the backend that is currently being registered/built
@@ -61,11 +63,11 @@ class EngineBackends:
         engine_backends = EngineBackends(tabular_operators)
         engine_backends.add(*list(backends))
         return engine_backends
-    
+
     @property
     def defined_interfaces(self):
         return self.backend_interfaces.keys()
-    
+
     @property
     def defined_backend_names(self):
         return self.implementations.keys()
@@ -84,7 +86,8 @@ class EngineBackends:
     def _add(self, backend_implementation):
         self.__id = backend_implementation['backend_id']
         implemented_interfaces = backend_implementation['interfaces']
-        self.implementations[self.__id] = {self.name(implementation): implementation for implementation in implemented_interfaces}
+        self.implementations[self.__id] =\
+            {self.name(implementation): implementation for implementation in implemented_interfaces}
         self.register(backend_implementation)
 
     def name(self, interface_implementation):
@@ -106,13 +109,13 @@ class EngineBackends:
 
         @attr.s
         @class_registry.register_as_subclass(backend_id)
-        class OperatorClass(class_registry):
+        class _OperatorClass(class_registry):
             _delegate = attr.ib(
                 default=attr.Factory(lambda: Delegate(self.implementations[backend_id][operator_type])))
 
             def __getattr__(self, name: str):
                 return getattr(self._delegate, name)
-    
+
 
 def magic_backends():
     return EngineBackends.from_initial_available(BUILT_IN_BACKENDS_DATA)
