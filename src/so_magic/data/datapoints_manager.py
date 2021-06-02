@@ -19,7 +19,7 @@ class DatapointsManager(Observer):
     Args:
         datapoints_objects (dict, optional): the initial structure that stores datapoints objects
     """
-    datapoints_objects = attr.ib(init=True, default={})
+    datapoints_objects = attr.ib(init=True, default=attr.Factory(dict))
     _last_key = attr.ib(init=False, default='')
 
     def update(self, subject: Subject):

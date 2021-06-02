@@ -37,6 +37,7 @@ class CommandsManager:
         command_factory (callable, optional): a callable that returns an instance of Command
     """
     _commands_getter = attr.ib(init=True, default=CommandGetter())
+    decorators = attr.ib(init=True, default=None)
 
     @property
     def command(self):

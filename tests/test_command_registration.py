@@ -1,7 +1,7 @@
 
 
 def test_command_registrator():
-    from so_magic.data.backend.engine import CommandRegistrator
+    from so_magic.data.backend.backend import CommandRegistrator
 
     class A(metaclass=CommandRegistrator): pass
     class B(metaclass=CommandRegistrator): pass
@@ -38,7 +38,6 @@ def test_command_registrator():
     assert B['b'] == 2
     assert C['c'] == 3
     assert D['d'] == 4
-
 
     class P1(CommandRegistrator): pass
     assert type(P1) == type

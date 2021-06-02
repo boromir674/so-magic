@@ -1,7 +1,6 @@
 
 def test_decorating():
-    from so_magic.data.backend.engine import MyDecorator, CommandRegistrator
-
+    from so_magic.data.backend.backend import MyDecorator, CommandRegistrator
 
     class A(MyDecorator): pass
     class Ab(MyDecorator): pass

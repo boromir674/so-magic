@@ -18,7 +18,7 @@ class SoMaster:
         cmd.args = [file_path]
         cmd.execute()
         self._last_path = file_path
-        return self._data_manager.backend.datapoints_manager.datapoints
+        return self._data_manager.engine.datapoints_manager.datapoints
 
     @property
     def map(self):
@@ -26,14 +26,14 @@ class SoMaster:
 
     @property
     def datapoints(self):
-        return self._data_manager.backend.datapoints_manager.datapoints
+        return self._data_manager.engine.datapoints_manager.datapoints
 
     @property
     def dataset(self):
-        datapoints_id = id(self._data_manager.backend.datapoints_manager.datapoints)
+        datapoints_id = id(self._data_manager.engine.datapoints_manager.datapoints)
         if datapoints_id not in self._datasets:
             self._datasets[datapoints_id] = self._dataset_constructor(
-                self._data_manager.backend.datapoints_manager.datapoints,
+                self._data_manager.engine.datapoints_manager.datapoints,
                 self._last_path,
             )
         return self._datasets[datapoints_id]

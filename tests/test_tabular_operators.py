@@ -3,10 +3,11 @@ import pytest
 
 @pytest.fixture
 def tabular_operators():
-    from so_magic.data.backend.panda_handling.df_backend import PDTabularRetriever, PDTabularIterator, PDTabularMutator
+    from so_magic.data.backend.panda_handling.df_backend import magic_backends
+    engine_backends = magic_backends()
     operators = {
         'retriever': {
-            'class': PDTabularRetriever,
+            'class': engine_backends.backend_interfaces['retriever']['class_registry'].subclasses['pd'],
             'interface': {
                 'column': '(identifier, data)',
                 'row': '(identifier, data)',
@@ -16,7 +17,7 @@ def tabular_operators():
             }
         },
         'iterator': {
-            'class': PDTabularIterator,
+            'class': engine_backends.backend_interfaces['iterator']['class_registry'].subclasses['pd'],
             'interface': {
                 'columnnames': '(data)',
                 'itercolumns': '(data)',
@@ -24,7 +25,7 @@ def tabular_operators():
             },
         },
         'mutator': {
-            'class': PDTabularMutator,
+            'class': engine_backends.backend_interfaces['mutator']['class_registry'].subclasses['pd'],
             'interface': {
                 'add_column': '(datapoints, values, new_attribute, **kwargs)',
             },

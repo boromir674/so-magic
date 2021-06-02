@@ -8,9 +8,9 @@ def data_engine_type():
     Returns:
         type: the EngineType metaclass
     """
-    from so_magic.data.backend.engine import EngineType
-    assert type(EngineType) == type
-    return EngineType
+    from so_magic.data.backend.backend import BackendType
+    assert type(BackendType) == type
+    return BackendType
 
 
 @pytest.fixture
@@ -20,15 +20,19 @@ def data_engine_class(data_engine_type):
     Returns:
         EngineType: the DataEngine class
     """
-    from so_magic.data.backend import DataEngine
-    assert type(DataEngine) == data_engine_type
-    return DataEngine
+    from so_magic.data.backend.backend import EngineBackend
+    assert type(EngineBackend) == data_engine_type
+    return EngineBackend
 
 
 @pytest.fixture
 def engine_attributes():
     """The important attributes that each data engine (eg pandas engine) is expected to have upon creation."""
-    return 'registry', '_commands', 'command'
+    return (
+        'registry',
+        '_commands',
+        # 'command',
+    )
 
 
 @pytest.fixture
@@ -50,7 +54,7 @@ def engine_creation_assertions(engine_attributes, data_engine_class, data_engine
 
 
 @pytest.mark.parametrize('engine_specs', [
-    # Scenario 1 -> create 2 engines, given the below data
+    # Scenario 1 -> create 2 engines, with the below names
     (['engine1',
       'engine2']),
 ])

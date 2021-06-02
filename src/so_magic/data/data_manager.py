@@ -3,22 +3,6 @@ from so_magic.utils import ObjectRegistry, Observer
 from .commands_manager import CommandsManager
 
 
-# from enum import Enum
-# from so_magic.utils import GenericMediator,
-# class MediatorEvent(Enum):
-#     A = 'A'
-#     B = 'B'
-#     C = 'C'
-#
-#
-# class DataMediator(GenericMediator):
-#     def __init__(self, *args, **kwargs):
-#         self.events = kwargs.get('events', {})
-#
-#     def notify(self, sender: object, event: str) -> None:
-#         pass
-
-
 class Phis(ObjectRegistry, Observer):
     def __getattr__(self, item):
         return self.objects[item]
@@ -29,7 +13,7 @@ class Phis(ObjectRegistry, Observer):
 
 @attr.s
 class DataManager:
-    backend = attr.ib(init=True)
+    engine = attr.ib(init=True)
     _phi_function_class = attr.ib(init=True)
     feature_manager = attr.ib(init=True)
 
@@ -39,8 +23,8 @@ class DataManager:
     built_phis = attr.ib(init=False, default=Phis())
 
     def __attrs_post_init__(self):
-        self.backend.datapoints_factory.subject.attach(self.backend.datapoints_manager)
-        self.backend.engine.command_factory.attach(self.commands_manager.command.accumulator)
+        self.engine.backend.datapoints_factory.subject.attach(self.engine.datapoints_manager)
+        self.engine.backend.command_factory.attach(self.commands_manager.command.accumulator)
         self._phi_function_class.subject.attach(self.built_phis)
 
     @property
@@ -61,4 +45,4 @@ class DataManager:
 
     @property
     def datapoints(self):
-        return self.backend.datapoints_manager.datapoints
+        return self.engine.datapoints_manager.datapoints

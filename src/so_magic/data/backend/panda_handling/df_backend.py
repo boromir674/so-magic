@@ -2,11 +2,11 @@ import inspect
 import types
 import attr
 
-from so_magic.data.backend.engine_specs import EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator
-from .client_code import PDTabularRetrieverDelegate, PDTabularIteratorDelegate, PDTabularMutatorDelegate
-
-
-__all__ = ['PDTabularRetriever', 'PDTabularIterator', 'PDTabularMutator']
+from so_magic.data.magic_datapoints_factory import BroadcastingDatapointsFactory
+from so_magic.data.interfaces import TabularRetriever, TabularIterator, TabularMutator
+from so_magic.data.backend.backend import EngineBackend
+from so_magic.data.backend.backend_specs import BackendSpecifications, EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator
+from .client_code import BACKEND
 
 
 # INFRASTRUCTURE
@@ -29,43 +29,90 @@ class Delegate:
 
 tabular_operators = {
     'retriever': {
-        'implementations': {
-            'pd': PDTabularRetrieverDelegate,
-        },
+        'interface': TabularRetriever,
         'class_registry': EngineTabularRetriever,
     },
     'iterator': {
-        'implementations': {
-            'pd': PDTabularIteratorDelegate,
-        },
+        'interface': TabularIterator,
         'class_registry': EngineTabularIterator,
     },
     'mutator': {
-        'implementations': {
-            'pd': PDTabularMutatorDelegate,
-        },
+        'interface': TabularMutator,
         'class_registry': EngineTabularMutator,
     }
 }
 
-
-def get_operator(backend_id: str, operator_type: str):
-    class_registry = tabular_operators[operator_type]['class_registry']
-
-    @attr.s
-    @class_registry.register_as_subclass(backend_id)
-    class OperatorClass(class_registry):
-        _delegate = attr.ib(
-            default=attr.Factory(lambda: Delegate(tabular_operators[operator_type]['implementations'][backend_id])))
-
-        def __getattr__(self, name: str):
-            return getattr(self._delegate, name)
-
-    return OperatorClass
+BUILT_IN_BACKENDS_DATA = [
+    BACKEND,
+]
 
 
-# CONCRETE IMPLEMENTATIONS
+@attr.s
+class EngineBackends:
+    backend_interfaces = attr.ib()
+    _interface_2_name = attr.ib(init=False, default=attr.Factory(lambda self: {v['interface']: interface_id for interface_id, v in self.backend_interfaces.items()}, takes_self=True))
+    implementations = attr.ib(init=False, default=attr.Factory(dict))
+    backends = attr.ib(init=False, default=attr.Factory(dict))
+    # id of the backend that is currently being registered/built
+    __id: str = attr.ib(init=False, default='')
 
-PDTabularRetriever = get_operator('pd', 'retriever')
-PDTabularIterator = get_operator('pd', 'iterator')
-PDTabularMutator = get_operator('pd', 'mutator')
+    @staticmethod
+    def from_initial_available(backends):
+        engine_backends = EngineBackends(tabular_operators)
+        engine_backends.add(*list(backends))
+        return engine_backends
+    
+    @property
+    def defined_interfaces(self):
+        return self.backend_interfaces.keys()
+    
+    @property
+    def defined_backend_names(self):
+        return self.implementations.keys()
+
+    def __iter__(self):
+        return iter((backend_name, interfaces_dict) for backend_name, interfaces_dict in self.implementations.items())
+
+    def _get_interface_names(self, backend_id):
+        """Get the names of the interfaces that the backend has found to implement."""
+        return self.implementations[backend_id].keys()
+
+    def add(self, *backend_implementations):
+        for backend_implementation in backend_implementations:
+            self._add(backend_implementation)
+
+    def _add(self, backend_implementation):
+        self.__id = backend_implementation['backend_id']
+        implemented_interfaces = backend_implementation['interfaces']
+        self.implementations[self.__id] = {self.name(implementation): implementation for implementation in implemented_interfaces}
+        self.register(backend_implementation)
+
+    def name(self, interface_implementation):
+        return self._interface_2_name[inspect.getmro(interface_implementation)[1]]
+
+    def register(self, backend_implementation: dict):
+        for implemented_interface_name in self._get_interface_names(self.__id):
+            self.define_operator(self.__id, implemented_interface_name)
+        # Build
+        backend_specs = BackendSpecifications(self.__id, backend_implementation['backend_name'])
+        backend = EngineBackend.new(self.__id)
+        # init backend attributes
+        backend_specs(backend)
+        backend.datapoints_factory = BroadcastingDatapointsFactory()
+        self.backends[self.__id] = backend
+
+    def define_operator(self, backend_id, operator_type: str):
+        class_registry = self.backend_interfaces[operator_type]['class_registry']
+
+        @attr.s
+        @class_registry.register_as_subclass(backend_id)
+        class OperatorClass(class_registry):
+            _delegate = attr.ib(
+                default=attr.Factory(lambda: Delegate(self.implementations[backend_id][operator_type])))
+
+            def __getattr__(self, name: str):
+                return getattr(self._delegate, name)
+    
+
+def magic_backends():
+    return EngineBackends.from_initial_available(BUILT_IN_BACKENDS_DATA)

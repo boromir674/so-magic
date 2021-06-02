@@ -1,13 +1,13 @@
-from so_magic.data.backend.engine_specs import EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator
+from so_magic.data.interfaces import TabularRetriever, TabularIterator, TabularMutator
 
-
-__all__ = ['PDTabularRetrieverDelegate', 'PDTabularIteratorDelegate', 'PDTabularMutatorDelegate']
+# __all__ = ['PDTabularRetrieverDelegate', 'PDTabularIteratorDelegate', 'PDTabularMutatorDelegate']
+__all__ = ['BACKEND']
 
 
 # DELEGATES
 # User defined (engine dependent implementations of tabular operations)
 
-class PDTabularRetrieverDelegate(EngineTabularRetriever):
+class PDTabularRetrieverDelegate(TabularRetriever):
     """The observation object is the same as the one your return from 'from_json_lines'"""
 
     @classmethod
@@ -24,7 +24,6 @@ class PDTabularRetrieverDelegate(EngineTabularRetriever):
 
     @classmethod
     def nb_rows(cls, data):
-        print('\n------ DEBUG NB ROWS PDTabularRetrieverDelegate DATA TYPE', type(data), ' ------\n')
         return len(data.observations)
 
     @classmethod
@@ -32,7 +31,7 @@ class PDTabularRetrieverDelegate(EngineTabularRetriever):
         return data.observations._get_numeric_data().columns.values
 
 
-class PDTabularIteratorDelegate(EngineTabularIterator):
+class PDTabularIteratorDelegate(TabularIterator):
     """The observation object is the same as the one your return from 'from_json_lines'"""
 
     @classmethod
@@ -48,8 +47,19 @@ class PDTabularIteratorDelegate(EngineTabularIterator):
         return iter(data.observations[column] for column in data.observations.columns)
 
 
-class PDTabularMutatorDelegate(EngineTabularMutator):
+class PDTabularMutatorDelegate(TabularMutator):
 
     @classmethod
     def add_column(cls, datapoints, values, new_attribute, **kwargs):
         datapoints.observations[new_attribute] = values
+
+
+BACKEND = {
+    'backend_id': 'pd',
+    'backend_name': 'pandas',
+    'interfaces': [
+        PDTabularRetrieverDelegate,
+        PDTabularIteratorDelegate,
+        PDTabularMutatorDelegate,
+    ]
+}
