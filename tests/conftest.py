@@ -85,3 +85,12 @@ def load_test_data(test_data_manager, sample_json):
         cmd.args = [json_lines_formatted_file_path]
         cmd.execute()
     return lambda: load_data(sample_json)
+
+
+@pytest.fixture
+def load_test_data_this(sample_collaped_json):
+    def load_data(so_master, json_lines_formatted_file_path):
+        cmd = so_master.command.observations_command
+        cmd.args = [json_lines_formatted_file_path]
+        cmd.execute()
+    return lambda so_master_instance: load_data(so_master_instance, sample_collaped_json)

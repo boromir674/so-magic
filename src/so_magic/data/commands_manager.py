@@ -45,4 +45,4 @@ class CommandsManager:
 
     @property
     def commands_dict(self):
-        return self._commands_accumulator.commands
+        return self._commands_getter._commands_accumulator.commands

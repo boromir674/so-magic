@@ -29,6 +29,14 @@ class SoMaster:
         return self._data_manager.engine.datapoints_manager.datapoints
 
     @property
+    def commands_decorators(self):
+        return self._data_manager.commands_manager.decorators
+
+    @property
+    def command(self):
+        return self._data_manager.command
+
+    @property
     def dataset(self):
         datapoints_id = id(self._data_manager.engine.datapoints_manager.datapoints)
         if datapoints_id not in self._datasets:
