@@ -35,8 +35,6 @@ def test_discretizer():
 
 @pytest.fixture
 def discretize_command():
-    import pandas as pd
-
     def get_discretize_command(discretizer):
         def test_discretize_command(data_manager, datapoints, attribute, nb_bins, new_column_name):
             output = discretizer.discretize(datapoints, attribute, nb_bins)

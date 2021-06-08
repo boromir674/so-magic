@@ -86,8 +86,8 @@ class BinnerFactory:
     parent_class = BinnerClass
 
     def equal_length_binner(self, *args, **kwargs) -> BaseBinner:
-       """Binner that create bins of equal size (max_value - min_value)"""
-       raise NotImplementedError
+        """Binner that create bins of equal size (max_value - min_value)"""
+        raise NotImplementedError
 
     def quantisized_binner(self, *args, **kwargs) -> BaseBinner:
         """Binner that will adjust the bin sizes so that the observations are evenly distributed in the bins
@@ -133,7 +133,8 @@ class AbstractAlgorithm(AlgorithmInterface, ABC):
     callback: callable = attr.ib()
     arguments: list = attr.ib(default=attr.Factory(list))
     parameters: dict = attr.ib(default=attr.Factory(dict))
-    default_parameter_values = attr.ib(init=False, default=attr.Factory(lambda self: {k: v['value'] for k, v in self.parameters.items()}, takes_self=True))
+    default_parameter_values = attr.ib(init=False, default=attr.Factory(
+        lambda self: {k: v['value'] for k, v in self.parameters.items()}, takes_self=True))
     _args = attr.ib(init=False, default=attr.Factory(list))
 
 
@@ -147,7 +148,8 @@ class MagicAlgorithm(AbstractAlgorithm):
         if not len(args) == len(self.arguments):
             raise MagicAlgorithmError(
                 f'Number of runtime positional arguments do not match the expected number of positional argumnets. '
-                f'Given {len(args)} arguments: [{", ".join(str(_) for _ in args)}]. Expected {len(self.arguments)} arguments: [{", ".join(str(_) for _ in self.arguments)}].')
+                f'Given {len(args)} arguments: [{", ".join(str(_) for _ in args)}]. Expected {len(self.arguments)} '
+                f'arguments: [{", ".join(str(_) for _ in self.arguments)}].')
         if not all(isinstance(argument, self.arguments[i]) for i, argument in enumerate(args)):
             raise MagicAlgorithmError(f'Bad positional argument for algorithm. Expected arguments with types '
                                       f'[{", ".join(self.arguments)}]. Instead got [{", ".join(self.arguments)}].')
@@ -177,7 +179,8 @@ class MagicAlgorithm(AbstractAlgorithm):
         }
 
     def update_parameters(self, **kwargs):
-        if not all(isinstance(parameter_value, self.parameters['type']) for parameter_name, parameter_value in kwargs if parameter_name in self.parameters):
+        if not all(isinstance(parameter_value, self.parameters['type']) for parameter_name, parameter_value in kwargs
+                   if parameter_name in self.parameters):
             raise MagicAlgorithmParametersError(
                 f'Bad algorithm parameters. Allowed parameters with types '
                 f'[{", ".join(f"{k}: {v}" for k, v in self.parameters.items())}]. '
@@ -216,8 +219,6 @@ class Discretizer(BaseDiscretizer):
         binner = BaseBinner(alg)
         return Discretizer(binner)
 
-
-from so_magic.utils import SubclassRegistry
 
 class BinningAlgorithm(metaclass=SubclassRegistry):
 
