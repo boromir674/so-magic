@@ -65,19 +65,12 @@ def validate_discretization_operation_behaviour():
 
 
 @pytest.fixture
-def discretiztion_test_data(somagic, load_test_data_this):
-    load_test_data_this(somagic)
-    print('DATAPOINTS BEFORE', len(somagic.datapoints.attributes))
-    print(set(type(x) for x in somagic.dataset.datapoints.column('Creative')))
+def discretization_test_data(somagic, test_datapoints):
     series = somagic.dataset.datapoints.column('Creative').replace('', 0.0, inplace=False)
     assert all(type(x) == float for x in series)
-    print(type(series))
-    print('MIN', min(series))
-    print('MAX', max(series))
 
     somagic.datapoints.add_column(list(series), 'Creative')
-    print('DATAPOINTS AFTER', len(somagic.datapoints.attributes))
-    print(set(type(x) for x in somagic.dataset.datapoints.column('Creative')))
+
     
     assert all(type(x) == float for x in somagic.datapoints.observations['Creative'])
 
@@ -91,18 +84,16 @@ def discretiztion_test_data(somagic, load_test_data_this):
     }
 
 
-def test_discretization_operation(somagic, data_manager_command_decorators, discretiztion_test_data, define_command, get_command, test_discretizer, discretize_command, validate_discretization_operation_behaviour):
-    print('INFO: datapoints columns:', somagic.datapoints.attributes)
+def test_discretization_operation(somagic, discretization_test_data, define_command, get_command, test_discretizer, discretize_command, validate_discretization_operation_behaviour):
     define_command(somagic.commands_decorators.data_manager_command(), discretize_command(test_discretizer))
-    print('ELA',  set(type(x) for x in somagic.dataset.datapoints.column('Creative')))
-    for attr_name in discretiztion_test_data['success']:
+    for attr_name in discretization_test_data['success']:
         cmd = get_command('test_discretize_command')
         cmd.args = [somagic.datapoints, attr_name, 4, f'binned_{attr_name}']
         cmd.execute()
 
         validate_discretization_operation_behaviour(cmd, test_discretizer.algorithm)
 
-    for attr_name in discretiztion_test_data['fail']:
+    for attr_name in discretization_test_data['fail']:
         cmd = get_command('test_discretize_command')
         cmd.args = [somagic.datapoints, attr_name, 4, f'binned_{attr_name}']
         with pytest.raises(TypeError):

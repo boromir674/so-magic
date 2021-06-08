@@ -16,7 +16,7 @@ class PDTabularRetrieverDelegate(TabularRetriever):
 
     @classmethod
     def row(cls, identifier, data):
-        return data.observations.loc(identifier)
+        return data.observations.iloc[[identifier]]
 
     @classmethod
     def nb_columns(cls, data):

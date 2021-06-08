@@ -88,9 +88,30 @@ def load_test_data(test_data_manager, sample_json):
 
 
 @pytest.fixture
-def load_test_data_this(sample_collaped_json):
+def read_observations(sample_collaped_json):
+    """Read a json lines formatted file and create the observations object (see Datapoints class)."""
     def load_data(so_master, json_lines_formatted_file_path):
+        """Create the observations object for a Datapoints instance, given a data file.
+
+        Args:
+            so_master (so_magic.so_master.SoMaster): an instance of SoMaster
+            json_lines_formatted_file_path (str): path to a json lines formatted file with the observations data
+        """
         cmd = so_master.command.observations_command
         cmd.args = [json_lines_formatted_file_path]
         cmd.execute()
-    return lambda so_master_instance: load_data(so_master_instance, sample_collaped_json)
+    return load_data
+
+
+@pytest.fixture
+def test_datapoints(read_observations, sample_collaped_json, somagic):
+    """Read the designated json lines 'test file' (which contains the 'test observations') as a Datapoints instance."""
+    read_observations(somagic, sample_collaped_json)
+    return somagic.datapoints
+
+
+@pytest.fixture
+def built_in_backends():
+    from so_magic.data.backend.panda_handling.df_backend import magic_backends
+    engine_backends = magic_backends()
+    return engine_backends

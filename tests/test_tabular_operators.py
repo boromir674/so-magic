@@ -1,13 +1,12 @@
+from typing import Generator, Iterable
 import pytest
 
 
 @pytest.fixture
-def tabular_operators():
-    from so_magic.data.backend.panda_handling.df_backend import magic_backends
-    engine_backends = magic_backends()
+def tabular_operators(built_in_backends):
     operators = {
         'retriever': {
-            'class': engine_backends.backend_interfaces['retriever']['class_registry'].subclasses['pd'],
+            'class': built_in_backends.backend_interfaces['retriever']['class_registry'].subclasses['pd'],
             'interface': {
                 'column': '(identifier, data)',
                 'row': '(identifier, data)',
@@ -17,7 +16,7 @@ def tabular_operators():
             }
         },
         'iterator': {
-            'class': engine_backends.backend_interfaces['iterator']['class_registry'].subclasses['pd'],
+            'class': built_in_backends.backend_interfaces['iterator']['class_registry'].subclasses['pd'],
             'interface': {
                 'columnnames': '(data)',
                 'itercolumns': '(data)',
@@ -25,7 +24,7 @@ def tabular_operators():
             },
         },
         'mutator': {
-            'class': engine_backends.backend_interfaces['mutator']['class_registry'].subclasses['pd'],
+            'class': built_in_backends.backend_interfaces['mutator']['class_registry'].subclasses['pd'],
             'interface': {
                 'add_column': '(datapoints, values, new_attribute, **kwargs)',
             },
@@ -70,3 +69,34 @@ def test_tabular_interfaces2(interface_id, tabular_operators, assert_correct_sig
 
     assert_correct_signatures(operator_instance1)
     assert_correct_delegate_behaviour(operator_instance1, operator_instance2)
+
+
+def test_retriever_implementation(test_datapoints, built_in_backends):
+    built_in_pd_backend = built_in_backends.implementations['pd']
+    first_row = built_in_pd_backend['retriever'].row(0, test_datapoints)
+    assert list(first_row) == list(test_datapoints.observations.iloc[[0]])
+    assert len(list(first_row)) == len(test_datapoints.attributes)
+    assert len(list(first_row)) == test_datapoints.nb_columns
+
+
+# through out the test suite we use the @pytest.mark.xfail decorator to indicate this is expected to fail (since it is a discovered bug).
+# when the bug is solved, simply remove the decorator and now you will have a regression test in place!
+
+@pytest.mark.xfail(reason="There is a bug in the built in pandas retriever.get_numerical_attributes method")
+def test_retriever_get_numerical_attributes(test_datapoints, built_in_backends):
+    built_in_pd_backend = built_in_backends.implementations['pd']
+    numerical_attributes = built_in_pd_backend['retriever'].get_numerical_attributes(test_datapoints)
+    assert set(numerical_attributes) != {}
+
+
+def test_iterator_implementation(test_datapoints, built_in_backends):
+    built_in_pd_backend = built_in_backends.implementations['pd']
+    columns_iterator = built_in_pd_backend['iterator'].itercolumns(test_datapoints)
+    import types
+    assert type(columns_iterator) == types.GeneratorType
+    assert isinstance(columns_iterator, types.GeneratorType)
+    
+
+    # assert list(built_in_pd_backend['retriever'].row('Creative', test_datapoints)) == list(test_datapoints)
+    # assert list(built_in_pd_backend['retriever'].row('Creative', test_datapoints)) == list(test_datapoints)
+    # assert list(built_in_pd_backend['retriever'].row('Creative', test_datapoints)) == list(test_datapoints)
