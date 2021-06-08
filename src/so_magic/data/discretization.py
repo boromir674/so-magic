@@ -174,7 +174,7 @@ class MagicAlgorithm(AbstractAlgorithm):
         return {
             'arguments': self._args,
             'parameters': {
-                param_name: v['value'] for param_name, v in self.parameters.items()
+                param_name: param_data['value'] for param_name, param_data in self.parameters.items()
             },
         }
 

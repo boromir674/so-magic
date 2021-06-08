@@ -9,45 +9,36 @@ def client_pandas_tabular_implementation():
         """The observation object is the same as the one you return from 'from_json_lines'"""
 
         @classmethod
-        def column(cls, identifier, data):
-            return data.observations[identifier]
+        def column(cls, identifier, data): pass
 
-        def row(self, identifier, data):
-            return data.observations.loc(identifier)
+        def row(self, identifier, data): pass
 
         @classmethod
-        def nb_columns(cls, data):
-            return len(data.observations.columns)
+        def nb_columns(cls, data): pass
 
         @classmethod
-        def nb_rows(cls, data):
-            return len(data.observations)
+        def nb_rows(cls, data): pass
 
         @classmethod
-        def get_numerical_attributes(cls, data):
-            return data.observations._get_numeric_data().columns.values
+        def get_numerical_attributes(cls, data): pass
 
 
     class TestPDTabularIteratorDelegate(TabularIterator):
         """The observation object is the same as the one your return from 'from_json_lines'"""
 
-        def columnnames(self, data):
-            return list(data.observations.columns)
+        def columnnames(self, data): pass
 
         @classmethod
-        def iterrows(cls, data):
-            return iter(data.observations.iterrows())
+        def iterrows(cls, data): pass
 
         @classmethod
-        def itercolumns(cls, data):
-            return iter(data.observations[column] for column in data.observations.columns)
+        def itercolumns(cls, data): pass
 
 
     class TestPDTabularMutatorDelegate(TabularMutator):
 
         @classmethod
-        def add_column(cls, datapoints, values, new_attribute, **kwargs):
-            datapoints.observations[new_attribute] = values
+        def add_column(cls, datapoints, values, new_attribute, **kwargs): pass
 
 
     BACKEND = {
