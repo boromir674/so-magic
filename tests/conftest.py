@@ -88,7 +88,7 @@ def load_test_data(test_data_manager, sample_json):
 
 
 @pytest.fixture
-def read_observations(sample_collaped_json):
+def read_observations():
     """Read a json lines formatted file and create the observations object (see Datapoints class)."""
     def load_data(so_master, json_lines_formatted_file_path):
         """Create the observations object for a Datapoints instance, given a data file.

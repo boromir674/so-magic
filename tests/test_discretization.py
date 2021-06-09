@@ -2,14 +2,6 @@ import pytest
 
 
 @pytest.fixture
-def data_manager_command_decorators(somagic):
-    return {
-        'data_manager_cmd': somagic.commands_decorators.data_manager_command,
-        'arbitrary_cmd': somagic.commands_decorators.arbitrary_command,
-    }
-
-
-@pytest.fixture
 def define_command():
     def _define_engine_command(decorator, command_function):
         decorator(command_function)
