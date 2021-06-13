@@ -1,7 +1,7 @@
 import logging
 import attr
 from so_magic.utils import Subject
-from .self_organising_map import SomTrainer, SelfOrganizingMap
+from .self_organising_map import SomTrainer, SelfOrganizingMap, NoFeatureVectorsError
 
 
 logger = logging.getLogger(__name__)
@@ -22,6 +22,3 @@ class SelfOrganizingMapFactory:
         except NoFeatureVectorsError as exception:
             logger.info("%s Fire up an 'encode' command.", str(exception))
             raise exception
-
-
-class NoFeatureVectorsError(Exception): pass
