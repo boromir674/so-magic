@@ -111,6 +111,47 @@ def test_datapoints(read_observations, sample_collaped_json, somagic):
 
 
 @pytest.fixture
+def test_dataset(somagic, read_observations, sample_collaped_json):
+    """Dataset ready to be fed into a training/inference algorithm; feature vectors have been computed."""
+    read_observations(somagic, sample_collaped_json)
+
+    ATTRS2 = ['type_hybrid', 'type_indica', 'type_sativa']
+    from functools import reduce
+    UNIQUE_FLAVORS = reduce(lambda i, j: set(i).union(set(j)),
+                            [_ for _ in somagic._data_manager.datapoints.observations['flavors'] if _ is not None])
+
+    cmd = somagic._data_manager.command.select_variables_command
+    # current limitations:
+    # 1. client code has to know the number of distict values for the nominal variable 'type'
+    # 2. client code has to provide the column names that will result after encoding the 'type' variable
+    cmd.args = [[
+        # current limitations:
+        # 1. client code has to know the number of distict values for the nominal variable 'type'
+        # 2. client code has to provide the column names that will result after encoding the 'type' variable
+        {'variable': 'type', 'columns': ATTRS2},
+        # current limitations:
+        # 1. client code has to know the number of distict values for the nominal variable 'flavors'
+        # 2. client code has to provide the column names that will result after encoding the 'flavors' variable
+        {'variable': 'flavors', 'columns': list(UNIQUE_FLAVORS)}]]
+    cmd.execute()
+
+    cmd = somagic._data_manager.command.one_hot_encoding_command
+    cmd.args = [somagic._data_manager.datapoints, 'type']
+    cmd.execute()
+
+    cmd = somagic._data_manager.command.one_hot_encoding_list_command
+    cmd.args = [somagic._data_manager.datapoints, 'flavors']
+    cmd.execute()
+
+    import numpy as np
+
+    setattr(somagic.dataset, 'feature_vectors',
+            np.array(somagic._data_manager.datapoints.observations[ATTRS2 + list(UNIQUE_FLAVORS)]))
+
+    return somagic.dataset
+
+
+@pytest.fixture
 def built_in_backends():
     from so_magic.data.backend.panda_handling.df_backend import magic_backends
     engine_backends = magic_backends()

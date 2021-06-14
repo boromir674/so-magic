@@ -7,7 +7,7 @@ from .factory import SelfOrganizingMapFactory
 logger = logging.getLogger(__name__)
 
 
-def _build_hash(_self, *args, **kwargs):
+def _build_hash(*args, **kwargs):
     return str(MapId(*args, kwargs.get('initialization'), kwargs.get('map_type'), kwargs.get('grid_type')))
 
 
@@ -19,7 +19,8 @@ class MapManager:
 
     def get_map(self, *args, **kwargs):
         """
-        'dataset', 'nb_cols', 'nb_rows', 'initialization', 'map_type', 'grid_type'
+        args: 'dataset', 'nb_cols', 'nb_rows'
+        kwargs: 'initialization', 'maptype', 'gridtype'
         """
         return self.pool.get_object(*args, **kwargs)
 
@@ -59,7 +60,3 @@ class MapId:
 
     def __str__(self):
         return '-'.join(str(getattr(self, _)) for _ in dir(self))
-
-
-if __name__ == '__main__':
-    map_manager = MapManager()
