@@ -59,4 +59,4 @@ class MapId:
         return iter([(k, getattr(self, k)) for k in self.__dir__()])
 
     def __str__(self):
-        return '-'.join(str(getattr(self, _)) for _ in dir(self))
+        return '-'.join(str(getattr(self, attribute.name)) for attribute in self.__attrs_attrs__)
