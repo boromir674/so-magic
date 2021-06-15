@@ -27,7 +27,7 @@ class ObjectRegistry(ABC):
 
     def pop(self, key):
         if key not in self.objects:
-            raise ObjectRegistryError(f"Requested to remove item with key {key}, which does not exist.")
+            raise ObjectRegistryError(f"Requested to pop item with key {key}, which does not exist.")
         return self.objects.pop(key)
 
     def get(self, key):

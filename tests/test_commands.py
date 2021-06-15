@@ -78,4 +78,4 @@ def test_invoker(invoker, command_class):
     invoker.execute_command(cmd1)
     assert invoker.history.stack == [cmd3]
 
-    assert cmd3 == invoker.history.stack.pop()
+    assert cmd3 == invoker.history.pop()

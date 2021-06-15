@@ -74,20 +74,6 @@ def data_manager():
 
 
 @pytest.fixture
-def test_data_manager(data_manager):
-    return data_manager()
-
-
-@pytest.fixture
-def load_test_data(test_data_manager, sample_json):
-    def load_data(json_lines_formatted_file_path):
-        cmd = test_data_manager.command.observations_command
-        cmd.args = [json_lines_formatted_file_path]
-        cmd.execute()
-    return lambda: load_data(sample_json)
-
-
-@pytest.fixture
 def read_observations():
     """Read a json lines formatted file and create the observations object (see Datapoints class)."""
     def load_data(so_master, json_lines_formatted_file_path):

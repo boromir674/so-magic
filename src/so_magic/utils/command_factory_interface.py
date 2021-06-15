@@ -17,7 +17,7 @@ class CommandFactoryInterface(ABC):
         """
         raise NotImplementedError
 
-
+# TODO use the subclass registry metaclass 
 class CommandFactoryType(type):
     def __new__(mcs, *args, **kwargs):
         command_factory_type = super().__new__(mcs, *args, **kwargs)
