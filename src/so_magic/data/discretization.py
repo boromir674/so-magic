@@ -170,7 +170,7 @@ class MagicAlgorithm(AbstractAlgorithm):
     def _get_result(self, result):
         return result
 
-    def _get_settings(self, result):
+    def _get_settings(self, _result):
         return {
             'arguments': self._args,
             'parameters': {
@@ -191,8 +191,8 @@ class MagicAlgorithm(AbstractAlgorithm):
         self._update_params(**self.default_parameter_values)
 
     def _update_params(self, **kwargs):
-        for k, v in kwargs.items():
-            self.parameters[k]['value'] = v
+        for key, value in kwargs.items():
+            self.parameters[key]['value'] = value
 
 
 class MagicAlgorithmError(Exception): pass
@@ -200,9 +200,8 @@ class MagicAlgorithmParametersError(Exception): pass
 class AlgorithmArgumentsError(Exception): pass
 
 
-
 def call_method(a_callable):
-    def _call(self, *args, **kwargs):
+    def _call(_self, *args, **kwargs):
         return a_callable(*args, **kwargs)
     return _call
 
@@ -225,14 +224,14 @@ class BinningAlgorithm(metaclass=SubclassRegistry):
     @classmethod
     def from_built_in(cls, algorithm_id):
         return cls.create(algorithm_id,
-                          cls.subclasses[algorithm_id]._callback,
+                          cls.subclasses[algorithm_id].callback,
                           # TODO replace with call to dataclass
                           [object, object],
                           {
                               'right': {
-                                'type': bool,
-                                'value': True
-                          },
+                                  'type': bool,
+                                  'value': True,
+                              },
                               'labels': {
                                   'type': object,
                                   'value': None
@@ -253,14 +252,15 @@ class BinningAlgorithm(metaclass=SubclassRegistry):
                                   'type': str,
                                   'value': 'raise'
                               },
-                          })
+                          }
+                          )
 
 
 import pandas as pd
 
 @BinningAlgorithm.register_as_subclass('pd.cut')
 class PDCutBinningAlgorithm(MagicAlgorithm):
-    _callback = pd.cut
+    callback = pd.cut
 
     def _get_settings(self, result):
         # if result:

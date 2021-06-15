@@ -43,7 +43,7 @@ def validate_discretization_operation_behaviour():
         nb_bins = cmd.args[2]
         min_value = min(iter(datapoints.column(target_column)))
         max_value = max(iter(datapoints.column(target_column)))
-        bin_size = (max_value - min_value) / float(nb_bins)
+        # bin_size = (max_value - min_value) / float(nb_bins)
         computed_bins = algorithm.output['settings']['used_bins']
         assert [_ for _ in computed_bins] == [-0.1, 25.0, 50.0, 75.0, 100.0]
 
