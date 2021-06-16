@@ -1,10 +1,8 @@
 from so_magic.data.interfaces import TabularRetriever, TabularIterator, TabularMutator
 
-# __all__ = ['PDTabularRetrieverDelegate', 'PDTabularIteratorDelegate', 'PDTabularMutatorDelegate']
 __all__ = ['BACKEND']
 
 
-# DELEGATES
 # User defined (engine dependent implementations of tabular operations)
 
 class PDTabularRetrieverDelegate(TabularRetriever):

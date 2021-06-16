@@ -72,6 +72,8 @@ def test_delegate_sanity_check(engine_backends, data_manager):
     # assert that the data engine initial (default) backend is "pandas-backend"
     # could need to change in the future if we give the client the option to initialize the engine with a backend of their preference
     assert dt_manager.engine.backend.id == 'pd'
-    for backend_id, _backend_implementation in engine_backends:
+    for backend_id, implementations_data in engine_backends:
         dt_manager.engine.backend = engine_backends.backends[backend_id]
         assert dt_manager.engine.backend.id == backend_id
+        for operator_interface_name, data in engine_backends.backend_interfaces.items():
+            assert all(interface_method in dir(implementations_data[operator_interface_name]) for interface_method in [method_name for method_name in dir(data['interface']) if callable(getattr(data['interface'], method_name))])
