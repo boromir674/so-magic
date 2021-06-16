@@ -7,12 +7,6 @@ def map_manager(somagic):
 
 
 @pytest.fixture
-def map_id_class():
-    from so_magic.som.manager import MapId
-    return MapId
-
-
-@pytest.fixture
 def identical_map_ids():
     def assert_map_ids_are_the_same(map_id1, map_id2):
         assert str(map_id1) == str(map_id2)
@@ -20,23 +14,37 @@ def identical_map_ids():
     return assert_map_ids_are_the_same
 
 
-def test_map_manager_get_map_method(map_manager, test_dataset, map_id_class, identical_map_ids):
+@pytest.fixture
+def test_data(test_dataset):
+    from collections import OrderedDict
+    from so_magic.som.manager import MapId
+    map_specs = OrderedDict([
+        ('nb-cols', 4),
+        ('nb-rows', 5),
+        ('initialization', 'pca'),
+        ('maptype', 'toroid'),
+        ('gridtype', 'hexagonal'),
+    ])
+    return type('TestData', (object,), {
+        'map_parameters': type('SomModelParameters', (object,), {
+            'args': (test_dataset, map_specs['nb-cols'], map_specs['nb-rows']),
+            'kwargs': {k: map_specs[k] for k in ('initialization', 'maptype', 'gridtype')}
+        }),
+        'get_runtime_map_id': lambda x: MapId.from_self_organizing_map(x),
+        'expected_map_id': MapId(*[test_dataset.name] + list(map_specs.values())),
+    })
+
+
+def test_map_manager_get_map_method(map_manager, test_data, identical_map_ids):
     # assert the get_map method returns the same object when invoked with already seen arguments
-    som1 = map_manager.get_map(test_dataset, 4, 5, initialization='pca', maptype='toroid', gridtype='hexagonal')
-    som2 = map_manager.get_map(test_dataset, 4, 5, initialization='pca', maptype='toroid', gridtype='hexagonal')
+    som1 = map_manager.get_map(*test_data.map_parameters.args, **test_data.map_parameters.kwargs)
+    som2 = map_manager.get_map(*test_data.map_parameters.args, **test_data.map_parameters.kwargs)
     assert id(som1) == id(som2)
 
-    map_id = map_id_class.from_self_organizing_map(som1)
-    identical_map_ids(map_id, map_id_class(
-        test_dataset.name,
-        4,
-        5,
-        'pca',
-        'toroid',
-        'hexagonal'
-    ))
-
+    map_id = test_data.get_runtime_map_id(som1)
+    identical_map_ids(map_id, test_data.expected_map_id)
     assert som1.get_map_id() == str(map_id)
+
     assert som1.nb_clusters == 0
 
     with pytest.raises(TypeError, match="'NoneType' object is not subscriptable"):

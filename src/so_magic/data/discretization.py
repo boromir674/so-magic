@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import inspect
 import attr
+import pandas as pd
 from so_magic.utils import SubclassRegistry
 
 
@@ -224,7 +225,7 @@ class BinningAlgorithm(metaclass=SubclassRegistry):
     @classmethod
     def from_built_in(cls, algorithm_id):
         return cls.create(algorithm_id,
-                          cls.subclasses[algorithm_id].callback,
+                          pd.cut,
                           # TODO replace with call to dataclass
                           [object, object],
                           {
@@ -256,16 +257,10 @@ class BinningAlgorithm(metaclass=SubclassRegistry):
                           )
 
 
-import pandas as pd
-
 @BinningAlgorithm.register_as_subclass('pd.cut')
 class PDCutBinningAlgorithm(MagicAlgorithm):
-    callback = pd.cut
 
     def _get_settings(self, result):
-        # if result:
-        #     return dict(super()._get_settings(result), **{'used_bins': [str(_) for _ in result.categories]})
-        # return super()._get_settings(result)
         return dict(super()._get_settings(result), **{'used_bins': result[1]})
 
     def _get_result(self, result):
