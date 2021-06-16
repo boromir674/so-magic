@@ -41,13 +41,17 @@ def test_decorating():
     assert not hasattr(CommandRegistrator, 'state')
 
     @ADecoratorClass.func_decorator()
-    def aa(): pass
+    def aa(x):
+        return str(x) + 'aa'
 
     assert 'aa' in ADecoratorClass.registry
     assert 'aa' not in BDecoratorClass.registry
+    assert ADecoratorClass.registry['aa']('1') == '1aa'
 
     @BDecoratorClass.func_decorator()
-    def bb(): pass
+    def bb(x):
+        return str(x) + 'bb'
 
     assert 'bb' in BDecoratorClass.registry
     assert 'bb' not in ADecoratorClass.registry
+    assert BDecoratorClass.registry['bb']('1') == '1bb'
