@@ -84,6 +84,9 @@ def test_delegate_sanity_check(built_in_n_client_backends, tabular_operators, da
                        for required_method_name in required_methods)
                    for operator_interface_name, required_methods in tabular_operators['required_methods'])
 
+
+def test_client_backend(built_in_n_client_backends, tabular_operators):
+
     for operator_interface_name, required_methods in tabular_operators['required_methods']:
         for m in required_methods:
             nb_args = tabular_operators['get_nb_args'](operator_interface_name, m)
