@@ -2,14 +2,6 @@ import pytest
 
 
 @pytest.fixture
-def define_command():
-    def _define_engine_command(decorator, command_function):
-        decorator(command_function)
-        return command_function.__name__
-    return _define_engine_command
-
-
-@pytest.fixture
 def test_discretizer():
     from so_magic.data.discretization import Discretizer, BinningAlgorithm
 
@@ -48,7 +40,7 @@ def validate_discretization_operation_behaviour():
 
 
 @pytest.fixture
-def discretization_cmd(somagic, test_datapoints, define_command, discretize_command, test_discretizer):
+def discretization_cmd(somagic, test_datapoints, discretize_command, test_discretizer):
     """Get a discretization command after some 'pre-processing' done on the test datapoints."""
     series = somagic.dataset.datapoints.column('Creative').replace('', 0.0, inplace=False)
     assert all(type(x) == float for x in series)
@@ -56,10 +48,9 @@ def discretization_cmd(somagic, test_datapoints, define_command, discretize_comm
     somagic.datapoints.add_column(list(series), 'Creative')
 
     assert all(type(x) == float for x in somagic.datapoints.observations['Creative'])
-
-    test_discretize_command_name: str = define_command(somagic.commands_decorators.data_manager_command(),
-                                                       discretize_command(test_discretizer))
-    return getattr(somagic.command, test_discretize_command_name)
+    user_defined_function = discretize_command(test_discretizer)
+    somagic.commands_decorators.data_manager_command()(user_defined_function)
+    return getattr(somagic.command, user_defined_function.__name__)
 
 
 @pytest.fixture(params=[
