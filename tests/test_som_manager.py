@@ -7,14 +7,6 @@ def map_manager(somagic):
 
 
 @pytest.fixture
-def identical_map_ids():
-    def assert_map_ids_are_the_same(map_id1, map_id2):
-        assert str(map_id1) == str(map_id2)
-        assert dict(map_id1) == dict(map_id2)
-    return assert_map_ids_are_the_same
-
-
-@pytest.fixture
 def test_data(test_dataset):
     from collections import OrderedDict
     from so_magic.som.manager import MapId
@@ -35,28 +27,37 @@ def test_data(test_dataset):
     })
 
 
-def test_map_manager_get_map_method(map_manager, test_data, identical_map_ids):
-    # assert the get_map method returns the same object when invoked with already seen arguments
+@pytest.fixture
+def test_soms(map_manager, test_data):
     som1 = map_manager.get_map(*test_data.map_parameters.args, **test_data.map_parameters.kwargs)
     som2 = map_manager.get_map(*test_data.map_parameters.args, **test_data.map_parameters.kwargs)
-    assert id(som1) == id(som2)
+    return [som1, som2]
 
-    map_id = test_data.get_runtime_map_id(som1)
-    identical_map_ids(map_id, test_data.expected_map_id)
-    assert som1.get_map_id() == str(map_id)
 
-    assert som1.nb_clusters == 0
+def test_memoize_behaviour(test_soms):
+    assert id(test_soms[0]) == id(test_soms[1])
+
+
+def test_map_id(test_soms, test_data):
+    map_id = test_data.get_runtime_map_id(test_soms[0])
+    assert str(map_id) == str(test_data.expected_map_id)
+    assert dict(map_id) == dict(test_data.expected_map_id)
+    assert test_soms[0].get_map_id() == str(map_id)
+
+
+def test_clustering_behaviour(test_soms):
+    assert test_soms[0].nb_clusters == 0
 
     with pytest.raises(TypeError, match="'NoneType' object is not subscriptable"):
-        _ = som1.visual_umatrix
+        _ = test_soms[0].visual_umatrix
 
     # tightly depends on the current implementation that requires to invoke the
     # 'cluster' method of a SelfOrganisingMap instance to do 'clustering' on the
     # output of the self-organising map training/learning algorithm
-    som1.cluster(4, random_state=1)
-    assert som1.nb_clusters == 4
+    test_soms[0].cluster(4, random_state=1)
+    assert test_soms[0].nb_clusters == 4
 
-    umatrix_str_representation = som1.visual_umatrix
+    umatrix_str_representation = test_soms[0].visual_umatrix
 
     assert umatrix_str_representation == '3 3 3 3\n2 0 0 0\n2 2 0 0\n1 1 1 1\n1 1 1 1\n'
     assert umatrix_str_representation == '3 3 3 3\n' \
@@ -72,4 +73,4 @@ def test_map_manager_get_map_method(map_manager, test_data, identical_map_ids):
 1 1 1 1\n\
 '
 
-    assert som1.datapoint_coordinates(0) == (2, 1)
+    assert test_soms[0].datapoint_coordinates(0) == (2, 1)
