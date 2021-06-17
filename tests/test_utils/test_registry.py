@@ -4,43 +4,40 @@ import pytest
 @pytest.fixture
 def registry_infra():
     from so_magic.utils import ObjectRegistry, ObjectRegistryError
-    return type('DummyClass', (object,), {'object': ObjectRegistry({'key1': 1}), 'error': ObjectRegistryError})
+    return type('DummyClass', (object,), {'object': ObjectRegistry({'key1': 1}), 'error': ObjectRegistryError,
+                                          'existing_key': 'key1', 'non_existing_key': 'key2'})
 
 
 def test_registry_remove_method(registry_infra):
-    key_to_remove = 'key1'
-    assert key_to_remove in registry_infra.object
+    assert registry_infra.existing_key in registry_infra.object
 
-    registry_infra.object.remove(key_to_remove)
+    registry_infra.object.remove(registry_infra.existing_key)
     assert registry_infra.object.objects == {}
 
     with pytest.raises(registry_infra.error,
-                       match=f'Requested to remove item with key {key_to_remove}, which does not exist.'):
-        registry_infra.object.remove(key_to_remove)
-    
+                       match=f'Requested to remove item with key {registry_infra.existing_key}, which does not exist.'):
+        registry_infra.object.remove(registry_infra.existing_key)
+
 
 def test_registry_pop_method(registry_infra):
-    key_to_pop = 'key1'
-    assert key_to_pop in registry_infra.object
+    assert registry_infra.existing_key in registry_infra.object
 
-    value = registry_infra.object.pop(key_to_pop)
+    value = registry_infra.object.pop(registry_infra.existing_key)
     assert value == 1
     assert registry_infra.object.objects == {}
 
     with pytest.raises(registry_infra.error,
-                       match=f'Requested to pop item with key {key_to_pop}, which does not exist.'):
-        registry_infra.object.pop(key_to_pop)
+                       match=f'Requested to pop item with key {registry_infra.existing_key}, which does not exist.'):
+        registry_infra.object.pop(registry_infra.existing_key)
 
 
 def test_registry_get_method(registry_infra):
-    key_to_get = 'key1'
-    assert key_to_get in registry_infra.object
+    assert registry_infra.existing_key in registry_infra.object
 
-    value = registry_infra.object.get(key_to_get)
+    value = registry_infra.object.get(registry_infra.existing_key)
     assert value == 1
-    assert registry_infra.object.objects == {'key1': 1}
+    assert registry_infra.object.objects == {registry_infra.existing_key: 1}
 
-    non_existing_key = 'key2'
-    with pytest.raises(registry_infra.error,
-                       match=f'Requested to get item with key {non_existing_key}, which does not exist.'):
-        _ = registry_infra.object.get(non_existing_key)
+    with pytest.raises(registry_infra.error, match=f'Requested to get item with key {registry_infra.non_existing_key}, '
+                                                   f'which does not exist.'):
+        _ = registry_infra.object.get(registry_infra.non_existing_key)
