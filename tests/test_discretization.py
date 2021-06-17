@@ -5,6 +5,7 @@ import pytest
 def define_command():
     def _define_engine_command(decorator, command_function):
         decorator(command_function)
+        return command_function.__name__
     return _define_engine_command
 
 
@@ -74,16 +75,16 @@ def discretization_test_data(somagic, test_datapoints):
 
 
 def test_discretization_operation(somagic, discretization_test_data, define_command, get_command, test_discretizer, discretize_command, validate_discretization_operation_behaviour):
-    define_command(somagic.commands_decorators.data_manager_command(), discretize_command(test_discretizer))
+    test_discretize_command_name: str = define_command(somagic.commands_decorators.data_manager_command(), discretize_command(test_discretizer))
     for attr_name in discretization_test_data['success']:
-        cmd = get_command('test_discretize_command')
+        cmd = get_command(test_discretize_command_name)
         cmd.args = [somagic.datapoints, attr_name, 4, f'binned_{attr_name}']
         cmd.execute()
 
         validate_discretization_operation_behaviour(cmd, test_discretizer.algorithm)
 
     for attr_name in discretization_test_data['fail']:
-        cmd = get_command('test_discretize_command')
+        cmd = get_command(test_discretize_command_name)
         cmd.args = [somagic.datapoints, attr_name, 4, f'binned_{attr_name}']
         with pytest.raises(TypeError):
             cmd.execute()
