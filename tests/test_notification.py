@@ -45,9 +45,6 @@ def test_attrs_sanity1():
     class B:
         _observers = attr.ib(init=True, default=attr.Factory(list))
 
-        def add(self, *objects):
-            self._observers.extend([_ for _ in objects])
-
     i1 = B()
     i2 = B()
     assert id(i1._observers) != id(i2._observers)

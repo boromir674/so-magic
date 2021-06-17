@@ -76,16 +76,15 @@ def test_delegate_sanity_check(built_in_n_client_backends, tabular_operators, da
     # could need to change in the future if we give the client the option to initialize the engine with a backend of
     # their preference
     assert dt_manager.engine.backend.id == 'pd'
-    required_implemented_methods = {operator_interface_name: v['interface'].keys() for operator_interface_name, v in tabular_operators['operators'].items()}
 
     for backend_id, implementations_data in built_in_n_client_backends:
         dt_manager.engine.backend = built_in_n_client_backends.backends[backend_id]
         assert dt_manager.engine.backend.id == backend_id
         assert all(all(required_method_name in dir(implementations_data[operator_interface_name])
                        for required_method_name in required_methods)
-                   for operator_interface_name, required_methods in required_implemented_methods.items())
+                   for operator_interface_name, required_methods in tabular_operators['required_methods'])
 
-    for operator_interface_name, required_methods in required_implemented_methods.items():
+    for operator_interface_name, required_methods in tabular_operators['required_methods']:
         for m in required_methods:
             nb_args = tabular_operators['get_nb_args'](operator_interface_name, m)
             # we have to initialize an instance out of an operator class like we do in the 'observations_command' method in the Backend

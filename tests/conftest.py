@@ -175,5 +175,8 @@ def tabular_operators(built_in_backends):
     return {
         'operators': operators,
         'reverse_dict': {operator_dict['class']: key for key, operator_dict in operators.items()},
-        'get_nb_args': lambda operator_interface_name, method_name: len(operators[operator_interface_name]['interface'][method_name].replace(', **kwargs', '').split(','))
+        'get_nb_args': lambda operator_interface_name, method_name: len(operators[operator_interface_name]['interface'][method_name].replace(', **kwargs', '').split(',')),
+        # operator_name_2_required_methods
+        'required_methods': iter(((operator_interface_name, v['interface'].keys())
+                                  for operator_interface_name, v in operators.items()))
     }
