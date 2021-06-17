@@ -28,14 +28,6 @@ def test_data(test_dataset):
 
 
 @pytest.fixture
-def validate_map_ip():
-    def _validate_map_ip(map_id1, map_id2):
-        assert str(map_id1) == str(map_id2)
-        assert dict(map_id1) == dict(map_id2)
-    return _validate_map_ip
-
-
-@pytest.fixture
 def test_soms(map_manager, test_data):
     som1 = map_manager.get_map(*test_data.map_parameters.args, **test_data.map_parameters.kwargs)
     som2 = map_manager.get_map(*test_data.map_parameters.args, **test_data.map_parameters.kwargs)
@@ -46,9 +38,10 @@ def test_memoize_behaviour(test_soms):
     assert id(test_soms[0]) == id(test_soms[1])
 
 
-def test_map_id(test_soms, validate_map_ip, test_data):
+def test_map_id(test_soms, test_data):
     map_id = test_data.get_runtime_map_id(test_soms[0])
-    validate_map_ip(map_id, test_data.expected_map_id)
+    assert str(map_id) == str(test_data.expected_map_id)
+    assert dict(map_id) == dict(test_data.expected_map_id)
     assert str(map_id) == test_soms[0].get_map_id()
 
 
