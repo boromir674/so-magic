@@ -5,14 +5,6 @@ from .command_interface import CommandInterface
 __all__ = ['Command', 'Invoker', 'CommandHistory', 'CommandInterface']
 
 
-# class CommandInterface(ABC):
-#     """Standalone command, encapsulating all logic and data needed, required for execution."""
-#     @abstractmethod
-#     def execute(self) -> None:
-#         """Execute the command; run the commands logic."""
-#         raise NotImplementedError
-
-
 class AbstractCommand(CommandInterface, ABC):
     """An abstract implementation of the CommandInterface.
 
