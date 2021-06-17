@@ -28,6 +28,14 @@ def test_data(test_dataset):
 
 
 @pytest.fixture
+def validate_map_ip():
+    def _validate_map_ip(map_id1, map_id2):
+        assert str(map_id1) == str(map_id2)
+        assert dict(map_id1) == dict(map_id2)
+    return _validate_map_ip
+
+
+@pytest.fixture
 def test_soms(map_manager, test_data):
     som1 = map_manager.get_map(*test_data.map_parameters.args, **test_data.map_parameters.kwargs)
     som2 = map_manager.get_map(*test_data.map_parameters.args, **test_data.map_parameters.kwargs)
@@ -38,11 +46,10 @@ def test_memoize_behaviour(test_soms):
     assert id(test_soms[0]) == id(test_soms[1])
 
 
-def test_map_id(test_soms, test_data):
+def test_map_id(test_soms, validate_map_ip, test_data):
     map_id = test_data.get_runtime_map_id(test_soms[0])
-    assert str(map_id) == str(test_data.expected_map_id)
-    assert dict(map_id) == dict(test_data.expected_map_id)
-    assert test_soms[0].get_map_id() == str(map_id)
+    validate_map_ip(map_id, test_data.expected_map_id)
+    assert str(map_id) == test_soms[0].get_map_id()
 
 
 def test_clustering_behaviour(test_soms):
@@ -51,26 +58,17 @@ def test_clustering_behaviour(test_soms):
     with pytest.raises(TypeError, match="'NoneType' object is not subscriptable"):
         _ = test_soms[0].visual_umatrix
 
-    # tightly depends on the current implementation that requires to invoke the
-    # 'cluster' method of a SelfOrganisingMap instance to do 'clustering' on the
-    # output of the self-organising map training/learning algorithm
+    # tightly depends on the current implementation that requires to invoke the 'cluster' method of a SelfOrganisingMap
+    # instance to do 'clustering' on the output of the self-organising map training/learning algorithm
     test_soms[0].cluster(4, random_state=1)
     assert test_soms[0].nb_clusters == 4
 
     umatrix_str_representation = test_soms[0].visual_umatrix
 
-    assert umatrix_str_representation == '3 3 3 3\n2 0 0 0\n2 2 0 0\n1 1 1 1\n1 1 1 1\n'
     assert umatrix_str_representation == '3 3 3 3\n' \
                                          '2 0 0 0\n' \
                                          '2 2 0 0\n' \
                                          '1 1 1 1\n' \
                                          '1 1 1 1\n'
-    assert umatrix_str_representation == '\
-3 3 3 3\n\
-2 0 0 0\n\
-2 2 0 0\n\
-1 1 1 1\n\
-1 1 1 1\n\
-'
 
     assert test_soms[0].datapoint_coordinates(0) == (2, 1)
