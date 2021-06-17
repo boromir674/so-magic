@@ -55,36 +55,43 @@ def validate_discretization_operation_behaviour():
 
 
 @pytest.fixture
-def discretization_test_data(somagic, test_datapoints):
+def discretization_cmd(somagic, test_datapoints, define_command, get_command, discretize_command, test_discretizer):
+    """Get a discretization command after some 'pre-processing' done on the test datapoints."""
     series = somagic.dataset.datapoints.column('Creative').replace('', 0.0, inplace=False)
     assert all(type(x) == float for x in series)
 
     somagic.datapoints.add_column(list(series), 'Creative')
 
-    
     assert all(type(x) == float for x in somagic.datapoints.observations['Creative'])
 
-    return {
-        'success': [
-            'Creative'
-        ],
-        'fail': [
-            'Energetic'
-        ],
-    }
+    test_discretize_command_name: str = define_command(somagic.commands_decorators.data_manager_command(),
+                                                       discretize_command(test_discretizer))
+    return get_command(test_discretize_command_name)
 
 
-def test_discretization_operation(somagic, discretization_test_data, define_command, get_command, test_discretizer, discretize_command, validate_discretization_operation_behaviour):
-    test_discretize_command_name: str = define_command(somagic.commands_decorators.data_manager_command(), discretize_command(test_discretizer))
-    for attr_name in discretization_test_data['success']:
-        cmd = get_command(test_discretize_command_name)
-        cmd.args = [somagic.datapoints, attr_name, 4, f'binned_{attr_name}']
-        cmd.execute()
+@pytest.fixture(params=[
+    ['Creative'],
+    # [],  # add more columns when we know the discretization command will succeed for them
+])
+def cmd_to_succeed(request, test_datapoints, discretization_cmd):
+    discretization_cmd.args = [test_datapoints, request.param[0], 4, f'binned_{request.param[0]}']
+    return discretization_cmd
 
-        validate_discretization_operation_behaviour(cmd, test_discretizer.algorithm)
 
-    for attr_name in discretization_test_data['fail']:
-        cmd = get_command(test_discretize_command_name)
-        cmd.args = [somagic.datapoints, attr_name, 4, f'binned_{attr_name}']
-        with pytest.raises(TypeError):
-            cmd.execute()
+def test_discretization_operation(cmd_to_succeed, test_discretizer, validate_discretization_operation_behaviour):
+    cmd_to_succeed.execute()
+    validate_discretization_operation_behaviour(cmd_to_succeed, test_discretizer.algorithm)
+
+
+@pytest.fixture(params=[
+    ['Energetic'],
+    # [],  # add more columns when we know the discretization command will fail for them
+])
+def cmd_to_fail(request, test_datapoints, discretization_cmd):
+    discretization_cmd.args = [test_datapoints, request.param[0], 4, f'binned_{request.param[0]}']
+    return discretization_cmd
+
+
+def test_discretization_on_non_preprocessed_attribute(cmd_to_fail):
+    with pytest.raises(TypeError):
+        cmd_to_fail.execute()
