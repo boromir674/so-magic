@@ -16,7 +16,7 @@ def init_data_manager(engine):
         FeatureManager([]),
     )
     mega_cmd_factory = DataManagerCommandFactory(my_data_manager)
-    mega_cmd_factory.attach(my_data_manager.commands_manager.command.accumulator)
+    mega_cmd_factory.subject.attach(my_data_manager.commands_manager.command.accumulator)
 
     my_data_manager.commands_manager.decorators = type('EngineCommandDecorators', (object,), {
         'data_manager_command': mega_cmd_factory.build_command_prototype,

@@ -99,12 +99,12 @@ def test_somagic_objects(nb_objects, nb_observers):
         phi_class = s._data_manager.phi_class
 
         subjects = [datapoints_fact.subject,
-                    cmd_fact,
+                    cmd_fact.subject,
                     phi_class.subject
                     ]
         assert len(set([id(x._observers) for x in subjects])) == len(subjects)
 
         assert datapoints_fact.subject._observers[0] == s._data_manager.engine.datapoints_manager
-        assert cmd_fact._observers[0] == s._data_manager.commands_manager.command.accumulator
+        assert cmd_fact.subject._observers[0] == s._data_manager.commands_manager.command.accumulator
         assert phi_class.subject._observers[0] == s._data_manager.built_phis
         assert all([len(subject._observers) == column for subject, column in zip(subjects, nb_observers[i])])

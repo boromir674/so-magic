@@ -1,45 +1,51 @@
+import inspect
 import pytest
 
 
 @pytest.fixture
 def client_pandas_tabular_implementation():
+    """Client code that defines an Engine Backend"""
     from so_magic.data.interfaces import TabularRetriever, TabularIterator, TabularMutator
     
     class TestPDTabularRetrieverDelegate(TabularRetriever):
-        """The observation object is the same as the one you return from 'from_json_lines'"""
 
         @classmethod
-        def column(cls, identifier, data): pass
+        def column(cls, identifier, data):
+            return inspect.currentframe().f_code.co_name
 
-        def row(self, identifier, data): pass
-
-        @classmethod
-        def nb_columns(cls, data): pass
-
-        @classmethod
-        def nb_rows(cls, data): pass
+        def row(self, identifier, data):
+            return inspect.currentframe().f_code.co_name
 
         @classmethod
-        def get_numerical_attributes(cls, data): pass
+        def nb_columns(cls, data):
+            return inspect.currentframe().f_code.co_name
 
+        @classmethod
+        def nb_rows(cls, data):
+            return inspect.currentframe().f_code.co_name
+
+        @classmethod
+        def get_numerical_attributes(cls, data):
+            return inspect.currentframe().f_code.co_name
 
     class TestPDTabularIteratorDelegate(TabularIterator):
-        """The observation object is the same as the one your return from 'from_json_lines'"""
 
-        def columnnames(self, data): pass
-
-        @classmethod
-        def iterrows(cls, data): pass
+        def columnnames(self, data):
+            return inspect.currentframe().f_code.co_name
 
         @classmethod
-        def itercolumns(cls, data): pass
+        def iterrows(cls, data):
+            return inspect.currentframe().f_code.co_name
 
+        @classmethod
+        def itercolumns(cls, data):
+            return inspect.currentframe().f_code.co_name
 
     class TestPDTabularMutatorDelegate(TabularMutator):
 
         @classmethod
-        def add_column(cls, datapoints, values, new_attribute, **kwargs): pass
-
+        def add_column(cls, datapoints, values, new_attribute, **kwargs):
+            return inspect.currentframe().f_code.co_name
 
     BACKEND = {
         'backend_id': 'test-pd',
@@ -55,25 +61,35 @@ def client_pandas_tabular_implementation():
 
 
 @pytest.fixture
-def engine_backends(client_pandas_tabular_implementation):
+def built_in_n_client_backends(built_in_backends, client_pandas_tabular_implementation):
     CLIENT_BACKENDS = [
         client_pandas_tabular_implementation,
     ]
-    from so_magic.data.backend.panda_handling.df_backend import magic_backends
 
-    backends = magic_backends()
-
-    backends.add(*CLIENT_BACKENDS)
-    return backends
+    built_in_backends.add(*CLIENT_BACKENDS)
+    return built_in_backends
 
 
-def test_delegate_sanity_check(engine_backends, data_manager):
+def test_delegate_sanity_check(built_in_n_client_backends, tabular_operators, data_manager):
     dt_manager = data_manager()
     # assert that the data engine initial (default) backend is "pandas-backend"
-    # could need to change in the future if we give the client the option to initialize the engine with a backend of their preference
+    # could need to change in the future if we give the client the option to initialize the engine with a backend of
+    # their preference
     assert dt_manager.engine.backend.id == 'pd'
-    for backend_id, implementations_data in engine_backends:
-        dt_manager.engine.backend = engine_backends.backends[backend_id]
+    required_implemented_methods = {operator_interface_name: v['interface'].keys() for operator_interface_name, v in tabular_operators['operators'].items()}
+
+    for backend_id, implementations_data in built_in_n_client_backends:
+        dt_manager.engine.backend = built_in_n_client_backends.backends[backend_id]
         assert dt_manager.engine.backend.id == backend_id
-        for operator_interface_name, data in engine_backends.backend_interfaces.items():
-            assert all(interface_method in dir(implementations_data[operator_interface_name]) for interface_method in [method_name for method_name in dir(data['interface']) if callable(getattr(data['interface'], method_name))])
+        assert all(all(required_method_name in dir(implementations_data[operator_interface_name])
+                       for required_method_name in required_methods)
+                   for operator_interface_name, required_methods in required_implemented_methods.items())
+
+    for operator_interface_name, required_methods in required_implemented_methods.items():
+        for m in required_methods:
+            nb_args = tabular_operators['get_nb_args'](operator_interface_name, m)
+            # we have to initialize an instance out of an operator class like we do in the 'observations_command' method in the Backend
+            # class (eg cls.retriever(), cls.iterator(), cls.mutator())
+            assert getattr(built_in_n_client_backends.implementations['test-pd'][operator_interface_name](), m)(*list([None] * nb_args)) == m
+
+        # assert all(getattr(built_in_n_client_backends.implementations['test-pd'][operator_interface_name], method)(None, None) == method for method in required_methods)

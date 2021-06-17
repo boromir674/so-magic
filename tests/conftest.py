@@ -57,15 +57,15 @@ def data_manager():
         assert isinstance(datapoints_fact, DatapointsFactory)
         assert isinstance(cmd_fact, MagicCommandFactory)
 
-        subjects = [datapoints_fact.subject, cmd_fact, data_manager.phi_class.subject]
+        subjects = [datapoints_fact.subject, cmd_fact.subject, data_manager.phi_class.subject]
         assert len(set([id(x._observers) for x in subjects])) == len(subjects)
 
         assert datapoints_fact.subject._observers[0] == data_manager.engine.datapoints_manager
-        assert cmd_fact._observers[0] == data_manager.commands_manager.command.accumulator
+        assert cmd_fact.subject._observers[0] == data_manager.commands_manager.command.accumulator
         assert data_manager.phi_class.subject._observers[0] == data_manager.built_phis
 
         print(f"DTP FCT OBS: [{', '.join(str(_) for _ in datapoints_fact.subject._observers)}]")
-        print(f"CMD FCT OBS: [{', '.join(str(_) for _ in cmd_fact._observers)}]")
+        print(f"CMD FCT OBS: [{', '.join(str(_) for _ in cmd_fact.subject._observers)}]")
         print(f"PHIFUNC class OBS: [{', '.join(str(_) for _ in data_manager.phi_class.subject._observers)}]")
         assert all([len(x._observers) == 1 for x in subjects])
         return data_manager
@@ -142,3 +142,38 @@ def built_in_backends():
     from so_magic.data.backend.panda_handling.df_backend import magic_backends
     engine_backends = magic_backends()
     return engine_backends
+
+
+@pytest.fixture
+def tabular_operators(built_in_backends):
+    operators = {
+        'retriever': {
+            'class': built_in_backends.backend_interfaces['retriever']['class_registry'].subclasses['pd'],
+            'interface': {
+                'column': '(identifier, data)',
+                'row': '(identifier, data)',
+                'nb_columns': '(data)',
+                'nb_rows': '(data)',
+                'get_numerical_attributes': '(data)',
+            }
+        },
+        'iterator': {
+            'class': built_in_backends.backend_interfaces['iterator']['class_registry'].subclasses['pd'],
+            'interface': {
+                'columnnames': '(data)',
+                'itercolumns': '(data)',
+                'iterrows': '(data)',
+            },
+        },
+        'mutator': {
+            'class': built_in_backends.backend_interfaces['mutator']['class_registry'].subclasses['pd'],
+            'interface': {
+                'add_column': '(datapoints, values, new_attribute, **kwargs)',
+            },
+        },
+    }
+    return {
+        'operators': operators,
+        'reverse_dict': {operator_dict['class']: key for key, operator_dict in operators.items()},
+        'get_nb_args': lambda operator_interface_name, method_name: len(operators[operator_interface_name]['interface'][method_name].replace(', **kwargs', '').split(','))
+    }

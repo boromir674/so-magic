@@ -16,16 +16,17 @@ class DataManagerCommandFactoryBuilder(metaclass=CommandFactoryType):
 
 
 @attr.s
-class DataManagerCommandFactory(Subject):
+class DataManagerCommandFactory:
     _data_manager = attr.ib(init=True)
     command_factory = attr.ib(init=True, default=DataManagerCommandFactoryBuilder)
+    subject: Subject = attr.ib(init=False, default=attr.Factory(Subject))
     name: str = attr.ib(init=False, default='')
 
     def __call__(self, command_type, *args, **kwargs):
-        self.state = self.command_factory.create(command_type).construct(self._data_manager, *args, **kwargs)
-        self.name = command_type
-        self.notify()
-        return self.state
+        self.subject.state = self.command_factory.create(command_type).construct(self._data_manager, *args, **kwargs)
+        self.subject.name = command_type
+        self.subject.notify()
+        return self.subject.state
 
     def build_command_prototype(self):
         def wrapper(a_callable: Callable) -> Callable:

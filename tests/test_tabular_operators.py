@@ -2,40 +2,6 @@ import pytest
 
 
 @pytest.fixture
-def tabular_operators(built_in_backends):
-    operators = {
-        'retriever': {
-            'class': built_in_backends.backend_interfaces['retriever']['class_registry'].subclasses['pd'],
-            'interface': {
-                'column': '(identifier, data)',
-                'row': '(identifier, data)',
-                'nb_columns': '(data)',
-                'nb_rows': '(data)',
-                'get_numerical_attributes': '(data)',
-            }
-        },
-        'iterator': {
-            'class': built_in_backends.backend_interfaces['iterator']['class_registry'].subclasses['pd'],
-            'interface': {
-                'columnnames': '(data)',
-                'itercolumns': '(data)',
-                'iterrows': '(data)',
-            },
-        },
-        'mutator': {
-            'class': built_in_backends.backend_interfaces['mutator']['class_registry'].subclasses['pd'],
-            'interface': {
-                'add_column': '(datapoints, values, new_attribute, **kwargs)',
-            },
-        },
-    }
-    return {
-        'operators': operators,
-        'reverse_dict': {operator_dict['class']: key for key, operator_dict in operators.items()},
-    }
-
-
-@pytest.fixture
 def assert_correct_signatures(tabular_operators):
     def _assert_correct_signatures(instance):
         interface_id = tabular_operators['reverse_dict'][type(instance)]

@@ -7,7 +7,7 @@ class Phis(ObjectRegistry, Observer):
     def __getattr__(self, item):
         return self.objects[item]
 
-    def update(self, subject):
+    def update(self, subject, *args, **kwargs):
         self.add(subject.name, subject.state)
 
 
@@ -24,7 +24,7 @@ class DataManager:
 
     def __attrs_post_init__(self):
         self.engine.backend.datapoints_factory.subject.attach(self.engine.datapoints_manager)
-        self.engine.backend.command_factory.attach(self.commands_manager.command.accumulator)
+        self.engine.backend.command_factory.subject.attach(self.commands_manager.command.accumulator)
         self._phi_function_class.subject.attach(self.built_phis)
 
     @property
