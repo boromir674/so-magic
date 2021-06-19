@@ -12,7 +12,16 @@ def app_phi_function(somagic):
     return somagic._data_manager.phi_class
 
 
-def test_phi_creation(app_phi_function, registering_phi_at_the_same_key_error):
+@pytest.fixture
+def assert_registered_function_keeps_original_func_properties():
+    def _f(func, expected_name: str, expected_doc: str):
+        assert func.__name__ == expected_name
+        assert func.__doc__ == expected_doc
+    return _f
+
+
+def test_phi_creation(app_phi_function, registering_phi_at_the_same_key_error,
+                      assert_registered_function_keeps_original_func_properties):
     from so_magic.data.features.phi import phi_registry
 
     assert phi_registry.objects == {}
@@ -26,8 +35,7 @@ def test_phi_creation(app_phi_function, registering_phi_at_the_same_key_error):
         return x + 1
 
     assert 'pame' in phi_registry
-    assert ela.__name__ == 'ela'
-    assert ela.__doc__ == 'ela Docstring'
+    assert_registered_function_keeps_original_func_properties(ela, 'ela', 'ela Docstring')
 
     assert phi_registry.get('pame').__name__ == 'ela'
     assert phi_registry.get('pame').__doc__ == 'ela Docstring'
@@ -68,8 +76,7 @@ def test_phi_creation(app_phi_function, registering_phi_at_the_same_key_error):
     assert 'qw' in phi_registry
     assert phi_registry.get('qw')(3) == -2
 
-    assert phi_registry.get('qw').__name__ == 'qw'
-    assert phi_registry.get('qw').__doc__ == qw.__call__.__doc__
+    assert_registered_function_keeps_original_func_properties(phi_registry.get('qw'), 'qw', qw.__call__.__doc__)
 
     @PhiFunction.register()
     class Nai:
@@ -78,8 +85,9 @@ def test_phi_creation(app_phi_function, registering_phi_at_the_same_key_error):
             return data - 1
 
     assert 'Nai' in phi_registry
-    assert phi_registry.get('Nai').__name__ == 'Nai'
-    assert phi_registry.get('Nai').__doc__ == 'Subtract 1 to the input number.'
+
+    assert_registered_function_keeps_original_func_properties(phi_registry.get('Nai'), 'Nai',
+                                                              'Subtract 1 to the input number.')
     
     assert phi_registry.get('Nai')(3) == 2
 
