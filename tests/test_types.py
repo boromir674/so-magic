@@ -10,7 +10,7 @@ def variable_class_name_regex():
 
 
 @pytest.fixture
-def discovered_types():
+def discovered_variable_classes():
     import importlib
     import inspect
     return {name: cls for name, cls in inspect.getmembers(
@@ -18,9 +18,9 @@ def discovered_types():
 
 
 @pytest.fixture
-def find_matches(discovered_types, variable_class_name_regex):
+def find_matches(discovered_variable_classes, variable_class_name_regex):
     return lambda variable_code_name: [_class_name for match, _class_name in ((variable_class_name_regex(
-        variable_code_name).match(class_name.lower()), class_name) for class_name in discovered_types.keys())
+        variable_code_name).match(class_name.lower()), class_name) for class_name in discovered_variable_classes.keys())
                                       if bool(match)]
 
 
@@ -42,24 +42,28 @@ def expected_number_of_matches():
     ['interval', 'numerical'],
     ['ratio', 'numerical'],
 ])
-def variables_to_test(request, find_matches):
-    return request.param, find_matches(request.param[0])
+def variables_to_test(request, find_matches, expected_number_of_matches, discovered_variable_classes):
+    return {
+        'code_name': request.param[0],
+        'parent_code_name': request.param[1],
+        'class_name_matches': find_matches(request.param[0]),
+        'parent_name_matches': find_matches(request.param[1]),
+        'expected_parent_nb_of_matches': expected_number_of_matches(request.param[1])(discovered_variable_classes)
+    }
 
 
 @pytest.fixture
-def check_node(discovered_types, find_matches, expected_number_of_matches):
-    def _check_node(class_name, parent_code_name):
-        variable_type_class = discovered_types[class_name]
+def check_node(discovered_variable_classes, find_matches):
+    def _check_node(test_data):
+        variable_type_class = discovered_variable_classes[test_data['class_name_matches'][0]]
         # find immediate ancestors
         variable_type_superclasses = variable_type_class.__bases__
-        # building the data
-        matches = find_matches(parent_code_name)
-        assert len(matches) == expected_number_of_matches(parent_code_name)(discovered_types)
+        assert len(test_data['parent_name_matches']) == test_data['expected_parent_nb_of_matches']
         # we expect that the class matching the 'parent_code_name' will be a superclass of the variable type class
-        assert matches[0] in [_.__name__ for _ in variable_type_superclasses]
+        assert test_data['parent_name_matches'][0] in [_.__name__ for _ in variable_type_superclasses]
     return _check_node
 
 
 def test_types_follow_taxonomy(check_node, variables_to_test):
-    assert len(variables_to_test[1]) == 1
-    check_node(variables_to_test[1][0], variables_to_test[0][1])
+    assert len(variables_to_test['class_name_matches']) == 1
+    check_node(variables_to_test)
