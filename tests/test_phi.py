@@ -13,19 +13,26 @@ def app_phi_function(somagic):
 
 
 @pytest.fixture
-def assert_registered_function_keeps_original_func_properties():
+def assert_function_properties_values():
     def _f(func, expected_name: str, expected_doc: str):
         assert func.__name__ == expected_name
         assert func.__doc__ == expected_doc
     return _f
 
 
-def test_phi_creation(app_phi_function, registering_phi_at_the_same_key_error,
-                      assert_registered_function_keeps_original_func_properties):
+@pytest.fixture
+def phi_registry():
     from so_magic.data.features.phi import phi_registry
+    return phi_registry
 
+
+def test_initial_phi_registry(phi_registry):
     assert phi_registry.objects == {}
-    assert 'pame' not in phi_registry
+    assert 'any-key' not in phi_registry
+
+
+def test_phi_creation(app_phi_function, phi_registry, registering_phi_at_the_same_key_error,
+                      assert_function_properties_values):
 
     PhiFunction = app_phi_function
 
@@ -35,7 +42,7 @@ def test_phi_creation(app_phi_function, registering_phi_at_the_same_key_error,
         return x + 1
 
     assert 'pame' in phi_registry
-    assert_registered_function_keeps_original_func_properties(ela, 'ela', 'ela Docstring')
+    assert_function_properties_values(ela, 'ela', 'ela Docstring')
 
     assert phi_registry.get('pame').__name__ == 'ela'
     assert phi_registry.get('pame').__doc__ == 'ela Docstring'
@@ -76,7 +83,7 @@ def test_phi_creation(app_phi_function, registering_phi_at_the_same_key_error,
     assert 'qw' in phi_registry
     assert phi_registry.get('qw')(3) == -2
 
-    assert_registered_function_keeps_original_func_properties(phi_registry.get('qw'), 'qw', qw.__call__.__doc__)
+    assert_function_properties_values(phi_registry.get('qw'), 'qw', qw.__call__.__doc__)
 
     @PhiFunction.register()
     class Nai:
@@ -86,8 +93,7 @@ def test_phi_creation(app_phi_function, registering_phi_at_the_same_key_error,
 
     assert 'Nai' in phi_registry
 
-    assert_registered_function_keeps_original_func_properties(phi_registry.get('Nai'), 'Nai',
-                                                              'Subtract 1 to the input number.')
+    assert_function_properties_values(phi_registry.get('Nai'), 'Nai', 'Subtract 1 to the input number.')
     
     assert phi_registry.get('Nai')(3) == 2
 
