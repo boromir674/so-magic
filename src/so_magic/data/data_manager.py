@@ -3,12 +3,18 @@ from so_magic.utils import ObjectRegistry, Observer
 from .commands_manager import CommandsManager
 
 
-class Phis(ObjectRegistry, Observer):
+@attr.s
+class Phis(Observer):
+    registry: ObjectRegistry = attr.ib(default=attr.Factory(ObjectRegistry))
+
     def __getattr__(self, item):
-        return self.objects[item]
+        return getattr(self.registry, item)
+
+    def __contains__(self, item):
+        return item in self.registry
 
     def update(self, subject, *args, **kwargs):
-        self.add(subject.name, subject.state)
+        self.registry.add(subject.name, subject.state)
 
 
 @attr.s

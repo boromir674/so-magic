@@ -4,38 +4,9 @@ at runtime. See the 'PhiFunctionRegistrator' class and its 'register' decorator 
 import logging
 import inspect
 from typing import Callable
-from so_magic.utils import Singleton, ObjectRegistry, Subject
+from so_magic.utils import Singleton, ObjectRegistry, ObjectRegistryError, Subject
 
 logger = logging.getLogger(__name__)
-
-
-class PhiFunctionRegistry(Singleton, ObjectRegistry):
-    """A Singleton dict-like object registry for phi functions.
-
-    Use this class to create a singleton object (instance of this class) that
-    acts as a storage for phi function objects.
-    """
-    def __new__(cls, *args, **kwargs):
-        """Create a new (singleton) instance and initialize an empty registry.
-
-        Returns:
-            PhiFunctionRegistry: the reference to the singleton object (instance)
-        """
-        phi_function_registry = Singleton.__new__(cls, *args, **kwargs)
-        phi_function_registry = ObjectRegistry(getattr(phi_function_registry, 'objects', {}))
-        return phi_function_registry
-
-    @staticmethod
-    def get_instance():
-        """Get the singleton object (instance).
-
-        Returns:
-            PhiFunctionRegistry: the reference to the singleton object (instance)
-        """
-        return PhiFunctionRegistry()
-
-
-phi_registry = PhiFunctionRegistry()
 
 
 class PhiFunctionMetaclass(type):
@@ -175,7 +146,6 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
             a_callable (Callable): the callable that holds the business logic of the phi function
             key_name (str, optional): custom phi name. Defaults to None, which means automatic determination of the name
         """
-        phi_registry.add(key_name, a_callable)
         cls.subject.name = key_name
         cls.subject.state = a_callable
         cls.subject.notify()
@@ -198,6 +168,7 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
             return type(a_callable).name
         if hasattr(type(a_callable), '__name__'):
             return type(a_callable).__name__
-        # TODO replace below line with a raise Exception
-        # we want to cause an error when we fail to get a sensible string name
-        return ''
+        raise PhiFunctionNameDeterminationError()
+
+
+class PhiFunctionNameDeterminationError(Exception): pass

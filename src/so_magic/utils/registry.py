@@ -16,7 +16,7 @@ class ObjectRegistry(ABC):
 
     def add(self, key, value):
         if self.objects.get(key, None):
-            raise ObjectRegistryError(f"Requested to insert value {value} in already existing key {key}."
+            raise ObjectRegistryError(f"Requested to insert value '{value}' in already existing key '{key}'. "
                                       f"All keys are [{', '.join(_ for _ in self.objects)}]")
         self.objects[key] = value
 
@@ -35,8 +35,17 @@ class ObjectRegistry(ABC):
             raise ObjectRegistryError(f"Requested to get item with key {key}, which does not exist.")
         return self.objects[key]
 
+    def __iter__(self):
+        return iter(self.objects.items())
+
     def __contains__(self, item):
         return item in self.objects
+
+    def __eq__(self, other):
+        return dict(self.objects) == dict(other)
+
+    def __repr__(self):
+        return repr(self.objects)
 
 
 class ObjectRegistryError(Exception): pass

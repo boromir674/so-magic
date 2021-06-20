@@ -62,6 +62,7 @@ def data_manager():
 
         assert datapoints_fact.subject._observers[0] == data_manager.engine.datapoints_manager
         assert cmd_fact.subject._observers[0] == data_manager.commands_manager.command.accumulator
+        assert id(data_manager.phi_class.subject._observers[0]) == id(data_manager.built_phis)
         assert data_manager.phi_class.subject._observers[0] == data_manager.built_phis
 
         print(f"DTP FCT OBS: [{', '.join(str(_) for _ in datapoints_fact.subject._observers)}]")

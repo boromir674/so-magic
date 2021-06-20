@@ -80,6 +80,7 @@ class AttributeReporter:
     def __str__(self):
         return self.label
 
+
 @attr.s
 class FeatureState:
     key = attr.ib(init=True)
