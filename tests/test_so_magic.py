@@ -72,14 +72,17 @@ def test_somagic_scenario(train_args, somagic, test_dataset, sample_collaped_jso
     assert all(parameter == getattr(som, attribute) for attribute, parameter in zip(attrs, train_args))
 
 
+@pytest.fixture
+def so_magic_instances():
+    from so_magic import init_so_magic
+    return [init_so_magic(), init_so_magic()]
+
+
 @pytest.mark.parametrize('nb_objects, nb_observers', [
     (2, [(1, 1, 1),
          (1, 1, 1)]),
 ])
-def test_somagic_objects(nb_objects, nb_observers):
-    from so_magic import init_so_magic
-    so_magic_instances = [init_so_magic() for _ in range(nb_objects)]
-
+def test_somagic_objects(nb_objects, so_magic_instances, nb_observers):
     assert id(so_magic_instances[0]) != id(so_magic_instances[1])
     assert id(so_magic_instances[0]._data_manager) != id(so_magic_instances[1]._data_manager)
     assert id(so_magic_instances[0]._data_manager.engine) != id(so_magic_instances[1]._data_manager.engine)
@@ -97,18 +100,19 @@ def test_somagic_objects(nb_objects, nb_observers):
     assert id(so_magic_instances[0]._data_manager.phi_class.subject) != id(so_magic_instances[1]._data_manager.phi_class.subject)
     assert id(so_magic_instances[0]._data_manager.phi_class.subject._observers) != id(so_magic_instances[1]._data_manager.phi_class.subject._observers)
 
-    for i, s in enumerate(so_magic_instances):
-        datapoints_fact = s._data_manager.engine.backend.datapoints_factory
-        cmd_fact = s._data_manager.engine.backend.command_factory
-        phi_class = s._data_manager.phi_class
 
-        subjects = [datapoints_fact.subject,
-                    cmd_fact.subject,
-                    phi_class.subject
-                    ]
-        assert len(set([id(x._observers) for x in subjects])) == len(subjects)
+def test_subscriptions(so_magic_instances):
+    s = so_magic_instances[0]
+    datapoints_fact = s._data_manager.engine.backend.datapoints_factory
+    cmd_fact = s._data_manager.engine.backend.command_factory
+    phi_class = s._data_manager.phi_class
+    nb_observers = (1, 1, 1)
+    subjects = [datapoints_fact.subject,
+                cmd_fact.subject,
+                phi_class.subject
+                ]
 
-        assert datapoints_fact.subject._observers[0] == s._data_manager.engine.datapoints_manager
-        assert cmd_fact.subject._observers[0] == s._data_manager.commands_manager.command.accumulator
-        assert phi_class.subject._observers[0] == s._data_manager.built_phis
-        assert all([len(subject._observers) == column for subject, column in zip(subjects, nb_observers[i])])
+    assert datapoints_fact.subject._observers[0] == s._data_manager.engine.datapoints_manager
+    assert cmd_fact.subject._observers[0] == s._data_manager.commands_manager.command.accumulator
+    assert phi_class.subject._observers[0] == s._data_manager.built_phis
+    assert all([len(subject._observers) == column for subject, column in zip(subjects, nb_observers)])
