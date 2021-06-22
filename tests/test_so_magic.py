@@ -13,46 +13,54 @@ def test_somagic_scenario(train_args, somagic, test_dataset, sample_collaped_jso
 
 
 @pytest.fixture
-def so_magic_instances():
+def objects_to_test():
+    def get_objects_to_test(so_master):
+        return {
+            'dtps_fct': so_master._data_manager.engine.backend.datapoints_factory,
+            'cmd_fct': so_master._data_manager.engine.backend.command_factory,
+            'phi_class': so_master._data_manager.phi_class,
+            'rest': (
+                so_master,
+                so_master._data_manager,
+                so_master._data_manager.engine,
+                so_master._data_manager.engine.backend,
+                so_master._data_manager.engine.datapoints_manager,
+                so_master._data_manager.engine.backend.datapoints_factory.subject,
+                so_master._data_manager.engine.backend.datapoints_factory.subject._observers,
+                so_master._data_manager.phi_class.subject,
+                so_master._data_manager.phi_class.subject._observers,
+            )
+        }
+    return get_objects_to_test
+
+
+@pytest.fixture
+def assert_different_objects():
+    def _assert_different_objects(objects):
+        assert len(set([id(x) for x in objects])) == len(objects)
+    return _assert_different_objects
+
+
+@pytest.fixture(params=[[2]])
+def so_magic_instances(request, objects_to_test):
     from so_magic import init_so_magic
-    return [init_so_magic(), init_so_magic()]
+    return [(i, objects_to_test(i)) for i in iter([init_so_magic() for _ in range(request.param[0])])]
 
 
-@pytest.mark.parametrize('nb_objects, nb_observers', [
-    (2, [(1, 1, 1),
-         (1, 1, 1)]),
-])
-def test_somagic_objects(nb_objects, so_magic_instances, nb_observers):
-    assert id(so_magic_instances[0]) != id(so_magic_instances[1])
-    assert id(so_magic_instances[0]._data_manager) != id(so_magic_instances[1]._data_manager)
-    assert id(so_magic_instances[0]._data_manager.engine) != id(so_magic_instances[1]._data_manager.engine)
-    assert id(so_magic_instances[0]._data_manager.engine.backend) != id(so_magic_instances[1]._data_manager.engine.backend)
-    assert id(so_magic_instances[0]._data_manager.engine.datapoints_manager) != id(so_magic_instances[1]._data_manager.engine.datapoints_manager)
-
-    assert id(so_magic_instances[0]._data_manager.engine.backend.datapoints_factory) != id(so_magic_instances[1]._data_manager.engine.backend.datapoints_factory)
-    assert id(so_magic_instances[0]._data_manager.engine.backend.datapoints_factory.subject) != id(so_magic_instances[1]._data_manager.engine.backend.datapoints_factory.subject)
-    assert id(so_magic_instances[0]._data_manager.engine.backend.datapoints_factory.subject._observers) != id(so_magic_instances[1]._data_manager.engine.backend.datapoints_factory.subject._observers)
-
-    assert id(so_magic_instances[0]._data_manager.engine.backend.command_factory) != id(so_magic_instances[1]._data_manager.engine.backend.command_factory)
-
-    assert so_magic_instances[0]._data_manager.phi_class != so_magic_instances[1]._data_manager.phi_class
-    assert id(so_magic_instances[0]._data_manager.phi_class) != id(so_magic_instances[1]._data_manager.phi_class)
-    assert id(so_magic_instances[0]._data_manager.phi_class.subject) != id(so_magic_instances[1]._data_manager.phi_class.subject)
-    assert id(so_magic_instances[0]._data_manager.phi_class.subject._observers) != id(so_magic_instances[1]._data_manager.phi_class.subject._observers)
+def test_somagic_objects(so_magic_instances, assert_different_objects):
+    from functools import reduce
+    assert_different_objects(reduce(lambda i, j: i + j,
+                                    ([x[1]['dtps_fct'], x[1]['cmd_fct'], x[1]['phi_class']] + list(x[1]['rest'])
+                                     for x in so_magic_instances)))
+    assert so_magic_instances[0][1]['phi_class'] != so_magic_instances[1][1]['phi_class']
 
 
 def test_subscriptions(so_magic_instances):
     s = so_magic_instances[0]
-    datapoints_fact = s._data_manager.engine.backend.datapoints_factory
-    cmd_fact = s._data_manager.engine.backend.command_factory
-    phi_class = s._data_manager.phi_class
     nb_observers = (1, 1, 1)
-    subjects = [datapoints_fact.subject,
-                cmd_fact.subject,
-                phi_class.subject
-                ]
 
-    assert datapoints_fact.subject._observers[0] == s._data_manager.engine.datapoints_manager
-    assert cmd_fact.subject._observers[0] == s._data_manager.commands_manager.command.accumulator
-    assert phi_class.subject._observers[0] == s._data_manager.built_phis
-    assert all([len(subject._observers) == column for subject, column in zip(subjects, nb_observers)])
+    assert s[1]['dtps_fct'].subject._observers[0] == s[0]._data_manager.engine.datapoints_manager
+    assert s[1]['cmd_fct'].subject._observers[0] == s[0]._data_manager.commands_manager.command.accumulator
+    assert s[1]['phi_class'].subject._observers[0] == s[0]._data_manager.built_phis
+    assert all([len(subject._observers) == obs for subject, obs in zip(
+        (s[1]['dtps_fct'].subject, s[1]['cmd_fct'].subject, s[1]['phi_class'].subject), nb_observers)])
