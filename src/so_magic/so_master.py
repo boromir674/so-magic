@@ -42,6 +42,6 @@ class SoMaster:
         if datapoints_id not in self._datasets:
             self._datasets[datapoints_id] = self._dataset_constructor(
                 self._data_manager.engine.datapoints_manager.datapoints,
-                self._last_path,
+                self._data_manager.engine.datapoints_manager.state,
             )
         return self._datasets[datapoints_id]

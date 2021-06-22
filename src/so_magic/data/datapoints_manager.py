@@ -39,7 +39,7 @@ class DatapointsManager(Observer):
         key = getattr(subject, 'name', '')
         if key == '':
             raise RuntimeError(f'Subject {subject} with state {str(subject.state)} resulted in an empty string as key.'
-                               f'We reject the key, since it is going to "query" a in dict/hash).')
+                               f'We reject the key, since it is going to "query" a dict/hash).')
         if key in self.datapoints_objects:
             raise RuntimeError(f"Attempted to register a new Datapoints object at the existing key '{key}'.")
         self.datapoints_objects[key] = datapoints_object

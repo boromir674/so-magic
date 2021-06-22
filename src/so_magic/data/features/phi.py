@@ -4,7 +4,7 @@ at runtime. See the 'PhiFunctionRegistrator' class and its 'register' decorator 
 import logging
 import inspect
 from typing import Callable
-from so_magic.utils import Singleton, ObjectRegistry, ObjectRegistryError, Subject
+from so_magic.utils import Subject
 
 logger = logging.getLogger(__name__)
 

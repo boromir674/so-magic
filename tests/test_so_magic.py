@@ -1,65 +1,73 @@
 import pytest
 
 
+@pytest.fixture
+def assert_selected_variables_are(somagic):
+    def _assert_selected_variables_are(variables: set):
+        assert set([x['variable'] for x in somagic._data_manager.feature_manager.feature_configuration.variables]) == variables
+    return _assert_selected_variables_are
+
+
+@pytest.fixture
+def assert_column_values(test_dataset):
+    import pandas as pd
+
+    def _assert_column_values_are(attribute, expected_values):
+        assert set([_ for _ in test_dataset[0].datapoints.observations[attribute]]) == set(expected_values)
+        assert set(pd.unique(test_dataset[0].datapoints.observations[attribute])) == set(expected_values)
+    return _assert_column_values_are
+
+
+@pytest.fixture
+def assert_correct_nominal_variable_encoding(test_dataset):
+    """Test a column with each row having a string representing one of the possible values of an Attrbiute.
+
+    Useful when an Attribute corresponds to a discreet Variable of type Nominal (ordering does not matter) and its
+    observation (row) can have only one of the possible values.
+    """
+    from collections import Counter
+
+    def _assert_nominal_variable_encoded_as_expected(expected_feature_columns):
+        assert all(Counter([datarow[_] for _ in expected_feature_columns]) ==
+                   Counter({0: len(expected_feature_columns) - 1, 1: 1})
+                   for index, datarow in test_dataset[0].datapoints.observations[expected_feature_columns].iterrows())
+    return _assert_nominal_variable_encoded_as_expected
+
+
 @pytest.mark.parametrize('train_args', [
     ([6, 8, 'toroid', 'hexagonal']),
     # ([12, 12, 'toroid', 'rectangular'])
 ])
-def test_somagic_scenario(train_args, somagic, sample_collaped_json):
-    somagic.load_data(sample_collaped_json)
-    ATTRS = ['hybrid', 'indica', 'sativa']
-    ATTRS2 = ['type_hybrid', 'type_indica', 'type_sativa']
-    from functools import reduce
-    UNIQUE_FLAVORS = reduce(lambda i, j: set(i).union(set(j)),
-                            [_ for _ in somagic._data_manager.datapoints.observations['flavors'] if _ is not None])
+def test_somagic_scenario(train_args, somagic, test_dataset, sample_collaped_json, assert_selected_variables_are,
+                          assert_column_values, assert_correct_nominal_variable_encoding):
+    ATTRS2 = [f'type_{x}' for x in test_dataset[1]]
 
-    if not getattr(somagic.dataset, 'feature_vectors', None):
-        cmd = somagic._data_manager.command.select_variables_command
-        cmd.args = [[{'variable': 'type', 'columns': ATTRS2}, {'variable': 'flavors', 'columns': list(UNIQUE_FLAVORS)}]]
-        cmd.execute()
+    datapoints = test_dataset[0].datapoints
+    assert_selected_variables_are({'type', 'flavors'})
 
-        assert set([x['variable'] for x in somagic._data_manager.feature_manager.feature_configuration.variables]) == {'type', 'flavors'}
+    assert all(type(x) == str for x in datapoints.observations['type'])
 
-        assert all(type(x) == str for x in somagic._data_manager.datapoints.observations['type'])
-        assert set(ATTRS) == set([_ for _ in somagic._data_manager.datapoints.observations['type']])
+    assert_column_values('type', expected_values=test_dataset[1])
 
-        import pandas as pd
-        assert set(ATTRS) == set(pd.unique(somagic._data_manager.datapoints.observations['type']))
+    assert_correct_nominal_variable_encoding(ATTRS2)
 
-        cmd = somagic._data_manager.command.one_hot_encoding_command
-        cmd.args = [somagic._data_manager.datapoints, 'type']
-        cmd.execute()
+    # cmd2
 
-        assert all(x in somagic._data_manager.datapoints.observations.columns for x in ATTRS2)
-        assert all(sum([datarow[_] for _ in ATTRS2]) == 1 and len([datarow[_] for _ in ATTRS2 if datarow[_] == 1]) == 1 for index, datarow in somagic._data_manager.datapoints.observations[ATTRS2].iterrows())
+    # the below is expected because test_dataset invokes the 'one_hot_encoding_list_command' command which unfortunately
+    # at the moment has a side effect on the attribute it operates on.
+    # side effect: _data_manager.datapoints.observations[_attribute].fillna(value=np.nan, inplace=True)
 
-        # cmd2
-        assert set([type(x) for x in somagic._data_manager.datapoints.observations['flavors']]) == {list, type(None)}
+    assert set([type(x) for x in datapoints.observations['flavors']]) == {list, float}
 
-        # assert all([type(x) == list for x in somagic._data_manager.datapoints.observations['flavors']])
+    assert len(test_dataset[2]) > 5
 
-        # set([]) pd.unique(somagic._data_manager.datapoints.observations['flavors'])
-        MAX_FLAVORS_PER_DAATPOINT = max([len(x) for x in [_ for _ in somagic._data_manager.datapoints.observations['flavors'] if type(_) is list]])
+    assert all(x in datapoints.observations.columns for x in test_dataset[2])
+    assert all(0 <= sum([datarow[_] for _ in test_dataset[2]]) <= test_dataset[3]
+               for index, datarow in datapoints.observations[list(test_dataset[2])].iterrows())
 
-        assert len(UNIQUE_FLAVORS) > 5
-        nb_columns_before = len(somagic._data_manager.datapoints.observations.columns)
+    assert hasattr(test_dataset[0], 'feature_vectors')
 
-        cmd = somagic._data_manager.command.one_hot_encoding_list_command
-        cmd.args = [somagic._data_manager.datapoints, 'flavors']
-        cmd.execute()
-
-        assert nb_columns_before + len(UNIQUE_FLAVORS) == len(somagic._data_manager.datapoints.observations.columns)
-
-        assert all(x in somagic._data_manager.datapoints.observations.columns for x in UNIQUE_FLAVORS)
-        assert all(0 <= sum([datarow[_] for _ in UNIQUE_FLAVORS]) <= MAX_FLAVORS_PER_DAATPOINT for index, datarow in somagic._data_manager.datapoints.observations[list(UNIQUE_FLAVORS)].iterrows())
-
-    import numpy as np
-    setattr(somagic.dataset, 'feature_vectors', np.array(somagic._data_manager.datapoints.observations[ATTRS2 + list(UNIQUE_FLAVORS)]))
-    # somagic.dataset.feature_vectors = np.array(somagic._data_manager.datapoints.observations[ATTRS2 + list(UNIQUE_FLAVORS)])
-
-    assert hasattr(somagic.dataset, 'feature_vectors')
-
-    print("ID", id(somagic.dataset))
+    print("ID", id(test_dataset[0]))
 
     attrs = ('width', 'height', 'type', 'grid_type')
 

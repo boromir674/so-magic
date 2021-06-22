@@ -19,11 +19,11 @@ def test_data(test_dataset):
     ])
     return type('TestData', (object,), {
         'map_parameters': type('SomModelParameters', (object,), {
-            'args': (test_dataset, map_specs['nb-cols'], map_specs['nb-rows']),
+            'args': (test_dataset[0], map_specs['nb-cols'], map_specs['nb-rows']),
             'kwargs': {k: map_specs[k] for k in ('initialization', 'maptype', 'gridtype')}
         }),
         'get_runtime_map_id': lambda x: MapId.from_self_organizing_map(x),
-        'expected_map_id': MapId(*[test_dataset.name] + list(map_specs.values())),
+        'expected_map_id': MapId(*[test_dataset[0].name] + list(map_specs.values())),
     })
 
 

@@ -52,10 +52,6 @@ class BroadcastingDatapointsFactory(DatapointsFactory):
         #     'datapoints': self.subject.state,
         #     'name': self.subject.name,
         # })}")
-        print("Created datapoints: {}".format(json.dumps({
-            'datapoints': str(self.subject.state),
-            'name': self.subject.name,
-        })))
         if args and not hasattr(self, '.name'):
             self.name = getattr(args[0], 'name', '')
         self.subject.notify()

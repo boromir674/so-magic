@@ -102,7 +102,8 @@ def test_dataset(somagic, read_observations, sample_collaped_json):
     """Dataset ready to be fed into a training/inference algorithm; feature vectors have been computed."""
     read_observations(somagic, sample_collaped_json)
 
-    ATTRS2 = ['type_hybrid', 'type_indica', 'type_sativa']
+    type_values = ['hybrid', 'indica', 'sativa']
+    ATTRS2 = [f'type_{x}' for x in type_values]
     from functools import reduce
     UNIQUE_FLAVORS = reduce(lambda i, j: set(i).union(set(j)),
                             [_ for _ in somagic._data_manager.datapoints.observations['flavors'] if _ is not None])
@@ -126,16 +127,23 @@ def test_dataset(somagic, read_observations, sample_collaped_json):
     cmd.args = [somagic._data_manager.datapoints, 'type']
     cmd.execute()
 
+    assert set([type(x) for x in somagic._data_manager.datapoints.observations['flavors']]) == {list, type(None)}
+
+    nb_columns_before = len(somagic._data_manager.datapoints.observations.columns)
+
     cmd = somagic._data_manager.command.one_hot_encoding_list_command
     cmd.args = [somagic._data_manager.datapoints, 'flavors']
     cmd.execute()
 
-    import numpy as np
+    assert nb_columns_before + len(UNIQUE_FLAVORS) == len(somagic._data_manager.datapoints.observations.columns)
 
+    import numpy as np
     setattr(somagic.dataset, 'feature_vectors',
             np.array(somagic._data_manager.datapoints.observations[ATTRS2 + list(UNIQUE_FLAVORS)]))
 
-    return somagic.dataset
+    MAX_FLAVORS_PER_DAATPOINT = max(
+        [len(x) for x in [_ for _ in somagic._data_manager.datapoints.observations['flavors'] if type(_) is list]])
+    return somagic.dataset, type_values, UNIQUE_FLAVORS, MAX_FLAVORS_PER_DAATPOINT, nb_columns_before
 
 
 @pytest.fixture
