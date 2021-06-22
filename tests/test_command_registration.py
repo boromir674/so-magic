@@ -34,7 +34,14 @@ def assert_retrieved():
     return _assert_retrieved
 
 
-def test_command_registrator(assert_different_objects, classes, modify_registry, assert_retrieved):
+@pytest.fixture
+def assert_not_in_registry(classes):
+    def _assert_not_in_registry(non_existing_keys, class_names):
+        assert all(k not in getattr(classes, c).registry for k, c in zip(non_existing_keys, class_names))
+    return _assert_not_in_registry
+
+
+def test_command_registrator(assert_different_objects, classes, modify_registry, assert_retrieved, assert_not_in_registry):
     assert all([hasattr(x, 'registry') for x in classes])
     assert all([hasattr(x, 'state') for x in classes])
     assert_different_objects([c.registry for c in classes])
@@ -49,16 +56,10 @@ def test_command_registrator(assert_different_objects, classes, modify_registry,
     assert_retrieved(lambda c, l: c.__getitem__(l), classes, keys='abcd', expected_values=values)
     assert_retrieved(lambda c, l: c[l], classes, keys='abcd', expected_values=values)
 
-    # assert_not_in_registry()
-
-    assert 'b' not in classes.C.registry
-    assert 'c' not in classes.B.registry
-    assert 'c' not in classes.D.registry
-    assert 'd' not in classes.C.registry
+    assert_not_in_registry(non_existing_keys='bccd', class_names='CBDC')
 
 
 def test_wrong_command_registrator_usage(command_registrator):
     class P1(command_registrator): pass
     assert type(P1) == type
-    assert not hasattr(P1, 'state')
     assert not hasattr(P1, 'state')
