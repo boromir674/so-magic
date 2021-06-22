@@ -34,13 +34,6 @@ def objects_to_test():
     return get_objects_to_test
 
 
-@pytest.fixture
-def assert_different_objects():
-    def _assert_different_objects(objects):
-        assert len(set([id(x) for x in objects])) == len(objects)
-    return _assert_different_objects
-
-
 @pytest.fixture(params=[[2]])
 def so_magic_instances(request, objects_to_test):
     from so_magic import init_so_magic

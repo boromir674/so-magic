@@ -189,3 +189,10 @@ def tabular_operators(built_in_backends):
         'required_methods': iter(((operator_interface_name, v['interface'].keys())
                                   for operator_interface_name, v in operators.items()))
     }
+
+
+@pytest.fixture
+def assert_different_objects():
+    def _assert_different_objects(objects):
+        assert len(set([id(x) for x in objects])) == len(objects)
+    return _assert_different_objects

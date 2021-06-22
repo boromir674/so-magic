@@ -1,24 +1,29 @@
+import pytest
 
 
-def test_command_registrator():
+@pytest.fixture
+def command_registrator():
     from so_magic.data.backend.backend import CommandRegistrator
+    return CommandRegistrator
 
-    class A(metaclass=CommandRegistrator): pass
-    class B(metaclass=CommandRegistrator): pass
+
+def test_command_registrator(assert_different_objects, command_registrator):
+    class A(metaclass=command_registrator): pass
+    class B(metaclass=command_registrator): pass
     class C(B): pass
     class D(B): pass
     classes = (A, B, C, D)
 
     assert all([hasattr(x, 'registry') for x in classes])
-    assert all([type(x) == CommandRegistrator for x in classes])
+    assert all([type(x) == command_registrator for x in classes])
     assert all([hasattr(x, 'state') for x in classes])
-    assert id(A.registry) != id(B.registry) != id(C.registry) != id(D.registry)
+    assert_different_objects([A.registry, B.registry, C.registry, D.registry])
 
     A.state = 1
     B.state = 2
     C.state = 3
     D.state = 4
-    assert id(A.state) != id(B.state) != id(C.state) != id(D.state)
+    assert_different_objects([A.state, B.state, C.state, D.state])
 
     A.registry['a'] = 1
     B.registry['b'] = 2
@@ -39,7 +44,14 @@ def test_command_registrator():
     assert C['c'] == 3
     assert D['d'] == 4
 
-    class P1(CommandRegistrator): pass
+    class P1(command_registrator): pass
+    assert type(P1) == type
+    assert not hasattr(P1, 'state')
+    assert not hasattr(P1, 'state')
+
+
+def test_wrong_command_registrator_usage(command_registrator):
+    class P1(command_registrator): pass
     assert type(P1) == type
     assert not hasattr(P1, 'state')
     assert not hasattr(P1, 'state')
