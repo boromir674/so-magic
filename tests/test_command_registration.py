@@ -8,6 +8,13 @@ def command_registrator():
 
 
 @pytest.fixture
+def modify_registry():
+    def _modify_registry(registry, key, value):
+        registry[key] = value
+    return _modify_registry
+
+
+@pytest.fixture
 def classes(command_registrator):
     class A(metaclass=command_registrator): pass
     class B(metaclass=command_registrator): pass
@@ -20,21 +27,16 @@ def classes(command_registrator):
     return classes
 
 
-def test_command_registrator(assert_different_objects, classes):
+def test_command_registrator(assert_different_objects, classes, modify_registry):
     assert all([hasattr(x, 'registry') for x in classes])
     assert all([hasattr(x, 'state') for x in classes])
     assert_different_objects([c.registry for c in classes])
 
-    classes.A.state = 1
-    classes.B.state = 2
-    classes.C.state = 3
-    classes.D.state = 4
+    values = [1, 2, 3, 4]
+    [setattr(getattr(classes, c), 'state', v) for v, c in zip(values, 'ABCD')]
     assert_different_objects([c.state for c in classes])
 
-    classes.A.registry['a'] = 1
-    classes.B.registry['b'] = 2
-    classes.C.registry['c'] = 3
-    classes.D.registry['d'] = 4
+    [modify_registry(getattr(classes, c).registry, c.lower(), v) for v, c in zip(values, 'ABCD')]
     assert classes.B.registry != classes.A.registry != classes.C.registry != classes.D.registry
 
     assert classes.A.__getitem__('a') == 1
