@@ -20,15 +20,10 @@ def test_decorating(test_infra):
     assert type(A) == type
     assert type(B) == test_infra.MyDecorator
 
-    RuntimeClass = test_infra.MyDecorator('RuntimeClass', (object,), {})
-    assert type(RuntimeClass) == test_infra.MyDecorator
-    o1 = RuntimeClass()
-    assert type(o1) == RuntimeClass
-
-    RuntimeClassA = test_infra.MyDecorator('RuntimeClassA', (object,), {})
-    assert type(RuntimeClassA) == test_infra.MyDecorator
-    o2 = RuntimeClassA()
-    assert type(o2) == RuntimeClassA
+    DynamicClass = test_infra.MyDecorator('DynamicClass', (object,), {})
+    assert type(DynamicClass) == test_infra.MyDecorator
+    o1 = DynamicClass()
+    assert type(o1) == DynamicClass
 
     class ParentClass: pass
     class DefinedClass(ParentClass, metaclass=test_infra.MyDecorator): pass
@@ -38,14 +33,15 @@ def test_decorating(test_infra):
     b = B()
     assert type(b) == B
 
-    objects = (test_infra.MyDecorator, A, Ab, B, type(RuntimeClass), type(type(o2)), DefinedClass)
+    objects = (test_infra.MyDecorator, A, Ab, B, type(DynamicClass), type(type(o1)), DefinedClass)
     assert all([hasattr(x, 'magic_decorator') for x in objects])
 
     assert id(A.magic_decorator) != id(Ab.magic_decorator)
     assert len(set([id(o.magic_decorator) for o in objects])) == 1
 
 
-def test_decorator(test_infra):
+@pytest.fixture
+def classes(test_infra):
     class ADecoratorClass(metaclass=test_infra.CommandRegistrator): pass
     class BDecoratorClass(metaclass=test_infra.CommandRegistrator): pass
 
@@ -53,14 +49,17 @@ def test_decorator(test_infra):
     def aa(x):
         return str(x) + 'aa'
 
-    assert 'aa' in ADecoratorClass.registry
-    assert 'aa' not in BDecoratorClass.registry
-    assert ADecoratorClass.registry['aa']('1') == '1aa'
-
     @BDecoratorClass.func_decorator()
     def bb(x):
         return str(x) + 'bb'
+    value = 1
+    return [{'c': c, 'test_data': (value, f'{value}{decorated_func_name}')}
+            for c, decorated_func_name in zip([ADecoratorClass, BDecoratorClass], ['aa', 'bb'])]
 
-    assert 'bb' in BDecoratorClass.registry
-    assert 'bb' not in ADecoratorClass.registry
-    assert BDecoratorClass.registry['bb']('1') == '1bb'
+
+def test_decorator(classes):
+    func_names = ('aa', 'bb')
+    assert all(func_name in test_data['c'].registry for func_name, test_data in zip(func_names, classes))
+    assert all(func_name not in test_data['c'].registry for func_name, test_data in zip(func_names, reversed(classes)))
+    assert all(test_data['c'].registry[func_name](test_data['test_data'][0]) == test_data['test_data'][1]
+               for func_name, test_data in zip(func_names, classes))
