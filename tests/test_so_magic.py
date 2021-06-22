@@ -34,12 +34,8 @@ def assert_correct_nominal_variable_encoding(test_dataset):
     return _assert_nominal_variable_encoded_as_expected
 
 
-@pytest.mark.parametrize('train_args', [
-    ([6, 8, 'toroid', 'hexagonal']),
-    # ([12, 12, 'toroid', 'rectangular'])
-])
-def test_somagic_scenario(train_args, somagic, test_dataset, sample_collaped_json, assert_selected_variables_are,
-                          assert_column_values, assert_correct_nominal_variable_encoding):
+def test_sanity_checks_on_dataset(test_dataset, assert_selected_variables_are, assert_column_values,
+                                  assert_correct_nominal_variable_encoding):
     ATTRS2 = [f'type_{x}' for x in test_dataset[1]]
 
     datapoints = test_dataset[0].datapoints
@@ -51,12 +47,9 @@ def test_somagic_scenario(train_args, somagic, test_dataset, sample_collaped_jso
 
     assert_correct_nominal_variable_encoding(ATTRS2)
 
-    # cmd2
-
     # the below is expected because test_dataset invokes the 'one_hot_encoding_list_command' command which unfortunately
     # at the moment has a side effect on the attribute it operates on.
     # side effect: _data_manager.datapoints.observations[_attribute].fillna(value=np.nan, inplace=True)
-
     assert set([type(x) for x in datapoints.observations['flavors']]) == {list, float}
 
     assert len(test_dataset[2]) > 5
@@ -67,10 +60,13 @@ def test_somagic_scenario(train_args, somagic, test_dataset, sample_collaped_jso
 
     assert hasattr(test_dataset[0], 'feature_vectors')
 
-    print("ID", id(test_dataset[0]))
 
+@pytest.mark.parametrize('train_args', [
+    ([6, 8, 'toroid', 'hexagonal']),
+    # ([12, 12, 'toroid', 'rectangular'])
+])
+def test_somagic_scenario(train_args, somagic, test_dataset, sample_collaped_json):
     attrs = ('width', 'height', 'type', 'grid_type')
-
     som = somagic.map.train(*train_args[:2], maptype=train_args[2], gridtype=train_args[3])
     assert som.dataset_name == sample_collaped_json
     assert all(parameter == getattr(som, attribute) for attribute, parameter in zip(attrs, train_args))
