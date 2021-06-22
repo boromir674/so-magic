@@ -7,11 +7,13 @@ def test_infra():
     return type('TestInfra', (object,), dict(MyDecorator=MyDecorator, CommandRegistrator=CommandRegistrator))
 
 
-def test_decorating(test_infra):
+def test_type_class_properties(test_infra):
     assert not hasattr(test_infra.CommandRegistrator, 'registry')
     assert not hasattr(test_infra.CommandRegistrator, 'state')
     assert not hasattr(test_infra.MyDecorator, '_commands_hash')
 
+
+def test_decorating(test_infra):
     class A(test_infra.MyDecorator): pass
     class Ab(test_infra.MyDecorator): pass
     class B(metaclass=test_infra.MyDecorator): pass
