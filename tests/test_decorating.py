@@ -13,33 +13,43 @@ def test_type_class_properties(test_infra):
     assert not hasattr(test_infra.MyDecorator, '_commands_hash')
 
 
-def test_decorating(test_infra):
+@pytest.fixture
+def test_objects(test_infra):
     class A(test_infra.MyDecorator): pass
     class Ab(test_infra.MyDecorator): pass
     class B(metaclass=test_infra.MyDecorator): pass
-
-    assert type(test_infra.MyDecorator) == type
-    assert type(A) == type
-    assert type(B) == test_infra.MyDecorator
-
     DynamicClass = test_infra.MyDecorator('DynamicClass', (object,), {})
-    assert type(DynamicClass) == test_infra.MyDecorator
-    o1 = DynamicClass()
-    assert type(o1) == DynamicClass
-
     class ParentClass: pass
     class DefinedClass(ParentClass, metaclass=test_infra.MyDecorator): pass
-    dc = DefinedClass()
-    assert type(dc) == DefinedClass
+    inst1 = DynamicClass()
+    inst2 = DefinedClass()
+    inst3 = B()
+    return type('TestObjects', (object,), {
+        'type_classes': type('TypeClasses', (object,), {'A': A, 'Ab': Ab, '__iter__': lambda self: iter([A, Ab])})(),
+        'normal_classes': type('NormalClasses', (object,), {'B': B, 'DynamicClass': DynamicClass, 'DefinedClass': DefinedClass, '__iter__': lambda self: iter([B, DynamicClass, DefinedClass])})(),
+        'instances': type('Instances', (object,), {'DynamicClass': inst1, 'DefinedClass': inst2, 'B': inst3, '__iter__': lambda self: iter([inst1, inst2, inst3])}),
+        'MyDecorator': test_infra.MyDecorator,
+        'have_magic_decorator': [type(type(test_objects.instances.DynamicClass)), test_objects.MyDecorator,
+                                 type(test_objects.normal_classes.DynamicClass)] +
+                                list(iter(test_objects.type_classes)) +
+                                list(iter(test_objects.normal_classes))
+    })
 
-    b = B()
-    assert type(b) == B
 
-    objects = (test_infra.MyDecorator, A, Ab, B, type(DynamicClass), type(type(o1)), DefinedClass)
-    assert all([hasattr(x, 'magic_decorator') for x in objects])
+def test_decorating(test_objects):
+    assert type(test_objects.MyDecorator) == type
+    assert type(test_objects.type_classes.A) == type
+    assert type(test_objects.normal_classes.B) == test_objects.MyDecorator
+    assert type(test_objects.normal_classes.DynamicClass) == test_objects.MyDecorator
+    assert type(test_objects.instances.DynamicClass) == test_objects.normal_classes.DynamicClass
+    assert type(test_objects.instances.DefinedClass) == test_objects.normal_classes.DefinedClass
+    assert type(test_objects.instances.B) == test_objects.normal_classes.B
 
-    assert id(A.magic_decorator) != id(Ab.magic_decorator)
-    assert len(set([id(o.magic_decorator) for o in objects])) == 1
+    assert not hasattr(test_objects.instances.B, 'magic_decorator')
+    assert not hasattr(test_objects.instances.DefinedClass, 'magic_decorator')
+    assert all([hasattr(x, 'magic_decorator') for x in test_objects.have_magic_decorator])
+    assert id(test_objects.type_classes.A.magic_decorator) != id(test_objects.type_classes.Ab.magic_decorator)
+    assert len(set([id(o.magic_decorator) for o in test_objects.have_magic_decorator])) == 1
 
 
 @pytest.fixture
