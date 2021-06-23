@@ -22,15 +22,13 @@ def test_objects(test_infra):
     class ParentClass: pass
     class DefinedClass(ParentClass, metaclass=test_infra.MyDecorator): pass
     inst1 = DynamicClass()
-    inst2 = DefinedClass()
-    inst3 = B()
     return type('TestObjects', (object,), {
         'type_classes': type('TypeClasses', (object,), {'A': A, 'Ab': Ab, '__iter__': lambda self: iter([A, Ab])})(),
-        'normal_classes': type('NormalClasses', (object,), {'B': B, 'DynamicClass': DynamicClass, 'DefinedClass': DefinedClass, '__iter__': lambda self: iter([B, DynamicClass, DefinedClass])})(),
-        'instances': type('Instances', (object,), {'DynamicClass': inst1, 'DefinedClass': inst2, 'B': inst3, '__iter__': lambda self: iter([inst1, inst2, inst3])}),
+        'normal_classes': type('NormalClasses', (object,),
+                               {'B': B, 'DynamicClass': DynamicClass, 'DefinedClass': DefinedClass})(),
+        'instances': type('Instances', (object,), {'DynamicClass': inst1, 'DefinedClass': DefinedClass(), 'B': B()}),
         'MyDecorator': test_infra.MyDecorator,
-        'have_magic_decorator': [type(type(inst1)), type(DynamicClass), test_infra.MyDecorator, A, Ab, B, DynamicClass,
-                                 DefinedClass]
+        'test': [type(type(inst1)), type(DynamicClass), test_infra.MyDecorator, A, Ab, B, DynamicClass, DefinedClass]
     })
 
 
@@ -38,12 +36,13 @@ def test_decorating(test_objects):
     assert all(type(x) == type for x in (test_objects.MyDecorator, test_objects.type_classes.A))
     assert all(type(x) == test_objects.MyDecorator
                for x in (test_objects.normal_classes.B, test_objects.normal_classes.DynamicClass))
-    assert all(type(getattr(test_objects.instances, x)) == getattr(test_objects.normal_classes, x) for x in ('DynamicClass', 'DefinedClass', 'B'))
+    assert all(type(getattr(test_objects.instances, x)) == getattr(test_objects.normal_classes, x)
+               for x in ('DynamicClass', 'DefinedClass', 'B'))
     assert not hasattr(test_objects.instances.B, 'magic_decorator')
     assert not hasattr(test_objects.instances.DefinedClass, 'magic_decorator')
-    assert all([hasattr(x, 'magic_decorator') for x in test_objects.have_magic_decorator])
+    assert all([hasattr(x, 'magic_decorator') for x in test_objects.test])
     assert id(test_objects.type_classes.A.magic_decorator) != id(test_objects.type_classes.Ab.magic_decorator)
-    assert len(set([id(o.magic_decorator) for o in test_objects.have_magic_decorator])) == 1
+    assert len(set([id(o.magic_decorator) for o in test_objects.test])) == 1
 
 
 @pytest.fixture
