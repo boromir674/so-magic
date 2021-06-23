@@ -60,9 +60,18 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
 
         Example:
 
-            >>> from so_magic.data.features.phi import PhiFunctionRegistry, PhiFunctionRegistrator
+            >>> from so_magic.data.features.phi import PhiFunctionRegistrator
+            >>> from so_magic.utils import Observer, ObjectRegistry
 
-            >>> registered_phis = PhiFunctionRegistry()
+            >>> class PhiFunctionRegistry(Observer):
+            ...  def __init__(self):
+            ...   self.registry = ObjectRegistry()
+            ...  def update(self, subject, *args, **kwargs):
+            ...   self.registry.add(subject.name, subject.state)
+
+            >>> phis = PhiFunctionRegistry()
+
+            >>> PhiFunctionRegistrator.subject.add(phis)
 
             >>> @PhiFunctionRegistrator.register()
             ... def f1(x):
@@ -70,11 +79,11 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
             ...  return x * 2
             Registering input function f1 as phi function, at key f1.
 
-            >>> registered_phis.get('f1').__doc__
+            >>> phis.registry.get('f1').__doc__
             'Multiply by 2.'
 
             >>> input_value = 5
-            >>> print(f"{input_value} * 2 = {registered_phis.get('f1')(input_value)}")
+            >>> print(f"{input_value} * 2 = {phis.registry.get('f1')(input_value)}")
             5 * 2 = 10
 
             >>> @PhiFunctionRegistrator.register()
@@ -84,7 +93,7 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
             Registering input class f2 instance as phi function, at key f2.
 
             >>> input_value = 1
-            >>> print(f"{input_value} + 5 = {registered_phis.get('f2')(input_value)}")
+            >>> print(f"{input_value} + 5 = {phis.registry.get('f2')(input_value)}")
             1 + 5 = 6
 
             >>> @PhiFunctionRegistrator.register('f3')
@@ -94,7 +103,7 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
             Registering input class MyCustomClass instance as phi function, at key f3.
 
             >>> input_value = 3
-            >>> print(f"{input_value} + 1 = {registered_phis.get('f3')(input_value)}")
+            >>> print(f"{input_value} + 1 = {phis.registry.get('f3')(input_value)}")
             3 + 1 = 4
 
         Args:
