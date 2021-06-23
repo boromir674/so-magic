@@ -44,33 +44,8 @@ def data_manager():
     def getter():
         from so_magic.data import init_data_manager
         from so_magic.data.backend import init_engine
-
         data_manager = init_data_manager(init_engine(engine_type='pd'))
-
-        datapoints_fact = data_manager.engine.backend.datapoints_factory
-        cmd_fact = data_manager.engine.backend.command_factory
-
-        # test 1
-        from so_magic.data.datapoints.datapoints import DatapointsFactory
-        from so_magic.data.backend.engine_command_factory import MagicCommandFactory
-
-        assert isinstance(datapoints_fact, DatapointsFactory)
-        assert isinstance(cmd_fact, MagicCommandFactory)
-
-        subjects = [datapoints_fact.subject, cmd_fact.subject, data_manager.phi_class.subject]
-        assert len(set([id(x._observers) for x in subjects])) == len(subjects)
-
-        assert datapoints_fact.subject._observers[0] == data_manager.engine.datapoints_manager
-        assert cmd_fact.subject._observers[0] == data_manager.commands_manager.command.accumulator
-        assert id(data_manager.phi_class.subject._observers[0]) == id(data_manager.built_phis)
-        assert data_manager.phi_class.subject._observers[0] == data_manager.built_phis
-
-        print(f"DTP FCT OBS: [{', '.join(str(_) for _ in datapoints_fact.subject._observers)}]")
-        print(f"CMD FCT OBS: [{', '.join(str(_) for _ in cmd_fact.subject._observers)}]")
-        print(f"PHIFUNC class OBS: [{', '.join(str(_) for _ in data_manager.phi_class.subject._observers)}]")
-        assert all([len(x._observers) == 1 for x in subjects])
         return data_manager
-
     return getter
 
 
