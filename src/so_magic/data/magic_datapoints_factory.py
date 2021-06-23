@@ -1,7 +1,6 @@
 """This module is responsible to provide means of creating (instantiating) objects
 representing Datapoints collections."""
 import logging
-import json
 from typing import Iterable
 import attr
 from so_magic.utils import Subject

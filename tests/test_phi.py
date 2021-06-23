@@ -2,12 +2,6 @@ import pytest
 
 
 @pytest.fixture
-def registering_phi_at_the_same_key_error():
-    from so_magic.utils.registry import ObjectRegistryError
-    return ObjectRegistryError
-
-
-@pytest.fixture
 def app_phi_function(somagic):
     return somagic._data_manager.phi_class
 
