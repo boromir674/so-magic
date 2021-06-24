@@ -1,12 +1,10 @@
 def test_singleton():
     from so_magic.utils import Singleton
 
-    class ObjectRegistry(Singleton):
-        def __new__(cls, *args, **kwargs):
-            x = super().__new__(cls)
-            if not getattr(x, 'objects', None):
-                x.objects = {}
-            return x
+    class ObjectRegistry(metaclass=Singleton):
+        def __init__(self):
+            super().__init__()
+            self.objects = {}
 
     reg1 = ObjectRegistry()
     reg1.objects['a'] = 1

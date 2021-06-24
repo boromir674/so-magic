@@ -6,12 +6,13 @@ from so_magic.utils import Observer
 class CommandsAccumulator(Observer):
     commands = attr.ib(init=False, default={})
 
-    def update(self, subject) -> None:
+    def update(self, subject, *args, **kwargs) -> None:
         # add logging here
         self.commands[getattr(subject, 'name', str(subject.state))] = subject.state
 
     def __contains__(self, item):
         return item in self.commands
+
 
 @attr.s
 class CommandGetter:
@@ -37,6 +38,7 @@ class CommandsManager:
         command_factory (callable, optional): a callable that returns an instance of Command
     """
     _commands_getter = attr.ib(init=True, default=CommandGetter())
+    decorators = attr.ib(init=True, default=None)
 
     @property
     def command(self):
@@ -44,4 +46,4 @@ class CommandsManager:
 
     @property
     def commands_dict(self):
-        return self._commands_accumulator.commands
+        return self._commands_getter.accumulator.commands

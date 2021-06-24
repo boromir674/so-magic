@@ -30,6 +30,7 @@ dataframe
 len
 Edw
 Ela
+Binner
 
 # Software Engineering
 runnable
@@ -63,6 +64,7 @@ runtime
 maptype
 gridtype
 compactsupport
+priori
 
 # 2nd, 3rd
 nd

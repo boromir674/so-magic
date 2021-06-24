@@ -5,8 +5,8 @@ from so_magic.utils.linear_mapping import LinearScale
 
 @pytest.mark.parametrize('lower_bound, upper_bound, wrong_index', [
     (20, 100, 2),
-    pytest.param(20, 20, 2, marks=pytest.mark.xfail(raises=ValueError, reason="lower_bound < upper_bound should be true; The lower bound of a linear scale is restricted to be strictly smaller than the upper bound")),
-    pytest.param(80, 20, 2, marks=pytest.mark.xfail(raises=ValueError, reason="lower_bound < upper_bound should be true; The lower bound of a linear scale is restricted to be strictly smaller than the upper bound")),
+    pytest.param(20, 20, 2, marks=pytest.mark.xfail(raises=ValueError, reason="Client supplied illogical arguments. lower_bound < upper_bound should be true; The lower bound of a linear scale is restricted to be strictly smaller than the upper bound")),
+    pytest.param(80, 20, 2, marks=pytest.mark.xfail(raises=ValueError, reason="Client supplied illogical arguments. lower_bound < upper_bound should be true; The lower bound of a linear scale is restricted to be strictly smaller than the upper bound")),
 ])
 def test_linear_scale(lower_bound, upper_bound, wrong_index):
     scale = LinearScale(lower_bound, upper_bound)

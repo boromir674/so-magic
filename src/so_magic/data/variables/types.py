@@ -15,7 +15,6 @@ class VariableType(ABC):
         def wrapper(subclass):
             cls.subclasses[variable_type] = subclass
             return subclass
-
         return wrapper
 
     @classmethod

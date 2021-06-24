@@ -1,11 +1,13 @@
-from abc import ABC
 
 __all__ = ['Singleton']
 
 
-class Singleton(ABC):
-    _instance = None
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(Singleton, cls).__new__(cls)
-        return cls._instance
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        instance = cls._instances.get(cls)
+        if not instance:
+            instance = super(Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return instance

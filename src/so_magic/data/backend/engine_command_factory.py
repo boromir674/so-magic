@@ -10,7 +10,7 @@ class BaseCommandFactory(metaclass=CommandFactoryType):
 
 @BaseCommandFactory.register_as_subclass('generic')
 class GenericCommandFactory(CommandFactoryInterface):
-    """Command Factory that constructs a command given all the necessary arguments.
+    """Command Factory that constructs a generic command given all the necessary arguments.
 
     Assumes the 1st argument is the 'receiver' (see Command module),
     2nd is the method to call on the receiver and the rest are the method's runtime arguments.
@@ -72,7 +72,7 @@ class CommandFactory:
 
 
 @attr.s
-class MagicCommandFactory(Subject):
+class MagicCommandFactory:
     """Instances of this class act as callable command factories that notify,
     subscribed observers/listeners upon new command object creation.
 
@@ -80,9 +80,9 @@ class MagicCommandFactory(Subject):
         command_factory (CommandFactory, optional): an instance of a CommandFActory
     """
     command_factory = attr.ib(init=True, default=CommandFactory())
-    name: str = attr.ib(init=False, default='')
+    subject: Subject = attr.ib(init=False, default=attr.Factory(Subject))
 
     def __call__(self, *args, **kwargs):
-        self.state, self.name = self.command_factory.create(*args, **kwargs)
-        self.notify()
-        return self.state
+        self.subject.state, self.subject.name = self.command_factory.create(*args, **kwargs)
+        self.subject.notify()
+        return self.subject.state

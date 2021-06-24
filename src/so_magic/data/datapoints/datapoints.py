@@ -152,6 +152,9 @@ class AbstractTabularData(StructuredData, TabularDataInterface, ABC):
 @DatapointsFactory.register_constructor('tabular-data')
 class TabularData(AbstractTabularData):
     """Table-like datapoints that are loaded in memory"""
+    retriever = attr.ib(init=True)
+    iterator = attr.ib(init=True)
+    mutator = attr.ib(init=True)
 
     @property
     def columns(self) -> Iterable:
@@ -160,10 +163,6 @@ class TabularData(AbstractTabularData):
     @property
     def rows(self) -> Iterable:
         pass
-
-    retriever = attr.ib(init=True)
-    iterator = attr.ib(init=True)
-    mutator = attr.ib(init=True)
 
     @property
     def attributes(self):
@@ -200,3 +199,6 @@ class TabularData(AbstractTabularData):
 
     def itercolumns(self):
         return self.iterator.itercolumns(self)
+
+    def add_column(self, values, column_name, **kwargs):
+        self.mutator.add_column(self, values, column_name, **kwargs)
