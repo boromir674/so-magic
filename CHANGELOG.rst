@@ -1,3 +1,35 @@
+0.7.0 (2021-24-06
+-----------------
+
+feature
+"""""""
+- add binning algorithm infrastructure
+
+fix
+"""
+- fix memoize
+- fix the logic of the retriever.row method
+- fix bug with wrong behaviour of different DatapointManager instances
+
+test
+""""
+- cover all code from the utils/registry module
+- ensure the Variable classes branch off as categorical/numerical
+- ensure all backends' operators satisfy the interfaces
+- assert instance reports expected values given test dataset & model params
+- assert MapManager's get_map memoize method fetches the same map given seen args
+- test failed attempt to create a som when no feature vectors ahave been computed
+
+documentation
+"""""""""""""
+- fix a bug where doctests would run for pandas and fail
+- add doctest for newly registered phi function's docstring
+
+ci
+""
+- remove the 'py<2.0.0' dependency statement for the format-report tox-dev command
+
+
 0.6.1 (2021-05-30)
 ------------------
 
