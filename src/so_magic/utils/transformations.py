@@ -6,6 +6,7 @@ import types
 
 __all__ = ['Transformer']
 
+
 class TransformerInterface(abc.ABC):
     """The interface with a method to transform structured data. Anyone, implementing this has the ability to receive
     some kind of data and return some kind of transformed version of them.
@@ -76,13 +77,12 @@ class RuntimeTransformer(TransformerInterface, abc.ABC):
         if nb_mandatory_arguments > 1:
             def _transform(_self, data, **keyword_args):
                 return a_callable(data, **keyword_args)
-            instance_object._transform = types.MethodType(_transform, instance_object)
         elif nb_mandatory_arguments == len(parameters):
             def _transform(_self, data, **_keyword_args_):
-                return a_callable(data)
-            instance_object._transform = types.MethodType(_transform, instance_object)
+                return a_callable(data, **_keyword_args_)
         else:
             raise Exception(f"Something went really bad above! Parameters: [{', '.join(str(_) for _ in parameters)}]")
+        instance_object._transform = types.MethodType(_transform, instance_object)
         instance_object._callable = a_callable
         return instance_object
 

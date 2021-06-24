@@ -4,14 +4,6 @@ so\_magic.data.features package
 Submodules
 ----------
 
-so\_magic.data.features.feature\_factory module
------------------------------------------------
-
-.. automodule:: so_magic.data.features.feature_factory
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 so\_magic.data.features.features module
 ---------------------------------------
 

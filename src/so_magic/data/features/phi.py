@@ -4,38 +4,9 @@ at runtime. See the 'PhiFunctionRegistrator' class and its 'register' decorator 
 import logging
 import inspect
 from typing import Callable
-from so_magic.utils import Singleton, ObjectRegistry, Subject
+from so_magic.utils import Subject
 
 logger = logging.getLogger(__name__)
-
-
-class PhiFunctionRegistry(Singleton, ObjectRegistry):
-    """A Singleton dict-like object registry for phi functions.
-
-    Use this class to create a singleton object (instance of this class) that
-    acts as a storage for phi function objects.
-    """
-    def __new__(cls, *args, **kwargs):
-        """Create a new (singleton) instance and initialize an empty registry.
-
-        Returns:
-            PhiFunctionRegistry: the reference to the singleton object (instance)
-        """
-        phi_function_registry = Singleton.__new__(cls, *args, **kwargs)
-        phi_function_registry = ObjectRegistry(getattr(phi_function_registry, 'objects', {}))
-        return phi_function_registry
-
-    @staticmethod
-    def get_instance():
-        """Get the singleton object (instance).
-
-        Returns:
-            PhiFunctionRegistry: the reference to the singleton object (instance)
-        """
-        return PhiFunctionRegistry()
-
-
-phi_registry = PhiFunctionRegistry()
 
 
 class PhiFunctionMetaclass(type):
@@ -74,7 +45,7 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
     # NICE TO HAVE: make the decorator work without parenthesis
     @classmethod
     def register(cls, phi_name=''):
-        """Add a new phi function to phi function registry and notify listeners/observers.
+        r"""Add a new phi function to phi function registry and notify listeners/observers.
 
         Use this decorator around either a callable function (defined with the 'def' python special word) or a class
         with a takes-no-arguments (or all-optional-arguments) constructor and a __call__ magic method.
@@ -89,17 +60,30 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
 
         Example:
 
-            >>> from so_magic.data.features.phi import PhiFunctionRegistry, PhiFunctionRegistrator
+            >>> from so_magic.data.features.phi import PhiFunctionRegistrator
+            >>> from so_magic.utils import Observer, ObjectRegistry
 
-            >>> registered_phis = PhiFunctionRegistry()
+            >>> class PhiFunctionRegistry(Observer):
+            ...  def __init__(self):
+            ...   self.registry = ObjectRegistry()
+            ...  def update(self, subject, *args, **kwargs):
+            ...   self.registry.add(subject.name, subject.state)
+
+            >>> phis = PhiFunctionRegistry()
+
+            >>> PhiFunctionRegistrator.subject.add(phis)
 
             >>> @PhiFunctionRegistrator.register()
             ... def f1(x):
+            ...  '''Multiply by 2.'''
             ...  return x * 2
             Registering input function f1 as phi function, at key f1.
 
+            >>> phis.registry.get('f1').__doc__
+            'Multiply by 2.'
+
             >>> input_value = 5
-            >>> print(f"{input_value} * 2 = {registered_phis.get('f1')(input_value)}")
+            >>> print(f"{input_value} * 2 = {phis.registry.get('f1')(input_value)}")
             5 * 2 = 10
 
             >>> @PhiFunctionRegistrator.register()
@@ -109,7 +93,7 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
             Registering input class f2 instance as phi function, at key f2.
 
             >>> input_value = 1
-            >>> print(f"{input_value} + 5 = {registered_phis.get('f2')(input_value)}")
+            >>> print(f"{input_value} + 5 = {phis.registry.get('f2')(input_value)}")
             1 + 5 = 6
 
             >>> @PhiFunctionRegistrator.register('f3')
@@ -119,7 +103,7 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
             Registering input class MyCustomClass instance as phi function, at key f3.
 
             >>> input_value = 3
-            >>> print(f"{input_value} + 1 = {registered_phis.get('f3')(input_value)}")
+            >>> print(f"{input_value} + 1 = {phis.registry.get('f3')(input_value)}")
             3 + 1 = 4
 
         Args:
@@ -171,7 +155,6 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
             a_callable (Callable): the callable that holds the business logic of the phi function
             key_name (str, optional): custom phi name. Defaults to None, which means automatic determination of the name
         """
-        phi_registry.add(key_name, a_callable)
         cls.subject.name = key_name
         cls.subject.state = a_callable
         cls.subject.notify()
@@ -194,27 +177,7 @@ class PhiFunctionRegistrator(metaclass=PhiFunctionMetaclass):
             return type(a_callable).name
         if hasattr(type(a_callable), '__name__'):
             return type(a_callable).__name__
-        # TODO replace below line with a raise Exception
-        # we want to cause an error when we fail to get a sensible string name
-        return ''
+        raise PhiFunctionNameDeterminationError()
 
 
-if __name__ == '__main__':
-    reg1 = PhiFunctionRegistry()
-    reg2 = PhiFunctionRegistry()
-    reg3 = PhiFunctionRegistry.get_instance()
-
-    assert id(reg1) == id(reg2) == id(reg3)
-
-    @PhiFunctionRegistrator.register
-    def example():
-        """Inherited Docstring"""
-        print('Called example function')
-
-    example()
-
-    print(example.__name__)
-    print('--')
-    print(example.__doc__)
-
-    reg1.get('example')()
+class PhiFunctionNameDeterminationError(Exception): pass

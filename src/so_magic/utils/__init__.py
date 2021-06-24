@@ -6,8 +6,12 @@ from .memoize import ObjectsPool
 from .singleton import Singleton
 from .transformations import Transformer
 from .linear_mapping import MapOnLinearSpace
-from .command_factory_interface import CommandFactoryInterface, CommandFactoryType
+from .command_factory_interface import CommandFactoryInterface
 from .subclass_registry import SubclassRegistry
+
+
+class CommandFactoryType(SubclassRegistry):
+    pass
 
 
 __all__ = ['Command', 'Invoker', 'CommandHistory', 'GenericMediator', 'BaseComponent', 'Observer', 'Subject',

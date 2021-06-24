@@ -56,15 +56,17 @@ class SelfOrganizingMap:
         return getattr(self.som, item)
 
     def get_map_id(self):
-        _ = '_'.join(getattr(self, attribute) for attribute in
-                     ['dataset_name', 'n_rows', 'n_columns', 'initialization', 'map_type', 'grid_type'])
+        _ = '-'.join(str(getattr(self, attribute)) for attribute in
+                     ['dataset_name', 'n_columns', 'n_rows', 'initialization', 'map_type', 'grid_type'])
         if self.som.clusters:
             return f'{_}_cl{self.nb_clusters}'
         return _
 
     @property
     def nb_clusters(self):
-        return np.max(self.som.clusters)
+        if self.som.clusters is not None:
+            return np.max(self.som.clusters) + 1
+        return 0
 
     def neurons_coordinates(self):
         raise NotImplementedError

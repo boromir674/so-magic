@@ -15,7 +15,7 @@ from typing import List
 __all__ = ['Subject', 'Observer']
 
 
-class Observer(ABC):
+class ObserverInterface(ABC):
     """The Observer interface declares the update method, used by subjects.
 
     Enables objects to act as "event" listeners; react to "notifications"
@@ -30,17 +30,16 @@ class Observer(ABC):
 class SubjectInterface(ABC):
     """The Subject interface declares a set of methods for managing subscribers.
 
-    Enables objects to act as "subjects of observations"; notify the
-    subscribed observers/listeners.
+    Enables objects to act as "subjects of observations"; notify the subscribed observers/listeners.
     """
 
     @abstractmethod
-    def attach(self, observer: Observer) -> None:
+    def attach(self, observer: ObserverInterface) -> None:
         """Attach an observer to the subject; subscribe the observer."""
         raise NotImplementedError
 
     @abstractmethod
-    def detach(self, observer: Observer) -> None:
+    def detach(self, observer: ObserverInterface) -> None:
         """Detach an observer from the subject; unsubscribe the observer."""
         raise NotImplementedError
 
@@ -48,6 +47,10 @@ class SubjectInterface(ABC):
     def notify(self) -> None:
         """Notify all observers about an event."""
         raise NotImplementedError
+
+
+class Observer(ObserverInterface, ABC):
+    pass
 
 
 class Subject(SubjectInterface):
@@ -64,11 +67,9 @@ class Subject(SubjectInterface):
     The subscription management methods provided are 'attach' and 'detach'
     to add or remove a subscriber respectively
     """
-    def __new__(cls, *args, **kwargs):
-        subject_object = super().__new__(cls)
-        subject_object._observers: List[Observer] = []
-        subject_object._state = None
-        return subject_object
+    def __init__(self, *args, **kwargs):
+        self._observers: List[Observer] = []
+        self._state = None
 
     def add(self, *observers):
         """Subscribe multiple observers at once."""

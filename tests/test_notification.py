@@ -1,5 +1,6 @@
 import pytest
 
+
 @pytest.fixture
 def subject():
     from so_magic.utils import Subject
@@ -40,10 +41,20 @@ def test_attrs_sanity1():
     assert i2._observers == []
     assert id(i1._observers) != id(i2._observers)
 
+    @attr.s
+    class B:
+        _observers = attr.ib(init=True, default=attr.Factory(list))
+
+    i1 = B()
+    i2 = B()
+    assert id(i1._observers) != id(i2._observers)
+
 
 def test_observers_sanity_test1(subject):
     subject1 = subject([])
     subject2 = subject([])
+    assert hasattr(subject1, '_observers')
+    assert hasattr(subject2, '_observers')
     assert id(subject1._observers) != id(subject2._observers)
 
 

@@ -2,100 +2,120 @@ import inspect
 import types
 import attr
 
-from so_magic.data.backend.engine_specs import EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator
-from .client_code import PDTabularRetrieverDelegate, PDTabularIteratorDelegate, PDTabularMutatorDelegate
-
-
-__all__ = ['PDTabularRetriever', 'PDTabularIterator', 'PDTabularMutator']
+from so_magic.data.magic_datapoints_factory import BroadcastingDatapointsFactory
+from so_magic.data.interfaces import TabularRetriever, TabularIterator, TabularMutator
+from so_magic.data.backend.backend import EngineBackend
+from ..backend_specs import EngineTabularRetriever, EngineTabularIterator, EngineTabularMutator, BackendSpecifications
+from .client_code import BACKEND
 
 
 # INFRASTRUCTURE
 
 def with_self(function):
-    # foo_code = compile(f'def {f_name}({arg_string}): return f({params_str})', "<string>", "exec")
-    # foo_func1 = types.FunctionType(foo_code.co_consts[0], globals(), f_name)
-
     def _function(_self, *args, **kwargs):
         return function(*args, **kwargs)
     return _function
 
 
 class Delegate:
-    def __new__(cls, *args, **kwargs):
-        delegate_ins = super().__new__(cls)
-        tabular_operator = args[0]
+    def __init__(self, tabular_operator):
         for _member_name, member in inspect.getmembers(
                 tabular_operator, predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])):
             if isinstance(member, types.FunctionType):  # if no decorator is used
-                setattr(delegate_ins, member.__name__, types.MethodType(member, delegate_ins))
+                setattr(self, member.__name__, types.MethodType(member, self))
             if isinstance(member, types.MethodType):  # if @classmethod is used
-                setattr(delegate_ins, member.__name__, types.MethodType(with_self(member), delegate_ins))
-        return delegate_ins
+                setattr(self, member.__name__, types.MethodType(with_self(member), self))
 
 
-def validate_delegate(tabular_operator, required_members):
-    for member_name, required_signature in required_members:
-        sig = str(inspect.signature(getattr(tabular_operator, member_name)))
-        if sig != required_signature:
-            raise ValueError(f"Expected signature {required_signature} for {member_name} member of object "
-                             f"{tabular_operator} with type {type(tabular_operator)}. Instead got {sig}.")
-
-
-RETRIEVER_REQUIRED_SIGNATURES = {
-        'column': '(identifier, data)',
-        'row': '(identifier, data)',
-        'nb_columns': '(data)',
-        'nb_rows': '(data)',
-        'get_numerical_attributes': '(data)',
+tabular_operators = {
+    'retriever': {
+        'interface': TabularRetriever,
+        'class_registry': EngineTabularRetriever,
+    },
+    'iterator': {
+        'interface': TabularIterator,
+        'class_registry': EngineTabularIterator,
+    },
+    'mutator': {
+        'interface': TabularMutator,
+        'class_registry': EngineTabularMutator,
     }
+}
 
-
-# CONCRETE IMPLEMENTATIONS
-
-@attr.s
-@EngineTabularRetriever.register_as_subclass('pd')
-class PDTabularRetriever(EngineTabularRetriever):
-    """The observation object is the same as the one your return from 'from_json_lines'"""
-    _delegate = attr.ib(default=attr.Factory(lambda: Delegate(PDTabularRetrieverDelegate)),
-                        # validator=lambda x, y, z: validate_delegate(z, RETRIEVER_REQUIRED_SIGNATURES)
-                        )
-
-    def column(self, identifier, data):
-        return self._delegate.column(identifier, data)
-
-    def row(self, identifier, data):
-        return self._delegate.row(identifier, data)
-
-    def nb_columns(self, data):
-        return self._delegate.nb_columns(data)
-
-    def nb_rows(self, data):
-        return self._delegate.nb_rows(data)
-
-    def get_numerical_attributes(self, data):
-        return self._delegate.get_numerical_attributes(data)
+BUILT_IN_BACKENDS_DATA = [
+    BACKEND,
+]
 
 
 @attr.s
-@EngineTabularIterator.register_as_subclass('pd')
-class PDTabularIterator(EngineTabularIterator):
-    """The observation object is the same as the one your return from 'from_json_lines'"""
-    _delegate = attr.ib(default=attr.Factory(lambda: Delegate(PDTabularIteratorDelegate)))
+class EngineBackends:
+    backend_interfaces = attr.ib()
+    _interface_2_name = attr.ib(init=False, default=attr.Factory(
+        lambda self: {v['interface']: interface_id for interface_id, v in self.backend_interfaces.items()},
+        takes_self=True))
+    implementations = attr.ib(init=False, default=attr.Factory(dict))
+    backends = attr.ib(init=False, default=attr.Factory(dict))
+    # id of the backend that is currently being registered/built
+    __id: str = attr.ib(init=False, default='')
 
-    def columnnames(self, data):
-        return self._delegate.columnnames(data)
+    @staticmethod
+    def from_initial_available(backends):
+        engine_backends = EngineBackends(tabular_operators)
+        engine_backends.add(*list(backends))
+        return engine_backends
 
-    def iterrows(self, data):
-        return self._delegate.iterrows(data)
+    @property
+    def defined_interfaces(self):
+        return self.backend_interfaces.keys()
 
-    def itercolumns(self, data):
-        return self._delegate.itercolumns(data)
+    @property
+    def defined_backend_names(self):
+        return self.implementations.keys()
+
+    def __iter__(self):
+        return iter((backend_name, interfaces_dict) for backend_name, interfaces_dict in self.implementations.items())
+
+    def _get_interface_names(self, backend_id):
+        """Get the names of the interfaces that the backend has found to implement."""
+        return self.implementations[backend_id].keys()
+
+    def add(self, *backend_implementations):
+        for backend_implementation in backend_implementations:
+            self._add(backend_implementation)
+
+    def _add(self, backend_implementation):
+        self.__id = backend_implementation['backend_id']
+        implemented_interfaces = backend_implementation['interfaces']
+        self.implementations[self.__id] =\
+            {self.name(implementation): implementation for implementation in implemented_interfaces}
+        self.register(backend_implementation)
+
+    def name(self, interface_implementation):
+        return self._interface_2_name[inspect.getmro(interface_implementation)[1]]
+
+    def register(self, backend_implementation: dict):
+        for implemented_interface_name in self._get_interface_names(self.__id):
+            self.define_operator(self.__id, implemented_interface_name)
+        # Build
+        backend_specs = BackendSpecifications(self.__id, backend_implementation['backend_name'])
+        backend = EngineBackend.new(self.__id)
+        # init backend attributes
+        backend_specs(backend)
+        backend.datapoints_factory = BroadcastingDatapointsFactory()
+        self.backends[self.__id] = backend
+
+    def define_operator(self, backend_id, operator_type: str):
+        class_registry = self.backend_interfaces[operator_type]['class_registry']
+
+        @attr.s
+        @class_registry.register_as_subclass(backend_id)
+        class _OperatorClass(class_registry):
+            _delegate = attr.ib(
+                default=attr.Factory(lambda: Delegate(self.implementations[backend_id][operator_type])))
+
+            def __getattr__(self, name: str):
+                return getattr(self._delegate, name)
 
 
-@attr.s
-@EngineTabularMutator.register_as_subclass('pd')
-class PDTabularMutator(EngineTabularMutator):
-    _delegate = attr.ib(default=attr.Factory(lambda: Delegate(PDTabularMutatorDelegate)))
-
-    def add_column(self, datapoints, values, new_attribute, **kwargs):
-        self._delegate.add_column(datapoints, values, new_attribute, **kwargs)
+def magic_backends():
+    return EngineBackends.from_initial_available(BUILT_IN_BACKENDS_DATA)

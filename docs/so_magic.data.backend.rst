@@ -36,10 +36,10 @@ so\_magic.data.backend.engine\_command\_factory module
    :undoc-members:
    :show-inheritance:
 
-so\_magic.data.backend.engine\_specs module
--------------------------------------------
+so\_magic.data.backend.backend\_specs module
+--------------------------------------------
 
-.. automodule:: so_magic.data.backend.engine_specs
+.. automodule:: so_magic.data.backend.backend_specs
    :members:
    :undoc-members:
    :show-inheritance:

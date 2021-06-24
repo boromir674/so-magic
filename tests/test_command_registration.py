@@ -1,46 +1,65 @@
+import pytest
 
 
-def test_command_registrator():
-    from so_magic.data.backend.engine import CommandRegistrator
+@pytest.fixture
+def command_registrator():
+    from so_magic.data.backend.backend import CommandRegistrator
+    return CommandRegistrator
 
-    class A(metaclass=CommandRegistrator): pass
-    class B(metaclass=CommandRegistrator): pass
+
+@pytest.fixture
+def modify_registry():
+    def _modify_registry(registry, key, value):
+        registry[key] = value
+    return _modify_registry
+
+
+@pytest.fixture
+def classes(command_registrator):
+    class A(metaclass=command_registrator): pass
+    class B(metaclass=command_registrator): pass
     class C(B): pass
     class D(B): pass
-    classes = (A, B, C, D)
+    classes = type('Classes', (object,), {'A': A, 'B': B, 'C': C, 'D': D,
+                                          '__iter__': lambda self: iter([getattr(self, x) for x in 'ABCD'])})()
+    assert all([type(x) == command_registrator for x in classes])  # sanity check
+    assert all([isinstance(x, command_registrator) for x in classes])  # sanity check
+    return classes
 
+
+@pytest.fixture
+def assert_retrieved():
+    def _assert_retrieved(getter, classes, keys, expected_values):
+        assert all(getter(c, l) == v for c, l, v in zip(classes, keys, expected_values))
+    return _assert_retrieved
+
+
+@pytest.fixture
+def assert_not_in_registry(classes):
+    def _assert_not_in_registry(non_existing_keys, class_names):
+        assert all(k not in getattr(classes, c).registry for k, c in zip(non_existing_keys, class_names))
+    return _assert_not_in_registry
+
+
+def test_command_registrator(assert_different_objects, classes, modify_registry, assert_retrieved, assert_not_in_registry):
     assert all([hasattr(x, 'registry') for x in classes])
-    assert all([type(x) == CommandRegistrator for x in classes])
     assert all([hasattr(x, 'state') for x in classes])
-    assert id(A.registry) != id(B.registry) != id(C.registry) != id(D.registry)
+    assert_different_objects([c.registry for c in classes])
 
-    A.state = 1
-    B.state = 2
-    C.state = 3
-    D.state = 4
-    assert id(A.state) != id(B.state) != id(C.state) != id(D.state)
+    values = [1, 2, 3, 4]
+    [setattr(getattr(classes, c), 'state', v) for v, c in zip(values, 'ABCD')]
+    assert_different_objects([c.state for c in classes])
 
-    A.registry['a'] = 1
-    B.registry['b'] = 2
-    C.registry['c'] = 3
-    D.registry['d'] = 4
-    assert B.registry != A.registry != C.registry != D.registry
+    [modify_registry(getattr(classes, c).registry, c.lower(), v) for v, c in zip(values, 'ABCD')]
+    assert classes.B.registry != classes.A.registry != classes.C.registry != classes.D.registry
 
-    assert A.__getitem__('a') == 1
-    assert B.__getitem__('b') == 2
-    assert C.__getitem__('c') == 3
-    assert D.__getitem__('d') == 4
-    assert 'b' not in C.registry
-    assert 'c' not in B.registry
-    assert 'c' not in D.registry
-    assert 'd' not in C.registry
-    assert A['a'] == 1
-    assert B['b'] == 2
-    assert C['c'] == 3
-    assert D['d'] == 4
+    assert_retrieved(lambda c, l: c.__getitem__(l), classes, keys='abcd', expected_values=values)
+    assert_retrieved(lambda c, l: c[l], classes, keys='abcd', expected_values=values)
+
+    assert_not_in_registry(non_existing_keys='bccd', class_names='CBDC')
 
 
-    class P1(CommandRegistrator): pass
+def test_wrong_command_registrator_usage(command_registrator):
+    class P1(command_registrator): pass
     assert type(P1) == type
-    assert not hasattr(P1, 'state')
     assert not hasattr(P1, 'state')

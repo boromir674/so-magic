@@ -1,40 +1,4 @@
 import pytest
-import inspect
-
-
-@pytest.fixture
-def tabular_operators():
-    from so_magic.data.backend.panda_handling.df_backend import PDTabularRetriever, PDTabularIterator, PDTabularMutator
-    operators = {
-        'retriever': {
-            'class': PDTabularRetriever,
-            'interface': {
-                'column': '(identifier, data)',
-                'row': '(identifier, data)',
-                'nb_columns': '(data)',
-                'nb_rows': '(data)',
-                'get_numerical_attributes': '(data)',
-            }
-        },
-        'iterator': {
-            'class': PDTabularIterator,
-            'interface': {
-                'columnnames': '(data)',
-                'itercolumns': '(data)',
-                'iterrows': '(data)',
-            },
-        },
-        'mutator': {
-            'class': PDTabularMutator,
-            'interface': {
-                'add_column': '(datapoints, values, new_attribute, **kwargs)',
-            },
-        },
-    }
-    return {
-        'operators': operators,
-        'reverse_dict': {operator_dict['class']: key for key, operator_dict in operators.items()},
-    }
 
 
 @pytest.fixture
@@ -42,8 +6,7 @@ def assert_correct_signatures(tabular_operators):
     def _assert_correct_signatures(instance):
         interface_id = tabular_operators['reverse_dict'][type(instance)]
         expected_implemented_methods_names = tabular_operators['operators'][interface_id]['interface'].keys()
-        runtime_members = list(x[0] for x in inspect.getmembers(instance, predicate=lambda x: any([inspect.ismethod(x), inspect.isfunction(x)])))
-        assert all(member in runtime_members and str(inspect.signature(getattr(instance, member))) == tabular_operators['operators'][interface_id]['interface'][member] for member in expected_implemented_methods_names)
+        assert all(callable(getattr(instance, member, None)) for member in expected_implemented_methods_names)
     return _assert_correct_signatures
 
 
@@ -71,3 +34,34 @@ def test_tabular_interfaces2(interface_id, tabular_operators, assert_correct_sig
 
     assert_correct_signatures(operator_instance1)
     assert_correct_delegate_behaviour(operator_instance1, operator_instance2)
+
+
+def test_retriever_implementation(test_datapoints, built_in_backends):
+    built_in_pd_backend = built_in_backends.implementations['pd']
+    first_row = built_in_pd_backend['retriever'].row(0, test_datapoints)
+    assert list(first_row) == list(test_datapoints.observations.iloc[[0]])
+    assert len(list(first_row)) == len(test_datapoints.attributes)
+    assert len(list(first_row)) == test_datapoints.nb_columns
+
+
+# through out the test suite we use the @pytest.mark.xfail decorator to indicate this is expected to fail (since it is a discovered bug).
+# when the bug is solved, simply remove the decorator and now you will have a regression test in place!
+
+@pytest.mark.xfail(reason="There is a bug in the built in pandas retriever.get_numerical_attributes method")
+def test_retriever_get_numerical_attributes(test_datapoints, built_in_backends):
+    built_in_pd_backend = built_in_backends.implementations['pd']
+    numerical_attributes = built_in_pd_backend['retriever'].get_numerical_attributes(test_datapoints)
+    assert set(numerical_attributes) != {}
+
+
+def test_iterator_implementation(test_datapoints, built_in_backends):
+    built_in_pd_backend = built_in_backends.implementations['pd']
+    columns_iterator = built_in_pd_backend['iterator'].itercolumns(test_datapoints)
+    import types
+    assert type(columns_iterator) == types.GeneratorType
+    assert isinstance(columns_iterator, types.GeneratorType)
+    
+
+    # assert list(built_in_pd_backend['retriever'].row('Creative', test_datapoints)) == list(test_datapoints)
+    # assert list(built_in_pd_backend['retriever'].row('Creative', test_datapoints)) == list(test_datapoints)
+    # assert list(built_in_pd_backend['retriever'].row('Creative', test_datapoints)) == list(test_datapoints)
