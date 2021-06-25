@@ -1,9 +1,10 @@
 """Defines the DatapointsManager type (class); a centralized facility where all
 datapoints objects should arrived and be retrieved from."""
 from typing import Iterable, Optional
+import json
 import logging
 import attr
-from so_magic.utils import Observer, Subject
+from so_magic.utils import Observer, Subject, ObjectRegistry, ObjectRegistryError
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,7 @@ class DatapointsManager(Observer):
     Args:
         datapoints_objects (dict, optional): the initial structure that stores datapoints objects
     """
-    datapoints_objects = attr.ib(init=True, default=attr.Factory(dict))
+    datapoints_registry = attr.ib(converter=lambda ddict: ObjectRegistry(ddict), default=attr.Factory(dict))
     _last_key = attr.ib(init=False, default='')
 
     def update(self, subject: Subject):
@@ -38,11 +39,11 @@ class DatapointsManager(Observer):
         datapoints_object = subject.state
         key = getattr(subject, 'name', '')
         if key == '':
-            raise RuntimeError(f'Subject {subject} with state {str(subject.state)} resulted in an empty string as key.'
-                               f'We reject the key, since it is going to "query" a dict/hash).')
-        if key in self.datapoints_objects:
+            raise RuntimeError(f'Subject {subject} with state {str(subject.state)} resulted in an empty string as key. '
+                               'We reject the key, since it is going to "query" a dict/hash.')
+        if key in self.datapoints_registry:
             raise RuntimeError(f"Attempted to register a new Datapoints object at the existing key '{key}'.")
-        self.datapoints_objects[key] = datapoints_object
+        self.datapoints_registry.add(key, datapoints_object)
         self._last_key = key
 
     @property
@@ -62,7 +63,15 @@ class DatapointsManager(Observer):
             Optional[Iterable]: the reference to the datapoints object
         """
         try:
-            return self.datapoints_objects[self._last_key]
-        except KeyError as exception:
-            logger.error("%s . Requested datapoints with id '%s', but was not found in registered [%s]",
-                         exception, self._last_key, {', '.join(_ for _ in self.datapoints_objects.keys())})
+            return self.datapoints_registry.get(self._last_key)
+        except ObjectRegistryError as non_existent_key_error:
+            logger.error('Non existant Datapoints: %s', json.dumps({
+                'last-key-used-to-register-datapoints': self._last_key,
+                'datapoints-registry-keys': f'[{", ".join(self.datapoints_registry.objects.items())}]',
+            }, indent=2))
+            raise NonExistantDatapointsError('Requested non existant Datapoints instance. Probable cause is that this '
+                                             '(self) DatapointsManager instance has not been notified by a '
+                                             'DatapointsFactory') from non_existent_key_error
+
+
+class NonExistantDatapointsError(Exception): pass
