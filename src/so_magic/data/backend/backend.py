@@ -10,19 +10,20 @@ class MyDecorator(type):
     The wrapper function logic should be implemented by the client code.
     """
     @classmethod
-    def magic_decorator(mcs, arg=None):
-        def decorator(_func):
+    def wrapper(cls, func, *args, **kwargs):
+        result = func(*args, **kwargs)
+        return result
+    @classmethod
+    def magic_decorator(cls, arg=None):
+        def decorator(func):
             def wrapper(*a, **ka):
-                ffunc = a[0]
-                mcs._wrapper(ffunc, *a[1:], **ka)
-                return ffunc
+                return cls.wrapper(func, *a, **ka)
             return wrapper
 
         if callable(arg):
-            _ = decorator(arg)
-            return _  # return 'wrapper'
-        _ = decorator
-        return _  # ... or 'decorator'
+            return decorator(arg)  # return 'wrapper'
+        else:
+            return decorator  # ... or 'decorator'
 
 
 class CommandRegistrator(MyDecorator):
