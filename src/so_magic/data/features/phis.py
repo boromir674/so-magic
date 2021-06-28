@@ -35,8 +35,7 @@ class ListOfCategoricalPhi:
             attribute (str): the attribute we wish to target for input to the phi function
         """
         self.attribute_reporter = args[0]
-        print('\nDEBUG - phis - __call__')
-        print(self._ordering)
+        # TODO fix the below
         return iter([self._binary_transformer[x in datapoint] for x in self._ordering]
                     for datapoint in self.datapoints.iterrows())
 

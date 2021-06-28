@@ -9,11 +9,8 @@ from .datapoints import DatapointsFactory
 logger = logging.getLogger(__name__)
 
 
-# TODO refactor to a composition (not inheritance) implementation of the below class
-# reason is that it will be more evident that this class simply combines the
-# features of 2 other classes (Subject & DatapointsFactory) to get the job done
 @attr.s
-class BroadcastingDatapointsFactory(DatapointsFactory):
+class BroadcastingDatapointsFactory:
     """Creates Datapoints objects and informs its subscribers when that happens.
 
     A factory class that informs its subscribers when a new object that
@@ -23,9 +20,9 @@ class BroadcastingDatapointsFactory(DatapointsFactory):
         subject (Subject, optional): the subject of observation; the "thing" that others
                           listen to
     """
-    subject: Subject = attr.ib(init=True, default=attr.Factory(Subject))
+    datapoints_factory = attr.ib(default=attr.Factory(DatapointsFactory))
+    subject: Subject = attr.ib(default=attr.Factory(Subject))
     name: str = attr.ib(init=False, default='')
-    # TODO check if above can be removed, along with self.name = getattr(args[0], 'name', '') in 'create' method
 
     def create(self, datapoints_factory_type: str, *args, **kwargs) -> Iterable:
         """Create new Datapoints and inform subscribers.
@@ -46,7 +43,7 @@ class BroadcastingDatapointsFactory(DatapointsFactory):
         if kwargs:
             msg = f"Kwargs: [{', '.join(f'{k}: {v}' for k, v in kwargs.items())}]"
             raise RuntimeError("The 'create' method of DatapointsFactory does not support kwargs:", msg)
-        self.subject.state = super().create(datapoints_factory_type, *args, **kwargs)
+        self.subject.state = self.datapoints_factory.create(datapoints_factory_type, *args, **kwargs)
         # logger.debug(f"Created datapoints: {json.dumps({
         #     'datapoints': self.subject.state,
         #     'name': self.subject.name,

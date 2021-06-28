@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 import attr
-
+from so_magic.utils import SubclassRegistry
 from .tabular_data_interface import TabularDataInterface
 
 
@@ -41,7 +41,7 @@ class StructuredDataInterface(ABC):
         raise NotImplementedError
 
 
-class DatapointsFactory:
+class DatapointsFactory(metaclass=SubclassRegistry):
     """Factory to construct Datapoints objects.
 
     A class that registers objects (constructors), which can be "called" to return (create) an
@@ -51,24 +51,6 @@ class DatapointsFactory:
     returns an object that implements the DatapointsInterface interface by
     delegating the creation process to one of the registered constructors.
     """
-    constructors = {}
-
-    @classmethod
-    def register_constructor(cls, name: str):
-        """Register, using a unique name, an object as a "runnable" constructor.
-
-        A decorator method that should decorate a callable" The callable should
-        return (create) an object that implements the DatapointsInterface
-        interface.
-
-        Args:
-            name (str): the name under which to register the "constructor"
-        """
-        def wrapper(subclass):
-            cls.constructors[name] = subclass
-            return subclass
-        return wrapper
-
     @classmethod
     def create(cls, name, *args, **kwargs) -> Iterable:
         """Create a Datapoints instance by using a registered "constructor".
@@ -83,32 +65,21 @@ class DatapointsFactory:
         Returns:
             Iterable: instance implementing the DatapointsInterface
         """
-        if name not in cls.constructors:
-            # TODO change to KeyError, because it better indicates the cause of the error
-            # In our case a string/key not found in the registry causes the error
-            raise KeyError(
-                f"Request Engine of type '{name}'; supported are [{', '.join(sorted(cls.constructors.keys()))}]")
         try:
-            return cls.constructors[name](*args, **kwargs)
+            return cls.subclasses[name](*args, **kwargs)
+        except ValueError as value_error:
+            raise Value_error
         except Exception as exception:
-            raise DatapointsCreationError({
-                'exception': exception,
-                'name': name,
-                'args': args,
-                'kwargs': kwargs,
-            }) from exception
+            raise DatapointsCreationError(f"Exception type {type(exception)}. Datapoints creation failed for constructor {name}: "
+            f"{cls.subclasses.get(name)}. Args: [{', '.join(f'{i}: {str(_)}' for i, _ in enumerate(args))}]\nKwargs: "
+            f"[{', '.join(f'{k}: {v}' for k, v in kwargs.items())}]") from exception
 
 
-class DatapointsCreationError(Exception):
-    def __init__(self, msg):
-        super().__init__(
-            f"Exception {str(msg['exception'])}. Datapoints creation failed for constructor {msg['name']}: "
-            f"{msg['constructor']}. Args: [{', '.join(f'{i}: {str(_)}' for i, _ in enumerate(msg['args']))}]\nKwargs: "
-            f"[{', '.join(f'{k}: {v}' for k, v in msg['kwargs'].items())}]")
+class DatapointsCreationError(Exception): pass
 
 
 @attr.s
-@DatapointsFactory.register_constructor('structured-data')
+@DatapointsFactory.register_as_subclass('structured-data')
 class StructuredData(DatapointsInterface, StructuredDataInterface):
     """Structured data. There are specific attributes/variables per observation.
 
@@ -149,7 +120,7 @@ class AbstractTabularData(StructuredData, TabularDataInterface, ABC):
 
 
 @attr.s
-@DatapointsFactory.register_constructor('tabular-data')
+@DatapointsFactory.register_as_subclass('tabular-data')
 class TabularData(AbstractTabularData):
     """Table-like datapoints that are loaded in memory"""
     retriever = attr.ib(init=True)
