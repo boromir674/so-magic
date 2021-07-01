@@ -1,35 +1,14 @@
-import os
+from glob import glob
 import pytest
 
 
-my_dir = os.path.dirname(os.path.realpath(__file__))
-
-####### Files and folders
-@pytest.fixture
-def tests_root_dir():
-    return my_dir
-
-@pytest.fixture
-def tests_data_root(tests_root_dir):
-    return os.path.join(tests_root_dir, 'dts')
-
-# Test data
-@pytest.fixture
-def sample_json(tests_data_root):
-    return os.path.join(tests_data_root, 'sample-data.jsonlines')
-
-@pytest.fixture
-def sample_collaped_json(tests_data_root):
-    return os.path.join(tests_data_root, 'sample-data-collapsed.jsonlines')
+def file_path_to_module_path(string: str) -> str:
+    return string.replace("/", ".").replace("\\", ".").replace(".py", "")
 
 
-@pytest.fixture()
-def test_json_data(sample_json):
-    return {
-        'file_path': sample_json,
-        'nb_lines': 100,
-        'attributes': {'flavors', 'name', 'medical', 'description', 'image_urls', 'parents', 'negatives', 'grow_info', '_id', 'type', 'image_paths', 'effects'},
-    }
+pytest_plugins = [
+    file_path_to_module_path(fixture) for fixture in glob("tests/fixtures/*.py") if "__" not in fixture
+]
 
 
 @pytest.fixture

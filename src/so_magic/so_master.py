@@ -11,7 +11,7 @@ class SoMaster:
                                                             takes_self=True))
     _last_path = attr.ib(init=False, default='')
 
-    _datasets = attr.ib(init=False, default={})
+    _datasets = attr.ib(init=False, default=attr.Factory(dict))
 
     def load_data(self, file_path):
         cmd = self._data_manager.command.observations_command

@@ -10,6 +10,7 @@ def assert_selected_variables_are(somagic):
 
 @pytest.fixture
 def assert_column_values(test_dataset):
+    """Assert that the set of some tabular data column's values is equal to the given set."""
     import pandas as pd
 
     def _assert_column_values_are(attribute, expected_values):
@@ -20,7 +21,7 @@ def assert_column_values(test_dataset):
 
 @pytest.fixture
 def assert_correct_nominal_variable_encoding(test_dataset):
-    """Test a column with each row having a string representing one of the possible values of an Attrbiute.
+    """Test a column with each row having a string representing one of the possible values of an Attribute.
 
     Useful when an Attribute corresponds to a discreet Variable of type Nominal (ordering does not matter) and its
     observation (row) can have only one of the possible values.

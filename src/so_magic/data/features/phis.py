@@ -15,8 +15,8 @@ def _values_set(list_to_nominal):
 class ListOfCategoricalPhi:
     datapoints = attr.ib()
     attribute_reporter = attr.ib(init=False, default=None)
-    _set = attr.ib(init=False, default=set())
-    _ordering = attr.ib(init=False, default=list())
+    _set = attr.ib(init=False, default=attr.Factory(set))
+    _ordering = attr.ib(init=False, default=attr.Factory(list))
     _binary_transformer = attr.ib(init=False, default={True: 1, False: 0})
 
     @property

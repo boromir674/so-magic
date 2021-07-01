@@ -39,7 +39,7 @@ def test_tabular_interfaces2(interface_id, tabular_operators, assert_correct_sig
 def test_retriever_implementation(test_datapoints, built_in_backends):
     built_in_pd_backend = built_in_backends.implementations['pd']
     first_row = built_in_pd_backend['retriever'].row(0, test_datapoints)
-    assert list(first_row) == list(test_datapoints.observations.iloc[[0]])
+    assert list(first_row) == list(test_datapoints.observations.iloc[0])
     assert len(list(first_row)) == len(test_datapoints.attributes)
     assert len(list(first_row)) == test_datapoints.nb_columns
 

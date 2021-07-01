@@ -13,17 +13,13 @@ def eliminate_nan_n_None_command(somagic, test_datapoints):
         assert majority_type == list
 
         def check(x, target_type):
-            if type(x) == target_type:
-                return x
             try:
-                if isnull(x):
-                    return majority_type()
-            except ValueError as e:
+                if isnull(x):  # True for both np.nan and None
+                    return target_type()
+            except ValueError:
                 pass
             return x
-
         datapoints.observations[attribute] = datapoints.observations[attribute].map(lambda a: check(a, majority_type))
-        # datapoints.add_column(frame, attribute)
         assert all([type(x) == majority_type for x in datapoints.column(attribute)])
 
     somagic.commands_decorators.data_manager_command()(_eliminate_nan_n_None_command)
@@ -32,7 +28,7 @@ def eliminate_nan_n_None_command(somagic, test_datapoints):
 
 def test_encoding_list_nominal(somagic, test_datapoints,
                                eliminate_nan_n_None_command,
-                               test_json_data):
+                               ):
     dt_manager = somagic._data_manager
     assert len(dt_manager.engine.datapoints_manager.datapoints_registry.objects) == 1
 
