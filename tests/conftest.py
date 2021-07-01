@@ -62,6 +62,19 @@ def test_dataset(somagic, read_observations, sample_collaped_json):
     UNIQUE_FLAVORS = reduce(lambda i, j: set(i).union(set(j)),
                             [_ for _ in somagic._data_manager.datapoints.observations['flavors'] if _ is not None])
 
+    # cmd = somagic._data_manager.command.encode_command
+    # cmd.args = [somagic._data_manager.datapoints, 'type']
+    # cmd.execute()
+    #
+    # cmd = somagic._data_manager.command.replace_empty_command
+    # cmd.args = [somagic._data_manager.datapoints, 'flavors', []]
+    # cmd.execute()
+    #
+    # cmd = somagic._data_manager.command.encode_command
+    # cmd.args = [somagic._data_manager.datapoints, 'flavors']
+    # cmd.execute()
+
+
     cmd = somagic._data_manager.command.select_variables_command
     # current limitations:
     # 1. client code has to know the number of distict values for the nominal variable 'type'
