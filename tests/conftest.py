@@ -57,23 +57,49 @@ def test_dataset(somagic, read_observations, sample_collaped_json):
     read_observations(somagic, sample_collaped_json)
 
     type_values = ['hybrid', 'indica', 'sativa']
-    ATTRS2 = [f'type_{x}' for x in type_values]
+    expected_feature_names = [f'type_{x}' for x in type_values]
     from functools import reduce
     UNIQUE_FLAVORS = reduce(lambda i, j: set(i).union(set(j)),
                             [_ for _ in somagic._data_manager.datapoints.observations['flavors'] if _ is not None])
+    
+    variables = type('Variables', (object,), {
+        'type': type('Variable', (object,), {
+            'type': 'nominal',
+            'data_type': str,
+            '__str__': lambda self: 'type',
+            }
+        )(),
+        'flavors': type('Variable', (object,), {
+            'type': 'nominal',
+            'data_type': list,
+            '__str__': lambda self: 'flavors',
+            }
+        )(),
+    })
 
-    # cmd = somagic._data_manager.command.encode_command
-    # cmd.args = [somagic._data_manager.datapoints, 'type']
-    # cmd.execute()
-    #
-    # cmd = somagic._data_manager.command.replace_empty_command
-    # cmd.args = [somagic._data_manager.datapoints, 'flavors', []]
-    # cmd.execute()
-    #
-    # cmd = somagic._data_manager.command.encode_command
-    # cmd.args = [somagic._data_manager.datapoints, 'flavors']
-    # cmd.execute()
+    assert len(somagic._data_manager.datapoints) == 100
+    assert all(x not in somagic._data_manager.datapoints.attributes for x in expected_feature_names)
 
+    cmd = somagic._data_manager.command.encode_command
+    cmd.args = [variables.type]
+    cmd.execute()
+
+    runtime_feature_names = list(somagic._data_manager.datapoints.attributes)[-len(expected_feature_names):]
+    assert runtime_feature_names == expected_feature_names
+
+    cmd = somagic._data_manager.command.replace_empty_command
+    cmd.args = [variables.flavors]
+    cmd.execute()
+
+    assert set([type(x) for x in somagic._data_manager.datapoints.observations['flavors']]) == {list}
+
+    nb_columns_before = len(somagic._data_manager.datapoints.observations.columns)
+
+    cmd = somagic._data_manager.command.encode_command
+    cmd.args = [variables.flavors]
+    cmd.execute()
+
+    assert nb_columns_before + len(UNIQUE_FLAVORS) == len(somagic._data_manager.datapoints.observations.columns)
 
     cmd = somagic._data_manager.command.select_variables_command
     # current limitations:
@@ -83,30 +109,16 @@ def test_dataset(somagic, read_observations, sample_collaped_json):
         # current limitations:
         # 1. client code has to know the number of distict values for the nominal variable 'type'
         # 2. client code has to provide the column names that will result after encoding the 'type' variable
-        {'variable': 'type', 'columns': ATTRS2},
+        {'variable': 'type', 'columns': runtime_feature_names},
         # current limitations:
         # 1. client code has to know the number of distict values for the nominal variable 'flavors'
         # 2. client code has to provide the column names that will result after encoding the 'flavors' variable
         {'variable': 'flavors', 'columns': list(UNIQUE_FLAVORS)}]]
     cmd.execute()
 
-    cmd = somagic._data_manager.command.one_hot_encoding_command
-    cmd.args = [somagic._data_manager.datapoints, 'type']
-    cmd.execute()
-
-    assert set([type(x) for x in somagic._data_manager.datapoints.observations['flavors']]) == {list, type(None)}
-
-    nb_columns_before = len(somagic._data_manager.datapoints.observations.columns)
-
-    cmd = somagic._data_manager.command.one_hot_encoding_list_command
-    cmd.args = [somagic._data_manager.datapoints, 'flavors']
-    cmd.execute()
-
-    assert nb_columns_before + len(UNIQUE_FLAVORS) == len(somagic._data_manager.datapoints.observations.columns)
-
     import numpy as np
     setattr(somagic.dataset, 'feature_vectors',
-            np.array(somagic._data_manager.datapoints.observations[ATTRS2 + list(UNIQUE_FLAVORS)]))
+            np.array(somagic._data_manager.datapoints.observations[runtime_feature_names + ['flavors_' + x for x in UNIQUE_FLAVORS]]))
 
     MAX_FLAVORS_PER_DAATPOINT = max(
         [len(x) for x in [_ for _ in somagic._data_manager.datapoints.observations['flavors'] if type(_) is list]])
@@ -145,6 +157,7 @@ def tabular_operators(built_in_backends):
             'class': built_in_backends.backend_interfaces['mutator']['class_registry'].subclasses['pd'],
             'interface': {
                 'add_column': '(datapoints, values, new_attribute, **kwargs)',
+                'add_columns': '(datapoints, values, column_names, **kwargs)',
             },
         },
     }

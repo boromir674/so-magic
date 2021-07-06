@@ -47,6 +47,10 @@ def client_pandas_tabular_implementation():
         def add_column(cls, datapoints, values, new_attribute, **kwargs):
             return inspect.currentframe().f_code.co_name
 
+        @classmethod
+        def add_columns(cls, datapoints, values, column_names, **kwargs):
+            return inspect.currentframe().f_code.co_name
+
     BACKEND = {
         'backend_id': 'test-pd',
         'backend_name': 'test-pandas',

@@ -37,8 +37,9 @@ def assert_correct_nominal_variable_encoding(test_dataset):
 
 def test_sanity_checks_on_dataset(test_dataset, assert_selected_variables_are, assert_column_values,
                                   assert_correct_nominal_variable_encoding):
-    ATTRS2 = [f'type_{x}' for x in test_dataset[1]]
-
+    expected_feature_columns = [f'type_{x}' for x in test_dataset[1]]
+    flavors_feature_column_names = ['flavors_' + x for x in test_dataset[2]]
+    print('expected_feature_columns:', expected_feature_columns)
     datapoints = test_dataset[0].datapoints
     assert_selected_variables_are({'type', 'flavors'})
 
@@ -46,17 +47,16 @@ def test_sanity_checks_on_dataset(test_dataset, assert_selected_variables_are, a
 
     assert_column_values('type', expected_values=test_dataset[1])
 
-    assert_correct_nominal_variable_encoding(ATTRS2)
+    from collections import Counter
+    for index, datarow in test_dataset[0].datapoints.observations[expected_feature_columns].iterrows():
+        assert Counter([datarow[_] for _ in expected_feature_columns]) == Counter({0: len(expected_feature_columns) - 1, 1: 1})
 
-    # the below is expected because test_dataset invokes the 'one_hot_encoding_list_command' command which unfortunately
-    # at the moment has a side effect on the attribute it operates on.
-    # side effect: _data_manager.datapoints.observations[_attribute].fillna(value=np.nan, inplace=True)
-    assert set([type(x) for x in datapoints.observations['flavors']]) == {list, float}
+    assert set([type(x) for x in datapoints.observations['flavors']]) == {list}
 
     assert len(test_dataset[2]) > 5
 
-    assert all(x in datapoints.observations.columns for x in test_dataset[2])
-    assert all(0 <= sum([datarow[_] for _ in test_dataset[2]]) <= test_dataset[3]
-               for index, datarow in datapoints.observations[list(test_dataset[2])].iterrows())
+    assert all(x in datapoints.observations.columns for x in flavors_feature_column_names)
+    assert all(0 <= sum([datarow[_] for _ in flavors_feature_column_names]) <= test_dataset[3]
+               for index, datarow in datapoints.observations[flavors_feature_column_names].iterrows())
 
     assert hasattr(test_dataset[0], 'feature_vectors')

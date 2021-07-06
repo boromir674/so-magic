@@ -4,7 +4,7 @@ from .features import FeatureManager
 from .command_factories import DataManagerCommandFactory
 
 from .built_in_commands import encode_nominal_subsets_command
-from .built_in_data_manager_commands import select_variables_command
+from .built_in_data_manager_commands import select_variables_command, encode_command, replace_empty_command
 from .pd_commands import data_manager_commands, arbitrary_commands
 
 
@@ -25,7 +25,10 @@ def init_data_manager(engine):
 
     # Build backend-agnostic, built-in engine commands
     my_data_manager.engine.backend.dec()(encode_nominal_subsets_command)
+
     mega_cmd_factory.build_command_prototype()(select_variables_command)
+    mega_cmd_factory.build_command_prototype()(encode_command)
+    mega_cmd_factory.build_command_prototype()(replace_empty_command)
 
     # Build backend-dependent (eg dependent on pandas) client engine commands
     for arbitrary_cmd in arbitrary_commands:

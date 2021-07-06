@@ -63,7 +63,7 @@ class OneHotListEncoder(NominalAttributeEncoder):
 
 # CMD 3
 def one_hot_encoding_list_command(_data_manager, _datapoints, _attribute):
-    _data_manager.datapoints.observations[_attribute].fillna(value=np.nan, inplace=True)
+    # _data_manager.datapoints.observations[_attribute].fillna(value=np.nan, inplace=True)
     dataframe = OneHotListEncoder().encode(_datapoints, _attribute)
     _data_manager.datapoints.observations = pd.concat([_data_manager.datapoints.observations, dataframe], axis=1)
 

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Dict
 import inspect
 import attr
 import pandas as pd
@@ -106,22 +107,58 @@ class BinnerFactory:
 
 
 class AlgorithmInterface(ABC):
+    """The Algorithm interface provides implementing classes with the 'run' method that executes some business logic.
+
+    Inherit from this interface if you want to use the 'Strategy Pattern' in your classes.
+    """
     @abstractmethod
     def run(self, *args, **kwargs):
+        """Run the algorithm, given any arguments and keyword arguments.
+
+        Executes the strategy/logic.
+        """
         raise NotImplementedError
 
 
 @attr.s
 class AlgorithmArguments:
-    """An algorithms expected positional arguments."""
-    arg_types = attr.ib()
-    default_values = attr.ib()
+    """An algorithm's expected positional arguments.
+    
+    Instances of this class represent the (positional) arguments that an algorithm requires as input
+    to operate.
+
+    Take the example of a sorting algorithm. A sorting algorithm operates on an array (or list),
+    so one might add a list to an AlgorithmArguments' instance.
+    On the other hand whether the algorithm sorts in descending or ascending order could be an optional algorithm parameter
+    and thus not be included in the AlgorithmArguments' instance.
+
+    Args:
+        arg_types (tuple): zero or more types of the required arguments by an algorithm to operate
+        default_values (tuple): zero or more values to use as default, for the right-most arguments that the client did not supply at runtime
+    Returns:
+        Iterable: the rows of the (data) table
+    """
+    arg_types: tuple = attr.ib()
+    default_values: tuple = attr.ib()
     _required_args = attr.ib(init=False, default=attr.Factory(lambda self: len(self.arg_types), takes_self=True))
 
     def values(self, *args):
+        """Get list of arguments, given the provided values.
+
+        In case of missing arguments, the default values are added.
+
+        Raises:
+            AlgorithmArgumentsError: [description]
+
+        Returns:
+            list: the list of argument values
+        """
         if len(args) > len(self._required_args):
-            raise AlgorithmArgumentsError(f'Given more than the supported naumber of arguments. '
+            raise AlgorithmArgumentsError(f'Given more than the supported number of arguments. '
                                           f'{len(args)} > {len(self._required_args)}')
+        if len(args) + len(self.default_values) < len(self._required_args):
+            raise AlgorithmArgumentsError(f'Given insufficient number of arguments. '
+                                          f'given={len(args)}, default={len(self.default_values)}, required={self._required_args}')
         missing = len(self._required_args) - len(args)
         computed_args_list = list(args) + self.default_values[-missing:]
         if not all(isinstance(arg_value, self.arg_types[i]) for i, arg_value in computed_args_list):
@@ -131,9 +168,16 @@ class AlgorithmArguments:
 
 @attr.s
 class AbstractAlgorithm(AlgorithmInterface, ABC):
+    """Uses a callback, arguments and optional parameters to run the algorithm.
+
+    Args:
+        callback (callable): the algorithm's business logic
+        arguments (list): the algorithm's required arguments to operate on
+        parameters (dict): the algorithm's optional parameters
+    """
     callback: callable = attr.ib()
     arguments: list = attr.ib(default=attr.Factory(list))
-    parameters: dict = attr.ib(default=attr.Factory(dict))
+    parameters: Dict[str, object] = attr.ib(default=attr.Factory(dict))
     default_parameter_values = attr.ib(init=False, default=attr.Factory(
         lambda self: {k: v['value'] for k, v in self.parameters.items()}, takes_self=True))
     _args = attr.ib(init=False, default=attr.Factory(list))
@@ -141,11 +185,23 @@ class AbstractAlgorithm(AlgorithmInterface, ABC):
 
 @attr.s
 class MagicAlgorithm(AbstractAlgorithm):
+    """Algorithm that stores its output in the 'output' property."""
     _signature = attr.ib(init=False,
                          default=attr.Factory(lambda self: inspect.signature(self.callback), takes_self=True))
     _output = attr.ib(init=False, default=attr.Factory(dict))
 
     def run(self, *args, **kwargs):
+        """Run the algorithm, using the given (required) arguments and optional parameters.
+
+        Use the args to pass required arguments and the kwargs to pass optional parameters.
+
+        Raises:
+            MagicAlgorithmError: [description]
+            MagicAlgorithmError: [description]
+
+        Returns:
+            [type]: [description]
+        """
         if not len(args) == len(self.arguments):
             raise MagicAlgorithmError(
                 f'Number of runtime positional arguments do not match the expected number of positional argumnets. '
@@ -218,6 +274,22 @@ class Discretizer(BaseDiscretizer):
     def from_algorithm(cls, alg):
         binner = BaseBinner(alg)
         return Discretizer(binner)
+
+# import typing
+
+# PNT = typing.TypeVar('PNT', str)
+
+# KT = typing.TypeVar('KT')
+# VT = typing.Type[KT]
+
+# class ParameterGeneric(typing.Generic[KT]):
+#     def __getitem__(self, key: KT) -> typing.Type[KT]:
+#         raise NotImplementedError
+
+
+# class ParameterDataDict(typing.Generic[KT]):
+#     def __getitem__(self, key: PNT) -> ParameterGeneric[KT]:
+#         raise NotImplementedError
 
 
 class BinningAlgorithm(metaclass=SubclassRegistry):

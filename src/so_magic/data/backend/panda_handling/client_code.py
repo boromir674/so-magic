@@ -1,3 +1,4 @@
+import pandas as pd
 from so_magic.data.interfaces import TabularRetriever, TabularIterator, TabularMutator
 
 __all__ = ['BACKEND']
@@ -50,6 +51,11 @@ class PDTabularMutatorDelegate(TabularMutator):
     @classmethod
     def add_column(cls, datapoints, values, new_attribute, **kwargs):
         datapoints.observations[new_attribute] = values
+
+    @classmethod
+    def add_columns(cls, datapoints, values, column_names, **kwargs):
+        datapoints.observations = pd.concat([datapoints.observations, pd.DataFrame(data=values, columns=column_names)],
+                                            axis=1)
 
 
 BACKEND = {

@@ -151,3 +151,12 @@ class TabularMutator(ABC):
             NotImplementedError: [description]
         """
         raise NotImplementedError
+
+    @abstractmethod
+    def add_columns(self, *args, **kwargs):
+        """Add multiple new columns to table-like data.
+
+        Raises:
+            NotImplementedError: [description]
+        """
+        raise NotImplementedError

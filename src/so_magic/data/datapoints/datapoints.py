@@ -173,3 +173,6 @@ class TabularData(AbstractTabularData):
 
     def add_column(self, values, column_name, **kwargs):
         self.mutator.add_column(self, values, column_name, **kwargs)
+
+    def add_columns(self, values, column_names, **kwargs):
+        self.mutator.add_column(self, values, column_names, **kwargs)
